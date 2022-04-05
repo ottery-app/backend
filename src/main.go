@@ -1,20 +1,21 @@
 package main
 
-import "github.com/gin-gonic/gin"
-import "net/http"
+import (
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+)
 
 func main() {
-	// Creates a gin router with default middleware:
-	// logger and recovery (crash-free) middleware
+	//allow the server to accept requests from any origin
 	router := gin.Default()
+	router.Use(cors.Default())
 
-	router.GET("/user/:name", func(c *gin.Context) {
-		name := c.Param("name")
-		c.String(http.StatusOK, "Hello %s", name)
+	router.POST("/login", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"user:": "lewibs",
+			"token": "123456",
+		})
 	})
 
-	// By default it serves on :8080 unless a
-	// PORT environment variable was defined.
 	router.Run()
-	// router.Run(":3000") for a hard coded port
 }
