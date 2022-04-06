@@ -10,11 +10,43 @@ func main() {
 	router := gin.Default()
 	router.Use(cors.Default())
 
-	router.POST("/login", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"user:": "lewibs",
-			"token": "123456",
-		})
+	router.POST("/user/load", func(c *gin.Context) {
+		load := struct {
+			Token string `json:"token"`
+		}{}
+
+		c.BindJSON(&load)
+
+		creds := struct {
+			Token string `json:"token"`
+			State string `json:"state"`
+		}{
+			Token: load.Token,
+			State: "guardian",
+		}
+
+		c.IndentedJSON(200, creds)
+	})
+
+	router.POST("/user/login", func(c *gin.Context) {
+		login := struct {
+			Username string `json:"username"`
+			Password string `json:"password"`
+		}{}
+
+		c.BindJSON(&login)
+
+		creds := struct {
+			Username string `json:"username"`
+			Token    string `json:"token"`
+			State    string `json:"state"`
+		}{
+			Username: login.Username,
+			Token:    login.Password,
+			State:    "guardian",
+		}
+
+		c.IndentedJSON(200, creds)
 	})
 
 	router.Run()
