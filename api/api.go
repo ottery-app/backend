@@ -2,12 +2,14 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	mon "github.com/ottery-app/backend/mongo"
 )
 
 func Api() {
-	router := gin.Default()
+	mon := mon.Go()
 
-	router = Auth(router)
+	router := gin.Default()
+	router = Auth(router, mon)
 	router = Guardian(router)
 
 	router.Run()
