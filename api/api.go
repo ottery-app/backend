@@ -7,6 +7,7 @@ import (
 
 func Api() {
 	mon := mon.Go()
+	defer mon.Disconnect()
 
 	router := gin.Default()
 	router = Auth(router, mon)

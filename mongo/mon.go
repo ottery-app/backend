@@ -2,17 +2,18 @@ package mon
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"math/rand"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Mon struct {
 	GoRegister func(string, string, string, string) string
+	Disconnect func()
 }
 
 /**
@@ -22,18 +23,31 @@ type Mon struct {
  */
 func Go() (mon Mon) {
 	//this is the client that connects to mongo
-	//client := connect()
-	//^^^^^^^^^^^^^^^^^^
+	client, ctx, disconect := connect()
+	mon.Disconnect = disconect
+
+	//gets the database aspects
+	database := client.Database("ottery")
+	users := database.Collection("users")
+
 	mon.GoRegister = func(email string, name string, address string, password string) string {
 		code := randomString()
-		fmt.Println(email + name + address + password + code) //add to server
+		//add the user to the database with the key attached
+		users.InsertOne(ctx, bson.M{
+			"email":    email,
+			"name":     name,
+			"address":  address,
+			"password": password,
+			"code":     code,
+		})
+
 		return code
 	}
 
 	return mon
 }
 
-func connect() *mongo.Client {
+func connect() (client *mongo.Client, ctx context.Context, disconect func()) {
 	const dbLink = "mongodb+srv://web-app:FktpDZRgrNbwwZw4@cluster0.jzohf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
 
 	client, err := mongo.NewClient(options.Client().ApplyURI(dbLink))
@@ -42,15 +56,20 @@ func connect() *mongo.Client {
 		log.Fatal(err)
 	}
 
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, _ = context.WithTimeout(context.Background(), 10*time.Second)
 	err = client.Connect(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	defer client.Disconnect(ctx)
+	disconect = func() {
+		err = client.Disconnect(ctx)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 
-	return client
+	return client, ctx, disconect
 }
 
 func randomString() string {
