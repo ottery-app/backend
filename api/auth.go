@@ -1,12 +1,12 @@
 package api
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ottery-app/backend/mailer"
 	mon "github.com/ottery-app/backend/mongo"
+	"github.com/ottery-app/backend/security"
 )
 
 func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
@@ -47,14 +47,13 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 
 		c.Bind(&content)
 
-		code := mon.GoRegister(content.Email, content.Name, content.Address, content.Password)
+		hashedPw, _ := security.HashPassword(content.Password)
+
+		code := mon.GoRegister(content.Email, content.Name, content.Address, hashedPw)
 
 		go func(email string, code string) {
 			time.Sleep(10 * time.Minute)
-			fmt.Println("remove " + email)
-			//get the user from the database
-			//check to see if the user has the code
-			//if they do then remove the user from the database
+			mon.GoRemove(email)
 		}(content.Email, code)
 
 		mailer.Send(content.Email, "Activate your account", "Your activation code is "+code)

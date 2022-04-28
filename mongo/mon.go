@@ -3,8 +3,10 @@ package mon
 import (
 	"context"
 	"log"
-	"math/rand"
-	"time"
+	"strings"
+
+	//import security package
+	"github.com/ottery-app/backend/security"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -13,6 +15,7 @@ import (
 
 type Mon struct {
 	GoRegister func(string, string, string, string) string
+	GoRemove   func(string)
 	Disconnect func()
 }
 
@@ -31,17 +34,29 @@ func Go() (mon Mon) {
 	users := database.Collection("users")
 
 	mon.GoRegister = func(email string, name string, address string, password string) string {
-		code := randomString()
+		code := security.RandomString()
 		//add the user to the database with the key attached
 		users.InsertOne(ctx, bson.M{
-			"email":    email,
+			"_id":      strings.ToLower(email),
 			"name":     name,
 			"address":  address,
 			"password": password,
 			"code":     code,
 		})
 
+		//return the code and the error
 		return code
+	}
+
+	mon.GoRemove = func(email string) {
+		users.DeleteOne(ctx, bson.M{"_id": strings.ToLower(email)})
+	}
+
+	mon.GoActivate = func(email string, code string) bool {
+		//check to see if the code given matches the user's code in the database
+		//if it does then remove the code from the user's database
+		//if it doesnt then return an error
+
 	}
 
 	return mon
@@ -56,7 +71,8 @@ func connect() (client *mongo.Client, ctx context.Context, disconect func()) {
 		log.Fatal(err)
 	}
 
-	ctx, _ = context.WithTimeout(context.Background(), 10*time.Second)
+	ctx = context.Background()
+
 	err = client.Connect(ctx)
 	if err != nil {
 		log.Fatal(err)
@@ -70,16 +86,4 @@ func connect() (client *mongo.Client, ctx context.Context, disconect func()) {
 	}
 
 	return client, ctx, disconect
-}
-
-func randomString() string {
-	rand.Seed(time.Now().Unix())
-	b := make([]byte, 5)
-	charset := "randomsturgillnoises01234567890123456789"
-
-	for i := range b {
-		b[i] = charset[rand.Intn(len(charset))]
-	}
-
-	return string(b)
 }
