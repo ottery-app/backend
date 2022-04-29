@@ -12,6 +12,5 @@ func Api() {
 	router := gin.Default()
 	router = Auth(router, mon)
 	router = Guardian(router)
-
 	router.Run()
 }

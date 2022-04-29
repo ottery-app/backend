@@ -3,7 +3,6 @@ package mon
 import (
 	"context"
 	"log"
-	"reflect"
 	"strings"
 
 	//import security package
@@ -22,7 +21,8 @@ type Mon struct {
 	GoRemoveUser      func(string) error
 	GoActivateUser    func(string, string) (string, error)
 	GoGetUser         func(string) (usertypes.User, error)
-	GoUpdateUser      func(string, usertypes.User) error
+	GoUpdateUserField func(string, string, interface{}) error
+	GoRemoveUserField func(string, string) error
 	GoLinkTokenToUser func(string, string) error
 }
 
@@ -41,6 +41,22 @@ func Go() (mon Mon) {
 	users := database.Collection("users")
 	tokens := database.Collection("tokens")
 
+	//This is a helper function so that code does not need to be written twice
+	updateOne := func(id string, field string, updateType string, val interface{}) error {
+		_, err := users.UpdateOne(
+			ctx,
+			bson.D{
+				{"_id", id},
+			},
+			bson.D{
+				{updateType, bson.D{
+					{field, val},
+				}},
+			},
+		)
+		return err
+	}
+
 	mon.GoRegisterUser = func(email string, name string, address string, password string) (code string, err error) {
 		code = security.RandomString()
 		//add the user to the database with the key attached
@@ -49,7 +65,7 @@ func Go() (mon Mon) {
 			"name":           name,
 			"address":        address,
 			"password":       password,
-			"ActivationCode": code,
+			"activationCode": code,
 		})
 
 		return code, err
@@ -60,12 +76,11 @@ func Go() (mon Mon) {
 		return err
 	}
 
-	mon.GoActivateUser = func(email string, ActivationCode string) (token string, err error) {
+	mon.GoActivateUser = func(email string, activationCode string) (token string, err error) {
 		user, err := mon.GoGetUser(email)
 
-		if user.ActivationCode == ActivationCode {
-			user.ActivationCode = ""
-			err = mon.GoUpdateUser("ActivationCode", user)
+		if user.ActivationCode == activationCode {
+			err = mon.GoRemoveUserField(user.Id, "activationCode")
 			token = security.GenerateSecureToken()
 			err = mon.GoLinkTokenToUser(email, token)
 		}
@@ -75,14 +90,18 @@ func Go() (mon Mon) {
 
 	mon.GoGetUser = func(email string) (user usertypes.User, err error) {
 		err = users.FindOne(ctx, bson.M{"_id": strings.ToLower(email)}).Decode(&user)
+		user.Id = email //this is required because the id isnt stored using decode and we need the id attached
 		return user, err
 	}
 
-	mon.GoUpdateUser = func(field string, user usertypes.User) error {
-		r := reflect.ValueOf(user)
-		val := reflect.Indirect(r).FieldByName(field)
+	//this limits everything to strings... v bad not good...
+	mon.GoUpdateUserField = func(id string, field string, val interface{}) error {
+		err := updateOne(id, field, "$set", val)
+		return err
+	}
 
-		_, err := users.UpdateOne(ctx, bson.M{"_id": strings.ToLower(user.Email)}, bson.M{"$set": bson.M{field: val}})
+	mon.GoRemoveUserField = func(id string, field string) error {
+		err := updateOne(id, field, "$unset", "")
 		return err
 	}
 

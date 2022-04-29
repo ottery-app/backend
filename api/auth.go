@@ -29,6 +29,13 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 			err = fmt.Errorf("invalid password or username")
 		}
 
+		if err != nil {
+			c.JSON(401, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
 		//TODO: add the token to a collection of tokens with emails attached
 		err = mon.GoLinkTokenToUser(login.Email, token)
 
