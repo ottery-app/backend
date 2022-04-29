@@ -3,10 +3,12 @@ package mon
 import (
 	"context"
 	"log"
+	"reflect"
 	"strings"
 
 	//import security package
 	"github.com/ottery-app/backend/security"
+	"github.com/ottery-app/backend/usertypes"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -14,9 +16,14 @@ import (
 )
 
 type Mon struct {
-	GoRegister func(string, string, string, string) string
-	GoRemove   func(string)
 	Disconnect func()
+
+	GoRegisterUser    func(string, string, string, string) (string, error)
+	GoRemoveUser      func(string) error
+	GoActivateUser    func(string, string) (string, error)
+	GoGetUser         func(string) (usertypes.User, error)
+	GoUpdateUser      func(string, usertypes.User) error
+	GoLinkTokenToUser func(string, string) error
 }
 
 /**
@@ -32,31 +39,56 @@ func Go() (mon Mon) {
 	//gets the database aspects
 	database := client.Database("ottery")
 	users := database.Collection("users")
+	tokens := database.Collection("tokens")
 
-	mon.GoRegister = func(email string, name string, address string, password string) string {
-		code := security.RandomString()
+	mon.GoRegisterUser = func(email string, name string, address string, password string) (code string, err error) {
+		code = security.RandomString()
 		//add the user to the database with the key attached
-		users.InsertOne(ctx, bson.M{
-			"_id":      strings.ToLower(email),
-			"name":     name,
-			"address":  address,
-			"password": password,
-			"code":     code,
+		_, err = users.InsertOne(ctx, bson.M{
+			"_id":            strings.ToLower(email),
+			"name":           name,
+			"address":        address,
+			"password":       password,
+			"ActivationCode": code,
 		})
 
-		//return the code and the error
-		return code
+		return code, err
 	}
 
-	mon.GoRemove = func(email string) {
-		users.DeleteOne(ctx, bson.M{"_id": strings.ToLower(email)})
+	mon.GoRemoveUser = func(email string) error {
+		_, err := users.DeleteOne(ctx, bson.M{"_id": strings.ToLower(email)})
+		return err
 	}
 
-	mon.GoActivate = func(email string, code string) bool {
-		//check to see if the code given matches the user's code in the database
-		//if it does then remove the code from the user's database
-		//if it doesnt then return an error
+	mon.GoActivateUser = func(email string, ActivationCode string) (token string, err error) {
+		user, err := mon.GoGetUser(email)
 
+		if user.ActivationCode == ActivationCode {
+			user.ActivationCode = ""
+			err = mon.GoUpdateUser("ActivationCode", user)
+			token = security.GenerateSecureToken()
+			err = mon.GoLinkTokenToUser(email, token)
+		}
+
+		return token, err
+	}
+
+	mon.GoGetUser = func(email string) (user usertypes.User, err error) {
+		err = users.FindOne(ctx, bson.M{"_id": strings.ToLower(email)}).Decode(&user)
+		return user, err
+	}
+
+	mon.GoUpdateUser = func(field string, user usertypes.User) error {
+		r := reflect.ValueOf(user)
+		val := reflect.Indirect(r).FieldByName(field)
+
+		_, err := users.UpdateOne(ctx, bson.M{"_id": strings.ToLower(user.Email)}, bson.M{"$set": bson.M{field: val}})
+		return err
+	}
+
+	mon.GoLinkTokenToUser = func(email string, token string) error {
+		_, err := tokens.InsertOne(ctx, bson.M{"_id": token, "user_id": strings.ToLower(email)})
+		return err
 	}
 
 	return mon

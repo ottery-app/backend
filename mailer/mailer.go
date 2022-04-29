@@ -1,7 +1,6 @@
 package mailer
 
 import (
-	"fmt"
 	"net/smtp"
 )
 
@@ -15,8 +14,6 @@ func Send(recipient string, subject string, body string) {
 	port := "587"
 	address := host + ":" + port
 
-	fmt.Println(subject)
-	fmt.Println(body)
 	message := []byte("Subject: " + subject + "\n" + body)
 
 	auth := smtp.PlainAuth("", from, password, host)

@@ -9,8 +9,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func GenerateSecureToken(length int) string {
-	b := make([]byte, length)
+func GenerateSecureToken() string {
+	b := make([]byte, 42)
 	if _, err := rand.Read(b); err != nil {
 		return ""
 	}
