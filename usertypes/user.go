@@ -5,6 +5,5 @@ type User struct {
 	Password       string `json:"password"`
 	Name           string `json:"name"`
 	Address        string `json:"address"`
-	ActivationCode string `json:"code"`
-	State          string `json:"state"`
+	ActivationCode string `json:"activationCode"`
 }
