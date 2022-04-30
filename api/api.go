@@ -23,5 +23,5 @@ func Api() {
 	router = Auth(router, mon)
 	router = Guardian(router)
 
-	router.Run()
+	router.Run(":8080")
 }
