@@ -119,7 +119,7 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 			return
 		}
 
-		mailer.Send(content.Email, "Activate your account", "Your activation code is "+code)
+		mailer.SendActivation(content.Email, code)
 
 		//if the user is not registered after a certain amount of time remove them from the database
 		go func(email string, code string) {
