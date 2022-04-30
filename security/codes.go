@@ -29,8 +29,8 @@ func CheckPasswordHash(password, hash string) bool {
 
 func RandomString() string {
 	random.Seed(time.Now().Unix())
-	b := make([]byte, 5)
-	charset := "randomsturgillnoises01234567890123456789"
+	b := make([]byte, 6)
+	charset := "ABCDEFGHJKMNPQRSTUVWXYZ23456789"
 
 	for i := range b {
 		b[i] = charset[random.Intn(len(charset))]

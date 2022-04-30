@@ -19,14 +19,10 @@ type Mon struct {
 
 	GoRegisterUser    func(string, string, string, string) (string, error)
 	GoRemoveUser      func(string) error
-	GoActivateUser    func(string, string) (string, error)
+	GoActivateUser    func(string, string) error
 	GoGetUser         func(string) (usertypes.User, error)
 	GoUpdateUserField func(string, string, interface{}) error
 	GoRemoveUserField func(string, string) error
-	GoLoadUser        func(string) (string, error)
-
-	GoLinkTokenToUser       func(string, string) error
-	GoRemoveTokenToUserLink func(string) error
 }
 
 /**
@@ -42,7 +38,6 @@ func Go() (mon Mon) {
 	//gets the database aspects
 	database := client.Database("ottery")
 	users := database.Collection("users")
-	tokens := database.Collection("tokens")
 
 	//This is a helper function so that code does not need to be written twice
 	updateOne := func(database *mongo.Collection, id string, field string, updateType string, val interface{}) error {
@@ -68,10 +63,13 @@ func Go() (mon Mon) {
 		}
 	*/
 
-	removeAll := func(database *mongo.Collection, field string, val interface{}) (err error) {
-		_, err = database.DeleteMany(ctx, bson.M{field: val})
-		return err
-	}
+	//this is a helper function so that code does not need to be written twice
+	/*
+		removeAll := func(database *mongo.Collection, field string, val interface{}) (err error) {
+			_, err = database.DeleteMany(ctx, bson.M{field: val})
+			return err
+		}
+	*/
 
 	mon.GoRegisterUser = func(email string, name string, address string, password string) (code string, err error) {
 		code = security.RandomString()
@@ -82,7 +80,6 @@ func Go() (mon Mon) {
 			"address":        address,
 			"password":       password,
 			"activationCode": code,
-			"state":          "guardian", //this is the default state
 		})
 
 		return code, err
@@ -93,29 +90,27 @@ func Go() (mon Mon) {
 		return err
 	}
 
-	mon.GoActivateUser = func(email string, activationCode string) (token string, err error) {
+	mon.GoActivateUser = func(email string, activationCode string) (err error) {
 		user, err := mon.GoGetUser(email)
 
 		if err != nil {
-			return "", err
+			return err
 		}
 
 		if user.ActivationCode == activationCode {
 			err = mon.GoRemoveUserField(user.Id, "activationCode")
 
 			if err != nil {
-				return "", err
+				return err
 			}
-
-			token = security.GenerateSecureToken()
 		}
 
-		return token, err
+		return err
 	}
 
-	mon.GoGetUser = func(email string) (user usertypes.User, err error) {
-		err = users.FindOne(ctx, bson.M{"_id": strings.ToLower(email)}).Decode(&user)
-		user.Id = email //this is required because the id isnt stored using decode and we need the id attached
+	mon.GoGetUser = func(id string) (user usertypes.User, err error) {
+		err = users.FindOne(ctx, bson.M{"_id": strings.ToLower(id)}).Decode(&user)
+		user.Id = id //this is required because the id isnt stored using decode and we need the id attached
 		return user, err
 	}
 
@@ -127,32 +122,6 @@ func Go() (mon Mon) {
 	mon.GoRemoveUserField = func(id string, field string) error {
 		err := updateOne(users, id, field, "$unset", "")
 		return err
-	}
-
-	mon.GoLinkTokenToUser = func(token string, email string) error {
-		_, err := tokens.InsertOne(ctx, bson.M{"_id": token, "user_id": strings.ToLower(email)})
-		return err
-	}
-
-	mon.GoRemoveTokenToUserLink = func(email string) (err error) {
-		err = removeAll(tokens, "user_id", strings.ToLower(email))
-		return err
-	}
-
-	mon.GoLoadUser = func(token string) (state string, err error) {
-		doc := struct {
-			Email string `bson:"user_id"`
-		}{}
-
-		err = tokens.FindOne(ctx, bson.M{"_id": token}).Decode(&doc)
-
-		if err != nil {
-			return state, err
-		}
-
-		user, err := mon.GoGetUser(doc.Email)
-
-		return user.State, err
 	}
 
 	return mon
