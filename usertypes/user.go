@@ -6,4 +6,5 @@ type User struct {
 	Name           string `json:"name"`
 	Address        string `json:"address"`
 	ActivationCode string `json:"code"`
+	State          string `json:"state"`
 }

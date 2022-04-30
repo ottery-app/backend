@@ -36,8 +36,19 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 			return
 		}
 
-		//TODO: add the token to a collection of tokens with emails attached
-		err = mon.GoLinkTokenToUser(login.Email, token)
+		//get the first occurance of the email in the tokens collection
+		//if it exists, remove it
+		err = mon.GoRemoveTokenToUserLink(login.Email)
+
+		if err != nil {
+			c.JSON(401, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		//replace the token with the new one
+		err = mon.GoLinkTokenToUser(token, login.Email)
 
 		if err != nil {
 			c.JSON(401, gin.H{
@@ -54,7 +65,7 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 	router.POST("auth/activate", func(c *gin.Context) {
 		activate := struct {
 			Email          string `json:"email"`
-			ActivationCode string `json:"ActivationCode"`
+			ActivationCode string `json:"activationCode"`
 		}{}
 
 		c.Bind(&activate)
@@ -68,6 +79,16 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 			return
 		}
 
+		err = mon.GoLinkTokenToUser(token, activate.Email)
+
+		if err != nil {
+			c.JSON(401, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		fmt.Println("new user activated " + activate.Email + " lets gooooooo!")
 		c.JSON(200, gin.H{
 			"token": token,
 		})
@@ -105,9 +126,34 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 			time.Sleep(10 * time.Minute)
 			user, _ := mon.GoGetUser(email)
 			if user.ActivationCode == code {
-				mon.GoRemoveUser(email)
+				if mon.GoRemoveUser(email) != nil {
+					fmt.Println("could not remove user: " + email)
+				} else {
+					fmt.Println("removed user: " + email)
+				}
 			}
 		}(content.Email, code)
+	})
+
+	router.POST("auth/load", func(c *gin.Context) {
+		res := struct {
+			Token string `json:"token"`
+		}{}
+
+		c.Bind(&res)
+
+		state, err := mon.GoLoadUser(res.Token)
+
+		if err != nil {
+			c.JSON(401, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		c.JSON(200, gin.H{
+			"state": state,
+		})
 	})
 
 	return router
