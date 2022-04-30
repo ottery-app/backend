@@ -22,5 +22,6 @@ func Api() {
 
 	router = Auth(router, mon)
 	router = Guardian(router)
+
 	router.Run()
 }
