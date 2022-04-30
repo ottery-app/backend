@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -23,29 +24,23 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		c.Bind(&login)
 
 		storeduser, err := mon.GoGetUser(login.Email)
+		HandleError(c, http.StatusUnauthorized, err)
 
 		if security.CheckPasswordHash(login.Password, storeduser.Password) {
 			token = security.GenerateSecureToken()
-		} else {
-			err = fmt.Errorf("invalid password or username")
-		}
 
-		if err != nil {
-			c.JSON(401, gin.H{
-				"error": err.Error(),
+			//adds the user to the session as the default guardian state
+			sesh.GetSesh().Add(token, sesh.User{
+				Id:    storeduser.Id,
+				State: "guardian",
 			})
-			return
-		}
 
-		//adds the user to the session as the default guardian state
-		sesh.GetSesh()[token] = sesh.User{
-			Id:    storeduser.Id,
-			State: "guardian",
+			HandleSuccess(c, http.StatusOK, gin.H{
+				"token": token,
+			})
+		} else {
+			HandleError(c, http.StatusUnauthorized, fmt.Errorf("username or password is incorrect"))
 		}
-
-		c.JSON(200, gin.H{
-			"token": token,
-		})
 	})
 
 	router.PUT("auth/activate", func(c *gin.Context) {
@@ -57,23 +52,16 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		c.Bind(&activate)
 
 		err := mon.GoActivateUser(activate.Email, activate.ActivationCode)
+		HandleError(c, http.StatusUnauthorized, err)
 
-		if err != nil {
-			c.JSON(401, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		//generate a token and add it to the session
 		token := security.GenerateSecureToken()
 
-		sesh.GetSesh()[token] = sesh.User{
+		sesh.GetSesh().Add(token, sesh.User{
 			Id:    activate.Email,
 			State: "guardian",
-		}
+		})
 
-		c.JSON(200, gin.H{
+		HandleSuccess(c, http.StatusOK, gin.H{
 			"token": token,
 		})
 	})
@@ -89,19 +77,11 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		c.Bind(&content)
 
 		hashedPw, err := security.HashPassword(content.Password)
+		HandleError(c, http.StatusExpectationFailed, err)
 
-		if err != nil {
-			panic(err)
-		}
-
-		code, err := mon.GoRegisterUser(content.Email, content.Name, content.Address, hashedPw)
-
-		if err != nil {
-			c.JSON(500, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
+		var code string
+		code, err = mon.GoRegisterUser(content.Email, content.Name, content.Address, hashedPw)
+		HandleError(c, http.StatusBadRequest, err)
 
 		mailer.SendActivation(content.Email, code)
 
@@ -129,15 +109,11 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		code := security.RandomString()
 
 		err := mon.GoUpdateUserField(head.Email, "activationCode", code)
+		HandleError(c, http.StatusExpectationFailed, err)
 
-		if err != nil {
-			c.JSON(500, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		mailer.SendActivation(head.Email, code)
+		err = mailer.SendActivation(head.Email, code)
+		HandleError(c, http.StatusExpectationFailed, err)
+		//add the delayed user removal?
 	})
 
 	router.POST("auth/load", func(c *gin.Context) {
@@ -148,13 +124,11 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		c.Bind(&res)
 
 		if sesh, ok := sesh.GetSesh()[res.Token]; ok {
-			c.JSON(200, gin.H{
+			HandleSuccess(c, http.StatusOK, gin.H{
 				"state": sesh.State,
 			})
 		} else {
-			c.JSON(401, gin.H{
-				"error": "invalid token",
-			})
+			HandleError(c, http.StatusUnauthorized, fmt.Errorf("invalid token"))
 		}
 	})
 
