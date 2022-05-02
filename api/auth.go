@@ -32,11 +32,12 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 			//adds the user to the session as the default guardian state
 			sesh.GetSesh().Add(token, sesh.User{
 				Id:    storeduser.Id,
-				State: "guardian",
+				State: sesh.DefaultState,
 			})
 
 			HandleSuccess(c, http.StatusOK, gin.H{
 				"token": token,
+				"state": sesh.DefaultState,
 			})
 		} else {
 			HandleError(c, http.StatusUnauthorized, fmt.Errorf("username or password is incorrect"))

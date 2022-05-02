@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+const DefaultState = "guardian"
+
 var once sync.Once
 
 type User struct {
