@@ -20,7 +20,6 @@ func Client(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		user := sesh.GetSesh()[body.Token]
 
 		userInfo, err := mon.GoGetUser(user.Id)
-
 		HandleError(c, http.StatusUnauthorized, err)
 
 		HandleSuccess(c, http.StatusOK, gin.H{
