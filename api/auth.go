@@ -19,6 +19,7 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 			Email    string `json:"email"`
 			Password string `json:"password"`
 		}{}
+
 		var token string
 
 		c.Bind(&login)
