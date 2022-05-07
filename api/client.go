@@ -10,14 +10,10 @@ import (
 
 func Client(router *gin.Engine, mon mon.Mon) *gin.Engine {
 
-	router.POST("client/info", func(c *gin.Context) {
-		body := struct {
-			Token string `json:"token"`
-		}{}
-
-		c.Bind(&body)
-
-		user := sesh.GetSesh()[body.Token]
+	router.GET("client/info", func(c *gin.Context) {
+		//get the Authorization header
+		token := c.GetHeader("Authorization")
+		user := sesh.GetSesh()[token]
 
 		userInfo, err := mon.GoGetUser(user.Id)
 		HandleError(c, http.StatusUnauthorized, err)
