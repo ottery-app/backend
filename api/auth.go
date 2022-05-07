@@ -122,14 +122,9 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		//add the delayed user removal?
 	})
 
-	router.POST("auth/load", func(c *gin.Context) {
-		res := struct {
-			Token string `json:"token"`
-		}{}
-
-		c.Bind(&res)
-
-		if sesh, ok := sesh.GetSesh()[res.Token]; ok {
+	router.GET("auth/load", func(c *gin.Context) {
+		token := c.GetHeader("Authorization")
+		if sesh, ok := sesh.GetSesh()[token]; ok {
 			HandleSuccess(c, http.StatusOK, gin.H{
 				"state": sesh.State,
 			})
@@ -138,14 +133,9 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		}
 	})
 
-	router.POST("auth/logout", func(c *gin.Context) {
-		body := struct {
-			Token string `json:"token"`
-		}{}
-
-		c.Bind(&body)
-
-		sesh.GetSesh().Delete(body.Token)
+	router.DELETE("auth/logout", func(c *gin.Context) {
+		token := c.GetHeader("Authorization")
+		sesh.GetSesh().Delete(token)
 	})
 
 	return router

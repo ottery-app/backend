@@ -7,7 +7,7 @@ import (
 
 	//import security package
 	"github.com/ottery-app/backend/security"
-	"github.com/ottery-app/backend/usertypes"
+	"github.com/ottery-app/backend/types"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -20,7 +20,7 @@ type Mon struct {
 	GoRegisterUser    func(string, string, string, string, string, string, string, string) (string, error)
 	GoRemoveUser      func(string) error
 	GoActivateUser    func(string, string) error
-	GoGetUser         func(string) (usertypes.User, error)
+	GoGetUser         func(string) (types.User, error)
 	GoUpdateUserField func(string, string, interface{}) error
 	GoRemoveUserField func(string, string) error
 }
@@ -112,7 +112,7 @@ func Go() (mon Mon) {
 		return err
 	}
 
-	mon.GoGetUser = func(id string) (user usertypes.User, err error) {
+	mon.GoGetUser = func(id string) (user types.User, err error) {
 		err = users.FindOne(ctx, bson.M{"_id": strings.ToLower(id)}).Decode(&user)
 		user.Id = id //this is required because the id isnt stored using decode and we need the id attached
 		return user, err

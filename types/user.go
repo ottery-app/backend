@@ -1,4 +1,4 @@
-package usertypes
+package types
 
 type User struct {
 	Id             string `json:"_id"` //this is the email
