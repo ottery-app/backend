@@ -25,6 +25,7 @@ func Client(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		HandleSuccess(c, http.StatusOK, gin.H{
 			"name":    userInfo.Name,
 			"address": userInfo.Address,
+			"email":   user.Id,
 		})
 	})
 
