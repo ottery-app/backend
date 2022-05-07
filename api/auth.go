@@ -70,10 +70,14 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 
 	router.POST("auth/register", func(c *gin.Context) {
 		content := struct {
-			Email    string `json:"email"`
-			Password string `json:"password"`
-			Name     string `json:"name"`
-			Address  string `json:"address"`
+			Email     string `json:"email"`
+			Password  string `json:"password"`
+			FirstName string `json:"firstName"`
+			LastName  string `json:"lastName"`
+			Address   string `json:"address"`
+			City      string `json:"city"`
+			State     string `json:"state"`
+			Zip       string `json:"zip"`
 		}{}
 
 		c.Bind(&content)
@@ -82,7 +86,7 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		HandleError(c, http.StatusExpectationFailed, err)
 
 		var code string
-		code, err = mon.GoRegisterUser(content.Email, content.Name, content.Address, hashedPw)
+		code, err = mon.GoRegisterUser(content.Email, content.FirstName, content.LastName, content.Address, content.City, content.State, content.Zip, hashedPw)
 		HandleError(c, http.StatusBadRequest, err)
 
 		mailer.SendActivation(content.Email, code)
