@@ -17,7 +17,7 @@ import (
 type Mon struct {
 	Disconnect func()
 
-	GoRegisterUser    func(string, string, string, string) (string, error)
+	GoRegisterUser    func(string, string, string, string, string, string, string, string) (string, error)
 	GoRemoveUser      func(string) error
 	GoActivateUser    func(string, string) error
 	GoGetUser         func(string) (usertypes.User, error)
@@ -71,13 +71,17 @@ func Go() (mon Mon) {
 		}
 	*/
 
-	mon.GoRegisterUser = func(email string, name string, address string, password string) (code string, err error) {
+	mon.GoRegisterUser = func(email string, firstName string, lastName string, address string, city string, state string, zip string, password string) (code string, err error) {
 		code = security.RandomString()
 		//add the user to the database with the key attached
 		_, err = users.InsertOne(ctx, bson.M{
 			"_id":            strings.ToLower(email),
-			"name":           name,
+			"firstName":      firstName,
+			"lastName":       lastName,
 			"address":        address,
+			"city":           city,
+			"state":          state,
+			"zip":            zip,
 			"password":       password,
 			"activationCode": code,
 		})
