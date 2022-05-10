@@ -22,7 +22,7 @@ func Api() {
 
 	router = Auth(router, mon)
 	router = Client(router, mon)
-	router = Guardian(router)
+	router = Guardian(router, mon)
 
 	router.Run(":8080")
 }

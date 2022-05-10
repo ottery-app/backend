@@ -4,6 +4,8 @@ go 1.18
 
 require go.mongodb.org/mongo-driver v1.9.0
 
+require github.com/google/uuid v1.3.0 // indirect
+
 require (
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-contrib/sse v0.1.0 // indirect

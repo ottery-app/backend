@@ -10,6 +10,7 @@ import (
 	"github.com/ottery-app/backend/types"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -23,6 +24,10 @@ type Mon struct {
 	GoGetUser         func(string) (types.User, error)
 	GoUpdateUserField func(string, string, interface{}) error
 	GoRemoveUserField func(string, string) error
+	GoAppendUserField func(string, string, interface{}) error
+
+	GoNewKid func(string, string, string, string, []string, []string) (string, error)
+	GoGetKid func(string) (types.Kid, error)
 }
 
 /**
@@ -38,6 +43,7 @@ func Go() (mon Mon) {
 	//gets the database aspects
 	database := client.Database("ottery")
 	users := database.Collection("users")
+	kids := database.Collection("kids")
 
 	//This is a helper function so that code does not need to be written twice
 	updateOne := func(database *mongo.Collection, id string, field string, updateType string, val interface{}) error {
@@ -123,9 +129,37 @@ func Go() (mon Mon) {
 		return err
 	}
 
+	mon.GoAppendUserField = func(id string, field string, val interface{}) error {
+		err := updateOne(users, id, field, "$push", val)
+		return err
+	}
+
 	mon.GoRemoveUserField = func(id string, field string) error {
 		err := updateOne(users, id, field, "$unset", "")
 		return err
+	}
+
+	mon.GoNewKid = func(firstName string, middleName string, lastName string, birthday string, primaryGuardians []string, authorizedGuardians []string) (id string, err error) {
+		res, err := kids.InsertOne(ctx, bson.M{
+			"firstName":           firstName,
+			"middleName":          middleName,
+			"lastName":            lastName,
+			"birthday":            birthday,
+			"primaryGuardians":    primaryGuardians,
+			"authorizedGuardians": authorizedGuardians,
+		})
+
+		//get the id of the kid
+		id = res.InsertedID.(primitive.ObjectID).Hex()
+
+		return id, err
+	}
+
+	mon.GoGetKid = func(id string) (kid types.Kid, err error) {
+		var oid primitive.ObjectID
+		oid, err = primitive.ObjectIDFromHex(id)
+		err = kids.FindOne(ctx, bson.M{"_id": oid}).Decode(&kid)
+		return kid, err
 	}
 
 	return mon
