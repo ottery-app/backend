@@ -10,6 +10,7 @@ type Kid struct {
 
 	//we can just assume location is on the parent's info
 
+	Owner               string   `json:"owner"`
 	PrimaryGuardians    []string `json:"PrimaryGuardians"`
 	AuthorizedGuardians []string `json:"AuthorizedGuardians"`
 }
