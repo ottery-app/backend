@@ -26,7 +26,7 @@ type Mon struct {
 	GoRemoveUserField func(string, string) error
 	GoAppendUserField func(string, string, interface{}) error
 
-	GoNewKid func(string, string, string, string, []string, []string) (string, error)
+	GoNewKid func(string, string, string, string, string, []string, []string) (string, error)
 	GoGetKid func(string) (types.Kid, error)
 }
 
@@ -139,12 +139,13 @@ func Go() (mon Mon) {
 		return err
 	}
 
-	mon.GoNewKid = func(firstName string, middleName string, lastName string, birthday string, primaryGuardians []string, authorizedGuardians []string) (id string, err error) {
+	mon.GoNewKid = func(firstName string, middleName string, lastName string, birthday string, owner string, primaryGuardians []string, authorizedGuardians []string) (id string, err error) {
 		res, err := kids.InsertOne(ctx, bson.M{
 			"firstName":           firstName,
 			"middleName":          middleName,
 			"lastName":            lastName,
 			"birthday":            birthday,
+			"owner":               owner,
 			"primaryGuardians":    primaryGuardians,
 			"authorizedGuardians": authorizedGuardians,
 		})

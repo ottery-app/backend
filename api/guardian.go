@@ -30,10 +30,11 @@ func Guardian(router *gin.Engine, mon mon.Mon) *gin.Engine {
 			return
 		}
 
+		kid.Owner = id
 		kid.PrimaryGuardians = append(kid.PrimaryGuardians, id)
 		kid.AuthorizedGuardians = append(kid.AuthorizedGuardians, id)
 
-		childId, err := mon.GoNewKid(kid.FirstName, kid.MiddleName, kid.LastName, kid.Birthday, kid.PrimaryGuardians, kid.AuthorizedGuardians)
+		childId, err := mon.GoNewKid(kid.FirstName, kid.MiddleName, kid.LastName, kid.Birthday, kid.Owner, kid.PrimaryGuardians, kid.AuthorizedGuardians)
 		kid.Id = childId
 		HandleError(c, http.StatusUnauthorized, err)
 
