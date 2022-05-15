@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -9,6 +10,21 @@ import (
 )
 
 func Client(router *gin.Engine, mon mon.Mon) *gin.Engine {
+
+	router.GET("client/search/user", func(c *gin.Context) {
+		//get the search param from the request url
+		search := c.Query("search")
+
+		res, err := mon.GoSearchUser(search)
+
+		fmt.Print(search)
+		fmt.Println(res)
+		fmt.Println(err)
+
+		HandleSuccess(c, http.StatusOK, gin.H{
+			"user": "user",
+		})
+	})
 
 	router.GET("client/info", func(c *gin.Context) {
 		//get the Authorization header
