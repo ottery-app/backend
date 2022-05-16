@@ -141,13 +141,25 @@ func Go() (mon Mon) {
 	}
 
 	mon.GoSearchUser = func(search string) (results []types.User, err error) {
-		//find the user with the search string using the mongodm search syntax
-		cur, err := users.Find(ctx, bson.M{"$text": bson.M{"$search": search}})
+		query := bson.M{
+			"$text": bson.M{
+				"$search": search,
+			},
+		}
+
+		cur, err := users.Find(ctx, query)
+		cur.All(ctx, &results)
+
+		//for each result call the MakeSafe method to remove personal information
+		for i := 0; i < len(results); i++ {
+			results[i].MakeSafe()
+		}
+
 		if err != nil {
 			return nil, err
 		}
 		//format cur to go into the results
-		err = cur.All(ctx, &results)
+
 		if err != nil {
 			return nil, err
 		}

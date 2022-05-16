@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -17,12 +16,13 @@ func Client(router *gin.Engine, mon mon.Mon) *gin.Engine {
 
 		res, err := mon.GoSearchUser(search)
 
-		fmt.Print(search)
-		fmt.Println(res)
-		fmt.Println(err)
+		if err != nil {
+			HandleError(c, http.StatusExpectationFailed, err)
+			return
+		}
 
 		HandleSuccess(c, http.StatusOK, gin.H{
-			"user": "user",
+			"users": res,
 		})
 	})
 
