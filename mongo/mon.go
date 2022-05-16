@@ -25,6 +25,7 @@ type Mon struct {
 	GoUpdateUserField func(string, string, interface{}) error
 	GoRemoveUserField func(string, string) error
 	GoAppendUserField func(string, string, interface{}) error
+	GoSearchUser      func(string) ([]types.User, error)
 
 	GoNewKid func(string, string, string, string, string, []string, []string) (string, error)
 	GoGetKid func(string) (types.Kid, error)
@@ -137,6 +138,33 @@ func Go() (mon Mon) {
 	mon.GoRemoveUserField = func(id string, field string) error {
 		err := updateOne(users, id, field, "$unset", "")
 		return err
+	}
+
+	mon.GoSearchUser = func(search string) (results []types.User, err error) {
+		query := bson.M{
+			"$text": bson.M{
+				"$search": search,
+			},
+		}
+
+		cur, err := users.Find(ctx, query)
+		cur.All(ctx, &results)
+
+		//for each result call the MakeSafe method to remove personal information
+		for i := 0; i < len(results); i++ {
+			results[i].MakeSafe()
+		}
+
+		if err != nil {
+			return nil, err
+		}
+		//format cur to go into the results
+
+		if err != nil {
+			return nil, err
+		}
+
+		return results, nil
 	}
 
 	mon.GoNewKid = func(firstName string, middleName string, lastName string, birthday string, owner string, primaryGuardians []string, authorizedGuardians []string) (id string, err error) {

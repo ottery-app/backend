@@ -10,6 +10,22 @@ import (
 
 func Client(router *gin.Engine, mon mon.Mon) *gin.Engine {
 
+	router.GET("client/search/user", func(c *gin.Context) {
+		//get the search param from the request url
+		search := c.Query("search")
+
+		res, err := mon.GoSearchUser(search)
+
+		if err != nil {
+			HandleError(c, http.StatusExpectationFailed, err)
+			return
+		}
+
+		HandleSuccess(c, http.StatusOK, gin.H{
+			"users": res,
+		})
+	})
+
 	router.GET("client/info", func(c *gin.Context) {
 		//get the Authorization header
 		token := c.GetHeader("Authorization")
