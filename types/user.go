@@ -11,6 +11,7 @@ type User struct {
 	Zip            string   `json:"zip"`
 	ActivationCode string   `json:"activationCode"`
 	Kids           []string `json:"kids"`
+	Vehicles       []string `json:"vehicles"`
 }
 
 // method that is used to make the user safe
@@ -22,4 +23,5 @@ func (u *User) MakeSafe() {
 	u.City = ""
 	u.State = ""
 	u.Zip = ""
+	u.Vehicles = nil
 }
