@@ -83,6 +83,7 @@ func Go() (mon Mon) {
 		//add the user to the database with the key attached
 		_, err = users.InsertOne(ctx, bson.M{
 			"_id":            strings.ToLower(email),
+			"email":          strings.ToLower(email),
 			"firstName":      firstName,
 			"lastName":       lastName,
 			"address":        address,
@@ -109,7 +110,7 @@ func Go() (mon Mon) {
 		}
 
 		if user.ActivationCode == activationCode {
-			err = mon.GoRemoveUserField(user.Id, "activationCode")
+			err = mon.GoRemoveUserField(user.Email, "activationCode")
 
 			if err != nil {
 				return err
@@ -121,7 +122,6 @@ func Go() (mon Mon) {
 
 	mon.GoGetUser = func(id string) (user types.User, err error) {
 		err = users.FindOne(ctx, bson.M{"_id": strings.ToLower(id)}).Decode(&user)
-		user.Id = id //this is required because the id isnt stored using decode and we need the id attached
 		return user, err
 	}
 
