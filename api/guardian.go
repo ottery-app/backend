@@ -23,7 +23,7 @@ func Guardian(router *gin.Engine, mon mon.Mon) *gin.Engine {
 
 		c.Bind(&kid)
 
-		id := sesh.GetSesh()[token].Id
+		id := sesh.GetSesh()[token].Email
 		//check that the id is defined
 		if id == "" {
 			HandleError(c, http.StatusUnauthorized, fmt.Errorf("no user id"))
@@ -47,7 +47,7 @@ func Guardian(router *gin.Engine, mon mon.Mon) *gin.Engine {
 
 	router.GET("guardian/get/kids", func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
-		id := sesh.GetSesh()[token].Id
+		id := sesh.GetSesh()[token].Email
 		if id == "" {
 			HandleError(c, http.StatusUnauthorized, fmt.Errorf("no user id"))
 			return

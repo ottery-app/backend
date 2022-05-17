@@ -36,7 +36,7 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 
 			//adds the user to the session as the default guardian state
 			sesh.GetSesh().Add(token, sesh.User{
-				Id:    storeduser.Id,
+				Email: storeduser.Email,
 				State: sesh.DefaultState,
 			})
 
@@ -63,7 +63,7 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		token := security.GenerateSecureToken()
 
 		sesh.GetSesh().Add(token, sesh.User{
-			Id:    activate.Email,
+			Email: activate.Email,
 			State: "guardian",
 		})
 
