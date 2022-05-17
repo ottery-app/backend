@@ -27,6 +27,9 @@ type Mon struct {
 	GoAppendUserField func(string, string, interface{}) error
 	GoSearchUser      func(string) ([]types.User, error)
 
+	GoNewVehicle func(string, types.Vehicle) (string, error)
+	GoGetVehicle func(string) (types.Vehicle, error)
+
 	GoNewKid func(string, string, string, string, string, []string, []string) (string, error)
 	GoGetKid func(string) (types.Kid, error)
 }
@@ -45,6 +48,7 @@ func Go() (mon Mon) {
 	database := client.Database("ottery")
 	users := database.Collection("users")
 	kids := database.Collection("kids")
+	vehicles := database.Collection("vehicles")
 
 	//This is a helper function so that code does not need to be written twice
 	updateOne := func(database *mongo.Collection, id string, field string, updateType string, val interface{}) error {
@@ -165,6 +169,25 @@ func Go() (mon Mon) {
 		}
 
 		return results, nil
+	}
+
+	mon.GoNewVehicle = func(id string, vehicle types.Vehicle) (string, error) {
+		vehicle.Owner = id
+		res, err := vehicles.InsertOne(ctx, vehicle)
+		if err != nil {
+			return "", err
+		}
+
+		id = res.InsertedID.(primitive.ObjectID).Hex()
+
+		return id, nil
+	}
+
+	mon.GoGetVehicle = func(id string) (vehicle types.Vehicle, err error) {
+		var oid primitive.ObjectID
+		oid, err = primitive.ObjectIDFromHex(id)
+		err = vehicles.FindOne(ctx, bson.M{"_id": oid}).Decode(&vehicle)
+		return vehicle, err
 	}
 
 	mon.GoNewKid = func(firstName string, middleName string, lastName string, birthday string, owner string, primaryGuardians []string, authorizedGuardians []string) (id string, err error) {
