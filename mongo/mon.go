@@ -26,6 +26,7 @@ type Mon struct {
 	GoRemoveUserField func(string, string) error
 	GoAppendUserField func(string, string, interface{}) error
 	GoSearchUser      func(string) ([]types.User, error)
+	GoUpdateUser      func(types.User) error
 
 	GoNewVehicle func(string, types.Vehicle) (string, error)
 	GoGetVehicle func(string) (types.Vehicle, error)
@@ -169,6 +170,12 @@ func Go() (mon Mon) {
 		}
 
 		return results, nil
+	}
+
+	mon.GoUpdateUser = func(user types.User) error {
+		err := users.FindOneAndReplace(ctx, bson.M{"_id": strings.ToLower(user.Email)}, user).Err()
+
+		return err
 	}
 
 	mon.GoNewVehicle = func(id string, vehicle types.Vehicle) (string, error) {
