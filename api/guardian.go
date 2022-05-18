@@ -15,7 +15,7 @@ import (
  */
 func Guardian(router *gin.Engine, mon mon.Mon) *gin.Engine {
 
-	router.POST("guardian/new/vehicle", func(c *gin.Context) {
+	router.POST("guardian/vehicles", func(c *gin.Context) {
 		var vehicle types.Vehicle
 		c.Bind(&vehicle)
 		//check that the auth header is in the sesh
@@ -51,7 +51,7 @@ func Guardian(router *gin.Engine, mon mon.Mon) *gin.Engine {
 
 	})
 
-	router.GET("guardian/get/vehicles", func(c *gin.Context) {
+	router.GET("guardian/vehicles", func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
 		if token == "" {
 			HandleError(c, http.StatusUnauthorized, fmt.Errorf("no token provided"))
@@ -88,7 +88,7 @@ func Guardian(router *gin.Engine, mon mon.Mon) *gin.Engine {
 	})
 
 	//this gets a new child from the front end. it should have a token field and a types.Kid object
-	router.POST("guardian/new/kid", func(c *gin.Context) {
+	router.POST("guardian/kids", func(c *gin.Context) {
 		var kid types.Kid
 		//bind the request to the kid object
 		token := c.GetHeader("Authorization")
@@ -117,7 +117,7 @@ func Guardian(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		})
 	})
 
-	router.GET("guardian/get/kids", func(c *gin.Context) {
+	router.GET("guardian/kids", func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
 		id := sesh.GetSesh()[token].Email
 		if id == "" {

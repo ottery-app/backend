@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	mon "github.com/ottery-app/backend/mongo"
 	"github.com/ottery-app/backend/sesh"
+	"github.com/ottery-app/backend/types"
 )
 
 func Client(router *gin.Engine, mon mon.Mon) *gin.Engine {
@@ -43,6 +44,42 @@ func Client(router *gin.Engine, mon mon.Mon) *gin.Engine {
 
 		HandleSuccess(c, http.StatusOK, gin.H{
 			"users": res,
+		})
+	})
+
+	router.PUT("client/user", func(c *gin.Context) {
+		//get the token from the auth header
+		token := c.GetHeader("Authorization")
+		//get the id from the session
+		id := sesh.GetSesh()[token].Email
+
+		//check that the id is defined
+		if id == "" {
+			HandleError(c, http.StatusUnauthorized, fmt.Errorf("user not logged in"))
+			return
+		}
+
+		//get the user from the request body
+		var user types.User
+		var err error
+
+		user, err = mon.GoGetUser(id)
+		c.Bind(&user)
+
+		if err != nil {
+			HandleError(c, http.StatusExpectationFailed, err)
+			return
+		}
+
+		err = mon.GoUpdateUser(user)
+
+		if err != nil {
+			HandleError(c, http.StatusExpectationFailed, err)
+			return
+		}
+
+		HandleSuccess(c, http.StatusOK, gin.H{
+			"message": "success",
 		})
 	})
 
