@@ -108,9 +108,16 @@ func Guardian(router *gin.Engine, mon mon.Mon) *gin.Engine {
 
 		childId, err := mon.GoNewKid(kid.FirstName, kid.MiddleName, kid.LastName, kid.Birthday, kid.Owner, kid.PrimaryGuardians, kid.AuthorizedGuardians)
 		kid.Id = childId
-		HandleError(c, http.StatusUnauthorized, err)
+		if err != nil {
+			HandleError(c, http.StatusInternalServerError, err)
+			return
+		}
 
-		mon.GoAppendUserField(id, "kids", childId)
+		err = mon.GoAppendUserField(id, "kids", childId)
+		if err != nil {
+			HandleError(c, http.StatusInternalServerError, err)
+			return
+		}
 
 		HandleSuccess(c, http.StatusAccepted, gin.H{
 			"kid": kid,
