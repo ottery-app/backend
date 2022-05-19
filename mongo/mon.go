@@ -137,6 +137,17 @@ func Go() (mon Mon) {
 
 	mon.GoAppendUserField = func(id string, field string, val interface{}) error {
 		err := updateOne(users, id, field, "$push", val)
+
+		//if the field is not an array, then we need to remove the old value
+		if err != nil {
+			err = mon.GoRemoveUserField(id, field)
+			if err != nil {
+				return err
+			}
+
+			err = updateOne(users, id, field, "$push", val)
+		}
+
 		return err
 	}
 

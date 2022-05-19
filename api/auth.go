@@ -25,9 +25,8 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		c.Bind(&login)
 
 		storeduser, err := mon.GoGetUser(login.Email)
-		HandleError(c, http.StatusUnauthorized, err)
 		if err != nil {
-			fmt.Println("user not found")
+			HandleError(c, http.StatusUnauthorized, err)
 			return
 		}
 
