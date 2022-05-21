@@ -21,8 +21,10 @@ func Api() {
 	}))
 
 	router = Auth(router, mon)
-	router = Client(router, mon)
-	router = Guardian(router, mon)
+	router = Children(router, mon)
+	router = Vehicles(router, mon)
+	router = Search(router, mon)
+	router = User(router, mon)
 
 	router.Run(":8080")
 }
