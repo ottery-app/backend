@@ -66,6 +66,7 @@ func User(router *gin.Engine, mon mon.Mon) *gin.Engine {
 			"state":     userInfo.State,
 			"zip":       userInfo.Zip,
 			"email":     user.Email,
+			"userState": user.State,
 		})
 	})
 
