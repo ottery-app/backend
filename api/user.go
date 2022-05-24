@@ -59,14 +59,16 @@ func User(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		HandleError(c, http.StatusUnauthorized, err)
 
 		HandleSuccess(c, http.StatusOK, gin.H{
-			"firstName": userInfo.FirstName,
-			"lastName":  userInfo.LastName,
-			"address":   userInfo.Address,
-			"city":      userInfo.City,
-			"state":     userInfo.State,
-			"zip":       userInfo.Zip,
-			"email":     user.Email,
-			"userState": user.State,
+			"user": gin.H{
+				"firstName": userInfo.FirstName,
+				"lastName":  userInfo.LastName,
+				"address":   userInfo.Address,
+				"city":      userInfo.City,
+				"state":     userInfo.State,
+				"zip":       userInfo.Zip,
+				"email":     user.Email,
+				"userState": user.State,
+			},
 		})
 	})
 
