@@ -57,7 +57,10 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		c.Bind(&activate)
 
 		err := mon.GoActivateUser(activate.Email, activate.ActivationCode)
-		HandleError(c, http.StatusUnauthorized, err)
+		if err != nil {
+			HandleError(c, http.StatusUnauthorized, err)
+			return
+		}
 
 		token := security.GenerateSecureToken()
 
@@ -86,11 +89,18 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		c.Bind(&content)
 
 		hashedPw, err := security.HashPassword(content.Password)
-		HandleError(c, http.StatusExpectationFailed, err)
+		if err != nil {
+			HandleError(c, http.StatusExpectationFailed, err)
+			return
+		}
 
 		var code string
 		code, err = mon.GoRegisterUser(content.Email, content.FirstName, content.LastName, content.Address, content.City, content.State, content.Zip, hashedPw)
-		HandleError(c, http.StatusBadRequest, err)
+
+		if err != nil {
+			HandleError(c, http.StatusBadRequest, err)
+			return
+		}
 
 		mailer.SendActivation(content.Email, code)
 
@@ -118,10 +128,17 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		code := security.RandomString()
 
 		err := mon.GoUpdateUserField(head.Email, "activationCode", code)
-		HandleError(c, http.StatusExpectationFailed, err)
+		if err != nil {
+			HandleError(c, http.StatusExpectationFailed, err)
+			return
+		}
 
 		err = mailer.SendActivation(head.Email, code)
-		HandleError(c, http.StatusExpectationFailed, err)
+
+		if err != nil {
+			HandleError(c, http.StatusExpectationFailed, err)
+			return
+		}
 		//add the delayed user removal?
 	})
 
@@ -131,14 +148,17 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 			HandleSuccess(c, http.StatusOK, gin.H{
 				"state": sesh.State,
 			})
+			return
 		} else {
 			HandleError(c, http.StatusUnauthorized, fmt.Errorf("invalid token"))
+			return
 		}
 	})
 
 	router.DELETE("auth/logout", func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
 		sesh.GetSesh().Delete(token)
+		HandleSuccess(c, http.StatusOK, gin.H{})
 	})
 
 	return router
