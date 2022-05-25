@@ -85,5 +85,50 @@ func Vehicles(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		})
 	})
 
+	/**
+	 * @api {get} /vehicles/:id Get a vehicle
+	 * @apiName GetVehicle
+	 * @apiGroup Vehicles
+	 */
+	router.GET("vehicles/:id", func(c *gin.Context) {
+		token := c.GetHeader("Authorization")
+		if token == "" {
+			HandleError(c, http.StatusUnauthorized, fmt.Errorf("no token provided"))
+			return
+		}
+		userSesh := sesh.GetSesh()[token]
+		if userSesh.Email == "" {
+			HandleError(c, http.StatusUnauthorized, fmt.Errorf("no user found"))
+			return
+		}
+
+		//get the user from the database
+		user, err := mon.GoGetUser(userSesh.Email)
+		if err != nil {
+			HandleError(c, http.StatusInternalServerError, err)
+			return
+		}
+
+		//check that the vehicle is in the user's vehicles
+		vehicleId := c.Param("id")
+
+		//check to see if the user has the vehicle
+		if !user.ContainsVehicle(vehicleId) {
+			HandleError(c, http.StatusUnauthorized, fmt.Errorf("user does not have vehicle"))
+			return
+		}
+
+		//get the vehicle from the database
+		vehicle, err := mon.GoGetVehicle(vehicleId)
+		if err != nil {
+			HandleError(c, http.StatusInternalServerError, err)
+			return
+		}
+
+		HandleSuccess(c, http.StatusOK, gin.H{
+			"vehicle": vehicle,
+		})
+	})
+
 	return router
 }

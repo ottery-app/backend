@@ -25,3 +25,13 @@ func (u *User) MakeSafe() {
 	u.Zip = ""
 	u.Vehicles = nil
 }
+
+//method that checks if the user contains a given vehicle id
+func (u *User) ContainsVehicle(id string) bool {
+	for _, v := range u.Vehicles {
+		if v == id {
+			return true
+		}
+	}
+	return false
+}
