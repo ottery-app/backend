@@ -31,7 +31,7 @@ type Mon struct {
 	GoNewVehicle func(string, types.Vehicle) (string, error)
 	GoGetVehicle func(string) (types.Vehicle, error)
 
-	GoNewKid func(string, string, string, string, string, []string, []string) (string, error)
+	GoNewKid func(string, string, string, int, string, []string, []string) (string, error)
 	GoGetKid func(string) (types.Kid, error)
 }
 
@@ -191,7 +191,9 @@ func Go() (mon Mon) {
 
 	mon.GoNewVehicle = func(id string, vehicle types.Vehicle) (string, error) {
 		vehicle.Owner = id
+
 		res, err := vehicles.InsertOne(ctx, vehicle)
+
 		if err != nil {
 			return "", err
 		}
@@ -208,7 +210,7 @@ func Go() (mon Mon) {
 		return vehicle, err
 	}
 
-	mon.GoNewKid = func(firstName string, middleName string, lastName string, birthday string, owner string, primaryGuardians []string, authorizedGuardians []string) (id string, err error) {
+	mon.GoNewKid = func(firstName string, middleName string, lastName string, birthday int, owner string, primaryGuardians []string, authorizedGuardians []string) (id string, err error) {
 		res, err := kids.InsertOne(ctx, bson.M{
 			"firstName":           firstName,
 			"middleName":          middleName,
