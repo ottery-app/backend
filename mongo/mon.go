@@ -2,6 +2,7 @@ package mon
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"strings"
 
@@ -164,21 +165,30 @@ func Go() (mon Mon) {
 		}
 
 		cur, err := users.Find(ctx, query)
-		cur.All(ctx, &results)
+
+		if err != nil {
+			return results, err
+		}
+
+		err = cur.All(ctx, &results)
+
+		if err != nil {
+			fmt.Println("there is an issue in the searching. because there is no search index??")
+			return results, err
+		}
 
 		//for each result call the MakeSafe method to remove personal information
 		for i := 0; i < len(results); i++ {
 			results[i].MakeSafe()
 		}
 
-		if err != nil {
-			return nil, err
-		}
-		//format cur to go into the results
+		fmt.Println("made it to line 176")
 
 		if err != nil {
 			return nil, err
 		}
+
+		fmt.Println("made it to line 182")
 
 		return results, nil
 	}
