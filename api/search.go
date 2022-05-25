@@ -22,11 +22,19 @@ func Search(router *gin.Engine, mon mon.Mon) *gin.Engine {
 			return
 		}
 
+		fmt.Println("made it to line 25")
+
 		//get the search param from the request url
-		search := c.Query("search")
+		searchParam := c.Query("search")
 
-		res, err := mon.GoSearchUser(search)
+		res, err := mon.GoSearchUser(searchParam)
 
+		if err != nil {
+			HandleError(c, http.StatusExpectationFailed, err)
+			return
+		}
+
+		fmt.Println("made it to line 35")
 		//remoove the id from the results
 		for i := 0; i < len(res); i++ {
 			if res[i].Email == id {
@@ -34,6 +42,8 @@ func Search(router *gin.Engine, mon mon.Mon) *gin.Engine {
 				i--
 			}
 		}
+
+		fmt.Println("made it to line 41")
 
 		if err != nil {
 			HandleError(c, http.StatusExpectationFailed, err)

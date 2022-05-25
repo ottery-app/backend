@@ -15,8 +15,10 @@ func Vehicles(router *gin.Engine, mon mon.Mon) *gin.Engine {
 	router.POST("vehicles", func(c *gin.Context) {
 		var vehicle types.Vehicle
 		c.Bind(&vehicle)
+
 		//check that the auth header is in the sesh
 		token := c.GetHeader("Authorization")
+
 		if token == "" {
 			HandleError(c, http.StatusUnauthorized, fmt.Errorf("no token provided"))
 			return
@@ -36,13 +38,12 @@ func Vehicles(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		}
 
 		err = mon.GoAppendUserField(user.Email, "vehicles", id)
-
 		if err != nil {
 			HandleError(c, http.StatusInternalServerError, err)
 			return
 		}
 
-		HandleSuccess(c, http.StatusOK, gin.H{
+		HandleSuccess(c, http.StatusAccepted, gin.H{
 			"message": "vehicle added",
 		})
 

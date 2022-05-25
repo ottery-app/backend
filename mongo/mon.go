@@ -2,6 +2,7 @@ package mon
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"strings"
 
@@ -31,7 +32,7 @@ type Mon struct {
 	GoNewVehicle func(string, types.Vehicle) (string, error)
 	GoGetVehicle func(string) (types.Vehicle, error)
 
-	GoNewKid func(string, string, string, string, string, []string, []string) (string, error)
+	GoNewKid func(string, string, string, int, string, []string, []string) (string, error)
 	GoGetKid func(string) (types.Kid, error)
 }
 
@@ -164,21 +165,30 @@ func Go() (mon Mon) {
 		}
 
 		cur, err := users.Find(ctx, query)
-		cur.All(ctx, &results)
+
+		if err != nil {
+			return results, err
+		}
+
+		err = cur.All(ctx, &results)
+
+		if err != nil {
+			fmt.Println("there is an issue in the searching. because there is no search index??")
+			return results, err
+		}
 
 		//for each result call the MakeSafe method to remove personal information
 		for i := 0; i < len(results); i++ {
 			results[i].MakeSafe()
 		}
 
-		if err != nil {
-			return nil, err
-		}
-		//format cur to go into the results
+		fmt.Println("made it to line 176")
 
 		if err != nil {
 			return nil, err
 		}
+
+		fmt.Println("made it to line 182")
 
 		return results, nil
 	}
@@ -191,7 +201,9 @@ func Go() (mon Mon) {
 
 	mon.GoNewVehicle = func(id string, vehicle types.Vehicle) (string, error) {
 		vehicle.Owner = id
+
 		res, err := vehicles.InsertOne(ctx, vehicle)
+
 		if err != nil {
 			return "", err
 		}
@@ -208,7 +220,7 @@ func Go() (mon Mon) {
 		return vehicle, err
 	}
 
-	mon.GoNewKid = func(firstName string, middleName string, lastName string, birthday string, owner string, primaryGuardians []string, authorizedGuardians []string) (id string, err error) {
+	mon.GoNewKid = func(firstName string, middleName string, lastName string, birthday int, owner string, primaryGuardians []string, authorizedGuardians []string) (id string, err error) {
 		res, err := kids.InsertOne(ctx, bson.M{
 			"firstName":           firstName,
 			"middleName":          middleName,

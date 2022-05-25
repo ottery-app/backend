@@ -8,5 +8,4 @@ type Vehicle struct {
 	Color string `json:"color"`
 	Plate string `json:"plate"`
 	Owner string `json:"owner"`
-	Name  string `json:"name"`
 }
