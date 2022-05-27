@@ -19,7 +19,7 @@ import (
 type Mon struct {
 	Disconnect func()
 
-	GoRegisterUser    func(string, string, string, string, string, string, string, string) (string, error)
+	GoRegisterUser    func(string, string, string, string, string, string, string, string, string) (string, error)
 	GoRemoveUser      func(string) error
 	GoActivateUser    func(string, string) error
 	GoGetUser         func(string) (types.User, error)
@@ -84,11 +84,12 @@ func Go() (mon Mon) {
 		}
 	*/
 
-	mon.GoRegisterUser = func(email string, firstName string, lastName string, address string, city string, state string, zip string, password string) (code string, err error) {
+	mon.GoRegisterUser = func(email string, firstName string, lastName string, address string, city string, state string, zip string, password string, username string) (code string, err error) {
 		code = security.RandomString()
 		//add the user to the database with the key attached
 		_, err = users.InsertOne(ctx, bson.M{
-			"_id":            strings.ToLower(email),
+			"_id":            username,
+			"username":       username,
 			"email":          strings.ToLower(email),
 			"firstName":      firstName,
 			"lastName":       lastName,
@@ -103,20 +104,20 @@ func Go() (mon Mon) {
 		return code, err
 	}
 
-	mon.GoRemoveUser = func(email string) error {
-		_, err := users.DeleteOne(ctx, bson.M{"_id": strings.ToLower(email)})
+	mon.GoRemoveUser = func(username string) error {
+		_, err := users.DeleteOne(ctx, bson.M{"_id": username})
 		return err
 	}
 
-	mon.GoActivateUser = func(email string, activationCode string) (err error) {
-		user, err := mon.GoGetUser(email)
+	mon.GoActivateUser = func(username string, activationCode string) (err error) {
+		user, err := mon.GoGetUser(username)
 
 		if err != nil {
 			return err
 		}
 
 		if user.ActivationCode == activationCode {
-			err = mon.GoRemoveUserField(user.Email, "activationCode")
+			err = mon.GoRemoveUserField(user.Username, "activationCode")
 
 			if err != nil {
 				return err
@@ -194,7 +195,7 @@ func Go() (mon Mon) {
 	}
 
 	mon.GoUpdateUser = func(user types.User) error {
-		err := users.FindOneAndReplace(ctx, bson.M{"_id": strings.ToLower(user.Email)}, user).Err()
+		err := users.FindOneAndReplace(ctx, bson.M{"_id": user.Username}, user).Err()
 
 		return err
 	}

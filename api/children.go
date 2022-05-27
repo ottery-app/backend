@@ -19,7 +19,7 @@ func Children(router *gin.Engine, mon mon.Mon) *gin.Engine {
 
 		c.Bind(&kid)
 
-		id := sesh.GetSesh()[token].Email
+		id := sesh.GetSesh()[token].Username
 		//check that the id is defined
 		if id == "" {
 			HandleError(c, http.StatusUnauthorized, fmt.Errorf("no user id"))
@@ -50,7 +50,7 @@ func Children(router *gin.Engine, mon mon.Mon) *gin.Engine {
 
 	router.GET("children", func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
-		id := sesh.GetSesh()[token].Email
+		id := sesh.GetSesh()[token].Username
 		if id == "" {
 			HandleError(c, http.StatusUnauthorized, fmt.Errorf("no user id"))
 			return

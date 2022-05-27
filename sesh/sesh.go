@@ -10,8 +10,8 @@ const DefaultState = "guardian"
 var once sync.Once
 
 type User struct {
-	Email string `json:"email"` //this is the email
-	State string `json:"state"`
+	Username string `json:"username"`
+	State    string `json:"state"`
 }
 
 // type global

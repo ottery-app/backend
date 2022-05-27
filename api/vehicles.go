@@ -26,18 +26,18 @@ func Vehicles(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		//check that the token is in the sesh
 		user := sesh.GetSesh()[token]
 
-		if user.Email == "" {
+		if user.Username == "" {
 			HandleError(c, http.StatusUnauthorized, fmt.Errorf("no user found"))
 			return
 		}
 
-		id, err := mon.GoNewVehicle(user.Email, vehicle)
+		id, err := mon.GoNewVehicle(user.Username, vehicle)
 		if err != nil {
 			HandleError(c, http.StatusInternalServerError, err)
 			return
 		}
 
-		err = mon.GoAppendUserField(user.Email, "vehicles", id)
+		err = mon.GoAppendUserField(user.Username, "vehicles", id)
 		if err != nil {
 			HandleError(c, http.StatusInternalServerError, err)
 			return
@@ -56,13 +56,13 @@ func Vehicles(router *gin.Engine, mon mon.Mon) *gin.Engine {
 			return
 		}
 		userSesh := sesh.GetSesh()[token]
-		if userSesh.Email == "" {
+		if userSesh.Username == "" {
 			HandleError(c, http.StatusUnauthorized, fmt.Errorf("no user found"))
 			return
 		}
 
 		//get the user from the database
-		user, err := mon.GoGetUser(userSesh.Email)
+		user, err := mon.GoGetUser(userSesh.Username)
 		if err != nil {
 			HandleError(c, http.StatusInternalServerError, err)
 			return
@@ -97,13 +97,13 @@ func Vehicles(router *gin.Engine, mon mon.Mon) *gin.Engine {
 			return
 		}
 		userSesh := sesh.GetSesh()[token]
-		if userSesh.Email == "" {
+		if userSesh.Username == "" {
 			HandleError(c, http.StatusUnauthorized, fmt.Errorf("no user found"))
 			return
 		}
 
 		//get the user from the database
-		user, err := mon.GoGetUser(userSesh.Email)
+		user, err := mon.GoGetUser(userSesh.Username)
 		if err != nil {
 			HandleError(c, http.StatusInternalServerError, err)
 			return
