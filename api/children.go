@@ -19,7 +19,7 @@ func Children(router *gin.Engine, mon mon.Mon) *gin.Engine {
 
 		c.Bind(&kid)
 
-		id := sesh.GetSesh()[token].Email
+		id := sesh.GetSesh()[token].Username
 		//check that the id is defined
 		if id == "" {
 			HandleError(c, http.StatusUnauthorized, fmt.Errorf("no user id"))
@@ -50,7 +50,7 @@ func Children(router *gin.Engine, mon mon.Mon) *gin.Engine {
 
 	router.GET("children", func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
-		id := sesh.GetSesh()[token].Email
+		id := sesh.GetSesh()[token].Username
 		if id == "" {
 			HandleError(c, http.StatusUnauthorized, fmt.Errorf("no user id"))
 			return
@@ -78,6 +78,99 @@ func Children(router *gin.Engine, mon mon.Mon) *gin.Engine {
 			"children": kids,
 		})
 
+	})
+
+	router.GET("children/:id", func(c *gin.Context) {
+		token := c.GetHeader("Authorization")
+
+		id := sesh.GetSesh()[token].Username
+		if id == "" {
+			HandleError(c, http.StatusUnauthorized, fmt.Errorf("no user id"))
+			return
+		}
+
+		kidId := c.Param("id")
+		kid, err := mon.GoGetKid(kidId)
+		if err != nil {
+			HandleError(c, http.StatusUnauthorized, err)
+			return
+		}
+
+		HandleSuccess(c, http.StatusOK, gin.H{
+			"kid": kid,
+		})
+	})
+
+	router.PUT("children/:id", func(c *gin.Context) {
+		token := c.GetHeader("Authorization")
+
+		id := sesh.GetSesh()[token].Username
+		if id == "" {
+			HandleError(c, http.StatusUnauthorized, fmt.Errorf("no user id"))
+			return
+		}
+
+		kidId := c.Param("id")
+		kid, err := mon.GoGetKid(kidId)
+		if err != nil {
+			HandleError(c, http.StatusUnauthorized, err)
+			return
+		}
+
+		var kidUpdate types.Kid
+		c.Bind(&kidUpdate)
+		kidUpdate.Id = kidId
+
+		//check that the user is a primary guardian if not fail
+		if !kid.IsPrimaryGuardian(id) {
+			HandleError(c, http.StatusUnauthorized, fmt.Errorf("user is not a primary guardian"))
+			return
+		}
+
+		err = mon.GoUpdateKid(kidUpdate)
+
+		if err != nil {
+			HandleError(c, http.StatusUnauthorized, err)
+			return
+		}
+
+		HandleSuccess(c, http.StatusOK, gin.H{
+			"kid": kid,
+		})
+	})
+
+	router.DELETE("children/:id", func(c *gin.Context) {
+		token := c.GetHeader("Authorization")
+
+		uid := sesh.GetSesh()[token].Username
+
+		if uid == "" {
+			HandleError(c, http.StatusUnauthorized, fmt.Errorf("no user id"))
+			return
+		}
+
+		kidId := c.Param("id")
+		kid, err := mon.GoGetKid(kidId)
+		if err != nil {
+			HandleError(c, http.StatusUnauthorized, err)
+			return
+		}
+
+		//check that the user is the owner
+		if kid.IsOwner(uid) {
+			HandleError(c, http.StatusUnauthorized, fmt.Errorf("user is not the owner"))
+			return
+		}
+
+		err = mon.GoDeleteKid(kidId)
+		if err != nil {
+			HandleError(c, http.StatusUnauthorized, err)
+			return
+		}
+
+		HandleSuccess(c, http.StatusOK, gin.H{
+			"kid": kid,
+		})
 	})
 
 	return router

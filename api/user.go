@@ -16,7 +16,7 @@ func User(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		//get the token from the auth header
 		token := c.GetHeader("Authorization")
 		//get the id from the session
-		id := sesh.GetSesh()[token].Email
+		id := sesh.GetSesh()[token].Username
 
 		//check that the id is defined
 		if id == "" {
@@ -55,18 +55,19 @@ func User(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		token := c.GetHeader("Authorization")
 		user := sesh.GetSesh()[token]
 
-		userInfo, err := mon.GoGetUser(user.Email)
+		userInfo, err := mon.GoGetUser(user.Username)
 		HandleError(c, http.StatusUnauthorized, err)
 
 		HandleSuccess(c, http.StatusOK, gin.H{
 			"user": gin.H{
+				"username":  userInfo.Username,
 				"firstName": userInfo.FirstName,
 				"lastName":  userInfo.LastName,
 				"address":   userInfo.Address,
 				"city":      userInfo.City,
 				"state":     userInfo.State,
 				"zip":       userInfo.Zip,
-				"email":     user.Email,
+				"email":     userInfo.Email,
 				"userState": user.State,
 			},
 		})

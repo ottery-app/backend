@@ -16,7 +16,7 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 
 	router.POST("auth/login", func(c *gin.Context) {
 		login := struct {
-			Email    string `json:"email"`
+			Username string `json:"username"`
 			Password string `json:"password"`
 		}{}
 
@@ -24,7 +24,7 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 
 		c.Bind(&login)
 
-		storeduser, err := mon.GoGetUser(login.Email)
+		storeduser, err := mon.GoGetUser(login.Username)
 		if err != nil {
 			HandleError(c, http.StatusUnauthorized, err)
 			return
@@ -35,8 +35,8 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 
 			//adds the user to the session as the default guardian state
 			sesh.GetSesh().Add(token, sesh.User{
-				Email: storeduser.Email,
-				State: sesh.DefaultState,
+				Username: storeduser.Username,
+				State:    sesh.DefaultState,
 			})
 
 			HandleSuccess(c, http.StatusOK, gin.H{
@@ -50,13 +50,13 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 
 	router.PUT("auth/activate", func(c *gin.Context) {
 		activate := struct {
-			Email          string `json:"email"`
+			Username       string `json:"username"`
 			ActivationCode string `json:"activationCode"`
 		}{}
 
 		c.Bind(&activate)
 
-		err := mon.GoActivateUser(activate.Email, activate.ActivationCode)
+		err := mon.GoActivateUser(activate.Username, activate.ActivationCode)
 		if err != nil {
 			HandleError(c, http.StatusUnauthorized, err)
 			return
@@ -65,8 +65,8 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		token := security.GenerateSecureToken()
 
 		sesh.GetSesh().Add(token, sesh.User{
-			Email: activate.Email,
-			State: "guardian",
+			Username: activate.Username,
+			State:    "guardian",
 		})
 
 		HandleSuccess(c, http.StatusOK, gin.H{
@@ -76,6 +76,7 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 
 	router.POST("auth/register", func(c *gin.Context) {
 		content := struct {
+			Username  string `json:"username"`
 			Email     string `json:"email"`
 			Password  string `json:"password"`
 			FirstName string `json:"firstName"`
@@ -95,7 +96,7 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		}
 
 		var code string
-		code, err = mon.GoRegisterUser(content.Email, content.FirstName, content.LastName, content.Address, content.City, content.State, content.Zip, hashedPw)
+		code, err = mon.GoRegisterUser(content.Email, content.FirstName, content.LastName, content.Address, content.City, content.State, content.Zip, hashedPw, content.Username)
 
 		if err != nil {
 			HandleError(c, http.StatusBadRequest, err)
@@ -105,35 +106,35 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		mailer.SendActivation(content.Email, code)
 
 		//if the user is not registered after a certain amount of time remove them from the database
-		go func(email string, code string) {
+		go func(username string, code string) {
 			time.Sleep(24 * time.Hour) //one day to authenticate before the user is removed
-			user, _ := mon.GoGetUser(email)
+			user, _ := mon.GoGetUser(username)
 			if user.ActivationCode == code {
-				if mon.GoRemoveUser(email) != nil {
-					fmt.Println("could not remove user: " + email)
+				if mon.GoRemoveUser(username) != nil {
+					fmt.Println("could not remove user: " + username)
 				} else {
-					fmt.Println("removed user: " + email)
+					fmt.Println("removed user: " + username)
 				}
 			}
-		}(content.Email, code)
+		}(content.Username, code)
 	})
 
 	router.POST("auth/resendActivation", func(c *gin.Context) {
 		head := struct {
-			Email string `json:"email"`
+			Username string `json:"username"`
 		}{}
 
 		c.Bind(&head)
 
 		code := security.RandomString()
 
-		err := mon.GoUpdateUserField(head.Email, "activationCode", code)
+		err := mon.GoUpdateUserField(head.Username, "activationCode", code)
 		if err != nil {
 			HandleError(c, http.StatusExpectationFailed, err)
 			return
 		}
 
-		err = mailer.SendActivation(head.Email, code)
+		err = mailer.SendActivation(head.Username, code)
 
 		if err != nil {
 			HandleError(c, http.StatusExpectationFailed, err)

@@ -14,7 +14,7 @@ func Search(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		//get the token from the auth header
 		token := c.GetHeader("Authorization")
 		//get the id from the session
-		id := sesh.GetSesh()[token].Email
+		id := sesh.GetSesh()[token].Username
 
 		//check that the id is defined
 		if id == "" {
@@ -37,7 +37,7 @@ func Search(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		fmt.Println("made it to line 35")
 		//remoove the id from the results
 		for i := 0; i < len(res); i++ {
-			if res[i].Email == id {
+			if res[i].Username == id {
 				res = append(res[:i], res[i+1:]...)
 				i--
 			}

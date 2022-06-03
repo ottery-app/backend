@@ -1,6 +1,7 @@
 package types
 
 type User struct {
+	Username       string   `json:"username"`
 	Email          string   `json:"email"`
 	Password       string   `json:"password"`
 	FirstName      string   `json:"firstName"`
@@ -24,4 +25,14 @@ func (u *User) MakeSafe() {
 	u.State = ""
 	u.Zip = ""
 	u.Vehicles = nil
+}
+
+//method that checks if the user contains a given vehicle id
+func (u *User) ContainsVehicle(id string) bool {
+	for _, v := range u.Vehicles {
+		if v == id {
+			return true
+		}
+	}
+	return false
 }

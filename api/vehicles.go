@@ -26,18 +26,18 @@ func Vehicles(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		//check that the token is in the sesh
 		user := sesh.GetSesh()[token]
 
-		if user.Email == "" {
+		if user.Username == "" {
 			HandleError(c, http.StatusUnauthorized, fmt.Errorf("no user found"))
 			return
 		}
 
-		id, err := mon.GoNewVehicle(user.Email, vehicle)
+		id, err := mon.GoNewVehicle(user.Username, vehicle)
 		if err != nil {
 			HandleError(c, http.StatusInternalServerError, err)
 			return
 		}
 
-		err = mon.GoAppendUserField(user.Email, "vehicles", id)
+		err = mon.GoAppendUserField(user.Username, "vehicles", id)
 		if err != nil {
 			HandleError(c, http.StatusInternalServerError, err)
 			return
@@ -56,13 +56,13 @@ func Vehicles(router *gin.Engine, mon mon.Mon) *gin.Engine {
 			return
 		}
 		userSesh := sesh.GetSesh()[token]
-		if userSesh.Email == "" {
+		if userSesh.Username == "" {
 			HandleError(c, http.StatusUnauthorized, fmt.Errorf("no user found"))
 			return
 		}
 
 		//get the user from the database
-		user, err := mon.GoGetUser(userSesh.Email)
+		user, err := mon.GoGetUser(userSesh.Username)
 		if err != nil {
 			HandleError(c, http.StatusInternalServerError, err)
 			return
@@ -82,6 +82,51 @@ func Vehicles(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		}
 		HandleSuccess(c, http.StatusOK, gin.H{
 			"vehicles": vehicles,
+		})
+	})
+
+	/**
+	 * @api {get} /vehicles/:id Get a vehicle
+	 * @apiName GetVehicle
+	 * @apiGroup Vehicles
+	 */
+	router.GET("vehicles/:id", func(c *gin.Context) {
+		token := c.GetHeader("Authorization")
+		if token == "" {
+			HandleError(c, http.StatusUnauthorized, fmt.Errorf("no token provided"))
+			return
+		}
+		userSesh := sesh.GetSesh()[token]
+		if userSesh.Username == "" {
+			HandleError(c, http.StatusUnauthorized, fmt.Errorf("no user found"))
+			return
+		}
+
+		//get the user from the database
+		user, err := mon.GoGetUser(userSesh.Username)
+		if err != nil {
+			HandleError(c, http.StatusInternalServerError, err)
+			return
+		}
+
+		//check that the vehicle is in the user's vehicles
+		vehicleId := c.Param("id")
+
+		//check to see if the user has the vehicle
+		if !user.ContainsVehicle(vehicleId) {
+			HandleError(c, http.StatusUnauthorized, fmt.Errorf("user does not have vehicle"))
+			return
+		}
+
+		//get the vehicle from the database
+		vehicle, err := mon.GoGetVehicle(vehicleId)
+		if err != nil {
+			HandleError(c, http.StatusInternalServerError, err)
+			return
+		}
+
+		HandleSuccess(c, http.StatusOK, gin.H{
+			"vehicle": vehicle,
 		})
 	})
 
