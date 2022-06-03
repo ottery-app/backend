@@ -14,3 +14,18 @@ type Kid struct {
 	PrimaryGuardians    []string `json:"PrimaryGuardians"`
 	AuthorizedGuardians []string `json:"AuthorizedGuardians"`
 }
+
+//method checks if the user id passed in is a primary guardian
+func (kid *Kid) IsPrimaryGuardian(id string) bool {
+	for _, guardian := range kid.PrimaryGuardians {
+		if guardian == id {
+			return true
+		}
+	}
+	return false
+}
+
+//method checks if the user is the owner
+func (kid *Kid) IsOwner(id string) bool {
+	return kid.Owner == id
+}

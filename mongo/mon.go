@@ -19,21 +19,24 @@ import (
 type Mon struct {
 	Disconnect func()
 
-	GoRegisterUser    func(string, string, string, string, string, string, string, string, string) (string, error)
-	GoRemoveUser      func(string) error
-	GoActivateUser    func(string, string) error
-	GoGetUser         func(string) (types.User, error)
-	GoUpdateUserField func(string, string, interface{}) error
-	GoRemoveUserField func(string, string) error
-	GoAppendUserField func(string, string, interface{}) error
-	GoSearchUser      func(string) ([]types.User, error)
-	GoUpdateUser      func(types.User) error
+	GoRegisterUser        func(string, string, string, string, string, string, string, string, string) (string, error)
+	GoRemoveUser          func(string) error
+	GoActivateUser        func(string, string) error
+	GoGetUser             func(string) (types.User, error)
+	GoUpdateUserField     func(string, string, interface{}) error
+	GoRemoveUserField     func(string, string) error
+	GoAppendUserField     func(string, string, interface{}) error
+	GoSearchUser          func(string) ([]types.User, error)
+	GoUpdateUser          func(types.User) error
+	GoRemoveFromUserField func(string, string, interface{}) error
 
 	GoNewVehicle func(string, types.Vehicle) (string, error)
 	GoGetVehicle func(string) (types.Vehicle, error)
 
-	GoNewKid func(string, string, string, int, string, []string, []string) (string, error)
-	GoGetKid func(string) (types.Kid, error)
+	GoNewKid    func(string, string, string, int, string, []string, []string) (string, error)
+	GoGetKid    func(string) (types.Kid, error)
+	GoUpdateKid func(types.Kid) error
+	GoDeleteKid func(string) error
 }
 
 /**
@@ -153,6 +156,12 @@ func Go() (mon Mon) {
 		return err
 	}
 
+	mon.GoRemoveFromUserField = func(id string, field string, val interface{}) error {
+		//removes the first instance of the value from the array in the user
+		err := updateOne(users, id, field, "$pull", bson.M{field: val})
+		return err
+	}
+
 	mon.GoRemoveUserField = func(id string, field string) error {
 		err := updateOne(users, id, field, "$unset", "")
 		return err
@@ -243,6 +252,34 @@ func Go() (mon Mon) {
 		oid, err = primitive.ObjectIDFromHex(id)
 		err = kids.FindOne(ctx, bson.M{"_id": oid}).Decode(&kid)
 		return kid, err
+	}
+
+	mon.GoUpdateKid = func(kid types.Kid) error {
+		err := kids.FindOneAndReplace(ctx, bson.M{"_id": kid.Id}, kid).Err()
+		return err
+	}
+
+	mon.GoDeleteKid = func(id string) error {
+		//get the kid and remove itself from all of the authorized guardians
+		kid, err := mon.GoGetKid(id)
+
+		if err != nil {
+			return err
+		}
+
+		//only need to remove from authorized guardians because that includes alls of the guardians regardless of type
+		for i := 0; i < len(kid.AuthorizedGuardians); i++ {
+			err = mon.GoRemoveFromUserField(kid.AuthorizedGuardians[i], "kids", id)
+
+			if err != nil {
+				return err
+			}
+		}
+
+		//handle success
+		err = kids.FindOneAndDelete(ctx, bson.M{"_id": kid.Id}).Err()
+
+		return err
 	}
 
 	return mon
