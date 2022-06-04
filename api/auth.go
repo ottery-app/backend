@@ -24,7 +24,7 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 
 		c.Bind(&login)
 
-		storeduser, err := mon.GoGetUser(login.Username)
+		storeduser, err := mon.GoUser.Get(login.Username)
 		if err != nil {
 			HandleError(c, http.StatusUnauthorized, err)
 			return
@@ -56,7 +56,7 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 
 		c.Bind(&activate)
 
-		err := mon.GoActivateUser(activate.Username, activate.ActivationCode)
+		err := mon.GoUser.Activate(activate.Username, activate.ActivationCode)
 		if err != nil {
 			HandleError(c, http.StatusUnauthorized, err)
 			return
@@ -96,7 +96,7 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		}
 
 		var code string
-		code, err = mon.GoRegisterUser(content.Email, content.FirstName, content.LastName, content.Address, content.City, content.State, content.Zip, hashedPw, content.Username)
+		code, err = mon.GoUser.Register(content.Email, content.FirstName, content.LastName, content.Address, content.City, content.State, content.Zip, hashedPw, content.Username)
 
 		if err != nil {
 			HandleError(c, http.StatusBadRequest, err)
@@ -108,9 +108,9 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		//if the user is not registered after a certain amount of time remove them from the database
 		go func(username string, code string) {
 			time.Sleep(24 * time.Hour) //one day to authenticate before the user is removed
-			user, _ := mon.GoGetUser(username)
+			user, _ := mon.GoUser.Get(username)
 			if user.ActivationCode == code {
-				if mon.GoRemoveUser(username) != nil {
+				if mon.GoUser.Delete(username) != nil {
 					fmt.Println("could not remove user: " + username)
 				} else {
 					fmt.Println("removed user: " + username)
@@ -128,7 +128,7 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 
 		code := security.RandomString()
 
-		err := mon.GoUpdateUserField(head.Username, "activationCode", code)
+		err := mon.GoUser.UpdateField(head.Username, "activationCode", code)
 		if err != nil {
 			HandleError(c, http.StatusExpectationFailed, err)
 			return

@@ -27,7 +27,7 @@ func Search(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		//get the search param from the request url
 		searchParam := c.Query("search")
 
-		res, err := mon.GoSearchUser(searchParam)
+		res, err := mon.GoUser.Search(searchParam)
 
 		if err != nil {
 			HandleError(c, http.StatusExpectationFailed, err)

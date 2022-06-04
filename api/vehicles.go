@@ -31,13 +31,13 @@ func Vehicles(router *gin.Engine, mon mon.Mon) *gin.Engine {
 			return
 		}
 
-		id, err := mon.GoNewVehicle(user.Username, vehicle)
+		id, err := mon.GoVehicle.New(user.Username, vehicle)
 		if err != nil {
 			HandleError(c, http.StatusInternalServerError, err)
 			return
 		}
 
-		err = mon.GoAppendUserField(user.Username, "vehicles", id)
+		err = mon.GoUser.AppendField(user.Username, "vehicles", id)
 		if err != nil {
 			HandleError(c, http.StatusInternalServerError, err)
 			return
@@ -62,7 +62,7 @@ func Vehicles(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		}
 
 		//get the user from the database
-		user, err := mon.GoGetUser(userSesh.Username)
+		user, err := mon.GoUser.Get(userSesh.Username)
 		if err != nil {
 			HandleError(c, http.StatusInternalServerError, err)
 			return
@@ -71,7 +71,7 @@ func Vehicles(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		//for each vehicle in the user's vehicles, get the vehicle info
 		vehicles := []types.Vehicle{}
 		for _, vehicle := range user.Vehicles {
-			vehicleInfo, err := mon.GoGetVehicle(vehicle)
+			vehicleInfo, err := mon.GoVehicle.Get(vehicle)
 			vehicleInfo.Id = vehicle
 			if err != nil {
 				HandleError(c, http.StatusUnauthorized, err)
@@ -85,11 +85,6 @@ func Vehicles(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		})
 	})
 
-	/**
-	 * @api {get} /vehicles/:id Get a vehicle
-	 * @apiName GetVehicle
-	 * @apiGroup Vehicles
-	 */
 	router.GET("vehicles/:id", func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
 		if token == "" {
@@ -103,7 +98,7 @@ func Vehicles(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		}
 
 		//get the user from the database
-		user, err := mon.GoGetUser(userSesh.Username)
+		user, err := mon.GoUser.Get(userSesh.Username)
 		if err != nil {
 			HandleError(c, http.StatusInternalServerError, err)
 			return
@@ -119,7 +114,7 @@ func Vehicles(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		}
 
 		//get the vehicle from the database
-		vehicle, err := mon.GoGetVehicle(vehicleId)
+		vehicle, err := mon.GoVehicle.Get(vehicleId)
 		if err != nil {
 			HandleError(c, http.StatusInternalServerError, err)
 			return
