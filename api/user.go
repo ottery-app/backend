@@ -28,7 +28,7 @@ func User(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		var user types.User
 		var err error
 
-		user, err = mon.GoGetUser(id)
+		user, err = mon.GoUser.Get(id)
 		fmt.Println(user)
 		c.Bind(&user)
 		fmt.Println(user)
@@ -38,7 +38,7 @@ func User(router *gin.Engine, mon mon.Mon) *gin.Engine {
 			return
 		}
 
-		err = mon.GoUpdateUser(user)
+		err = mon.GoUser.Update(user)
 
 		if err != nil {
 			HandleError(c, http.StatusExpectationFailed, err)
@@ -55,7 +55,7 @@ func User(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		token := c.GetHeader("Authorization")
 		user := sesh.GetSesh()[token]
 
-		userInfo, err := mon.GoGetUser(user.Username)
+		userInfo, err := mon.GoUser.Get(user.Username)
 		HandleError(c, http.StatusUnauthorized, err)
 
 		HandleSuccess(c, http.StatusOK, gin.H{

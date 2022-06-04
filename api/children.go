@@ -30,14 +30,14 @@ func Children(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		kid.PrimaryGuardians = append(kid.PrimaryGuardians, id)
 		kid.AuthorizedGuardians = append(kid.AuthorizedGuardians, id)
 
-		childId, err := mon.GoNewKid(kid.FirstName, kid.MiddleName, kid.LastName, kid.Birthday, kid.Owner, kid.PrimaryGuardians, kid.AuthorizedGuardians)
+		childId, err := mon.GoChild.New(kid.FirstName, kid.MiddleName, kid.LastName, kid.Birthday, kid.Owner, kid.PrimaryGuardians, kid.AuthorizedGuardians)
 		kid.Id = childId
 		if err != nil {
 			HandleError(c, http.StatusInternalServerError, err)
 			return
 		}
 
-		err = mon.GoAppendUserField(id, "kids", childId)
+		err = mon.GoUser.AppendField(id, "kids", childId)
 		if err != nil {
 			HandleError(c, http.StatusInternalServerError, err)
 			return
@@ -56,7 +56,7 @@ func Children(router *gin.Engine, mon mon.Mon) *gin.Engine {
 			return
 		}
 
-		user, err := mon.GoGetUser(id)
+		user, err := mon.GoUser.Get(id)
 		if err != nil {
 			HandleError(c, http.StatusUnauthorized, err)
 			return
@@ -65,7 +65,7 @@ func Children(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		//for eash kid in the user's kids field get that kid from the mongo db and store it in an array
 		kids := []types.Kid{}
 		for _, kid := range user.Kids {
-			kidInfo, err := mon.GoGetKid(kid)
+			kidInfo, err := mon.GoChild.Get(kid)
 			kidInfo.Id = kid
 			if err != nil {
 				HandleError(c, http.StatusUnauthorized, err)
@@ -90,7 +90,7 @@ func Children(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		}
 
 		kidId := c.Param("id")
-		kid, err := mon.GoGetKid(kidId)
+		kid, err := mon.GoChild.Get(kidId)
 		if err != nil {
 			HandleError(c, http.StatusUnauthorized, err)
 			return
@@ -111,7 +111,7 @@ func Children(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		}
 
 		kidId := c.Param("id")
-		kid, err := mon.GoGetKid(kidId)
+		kid, err := mon.GoChild.Get(kidId)
 		if err != nil {
 			HandleError(c, http.StatusUnauthorized, err)
 			return
@@ -127,7 +127,7 @@ func Children(router *gin.Engine, mon mon.Mon) *gin.Engine {
 			return
 		}
 
-		err = mon.GoUpdateKid(kidUpdate)
+		err = mon.GoChild.Update(kidUpdate)
 
 		if err != nil {
 			HandleError(c, http.StatusUnauthorized, err)
@@ -150,7 +150,7 @@ func Children(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		}
 
 		kidId := c.Param("id")
-		kid, err := mon.GoGetKid(kidId)
+		kid, err := mon.GoChild.Get(kidId)
 		if err != nil {
 			HandleError(c, http.StatusUnauthorized, err)
 			return
@@ -162,7 +162,7 @@ func Children(router *gin.Engine, mon mon.Mon) *gin.Engine {
 			return
 		}
 
-		err = mon.GoDeleteKid(kidId)
+		err = mon.GoChild.Delete(kidId)
 		if err != nil {
 			HandleError(c, http.StatusUnauthorized, err)
 			return
