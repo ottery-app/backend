@@ -44,14 +44,28 @@ func (mon *Mon) child(ctx context.Context, database *mongo.Database) {
 		return kid, err
 	}
 
-	mon.GoChild.Update = func(kid types.Kid) error {
-		err := kids.FindOneAndReplace(ctx, bson.M{"_id": kid.Id}, kid).Err()
+	mon.GoChild.Update = func(kid types.Kid) (err error) {
+		var oid primitive.ObjectID
+		oid, err = primitive.ObjectIDFromHex(kid.Id)
+
+		if err != nil {
+			return err
+		}
+
+		err = kids.FindOneAndReplace(ctx, bson.M{"_id": oid}, kid).Err()
 		return err
 	}
 
 	mon.GoChild.Delete = func(id string) error {
 		//get the kid and remove itself from all of the authorized guardians
 		kid, err := mon.GoChild.Get(id)
+
+		if err != nil {
+			return err
+		}
+
+		//get oid
+		oid, err := primitive.ObjectIDFromHex(kid.Id)
 
 		if err != nil {
 			return err
@@ -67,7 +81,7 @@ func (mon *Mon) child(ctx context.Context, database *mongo.Database) {
 		}
 
 		//handle success
-		err = kids.FindOneAndDelete(ctx, bson.M{"_id": kid.Id}).Err()
+		err = kids.FindOneAndDelete(ctx, bson.M{"_id": oid}).Err()
 
 		return err
 	}

@@ -150,6 +150,7 @@ func Children(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		}
 
 		kidId := c.Param("id")
+
 		kid, err := mon.GoChild.Get(kidId)
 		if err != nil {
 			HandleError(c, http.StatusUnauthorized, err)
