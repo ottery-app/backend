@@ -20,6 +20,9 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 			Password string `json:"password"`
 		}{}
 
+		fmt.Println(login.Username)
+		fmt.Println(login.Password)
+
 		var token string
 
 		c.Bind(&login)
@@ -117,6 +120,10 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 				}
 			}
 		}(content.Username, code)
+
+		HandleSuccess(c, http.StatusOK, gin.H{
+			"message": "user created",
+		})
 	})
 
 	router.POST("auth/resendActivation", func(c *gin.Context) {
@@ -159,7 +166,10 @@ func Auth(router *gin.Engine, mon mon.Mon) *gin.Engine {
 	router.DELETE("auth/logout", func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
 		sesh.GetSesh().Delete(token)
-		HandleSuccess(c, http.StatusOK, gin.H{})
+
+		HandleSuccess(c, http.StatusOK, gin.H{
+			"message": "logged out",
+		})
 	})
 
 	return router
