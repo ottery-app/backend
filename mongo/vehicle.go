@@ -10,8 +10,10 @@ import (
 )
 
 type goVehicle struct {
-	New func(string, types.Vehicle) (string, error)
-	Get func(string) (types.Vehicle, error)
+	New    func(string, types.Vehicle) (string, error)
+	Get    func(string) (types.Vehicle, error)
+	Update func(string, types.Vehicle) error
+	Delete func(string) error
 }
 
 func (mon *Mon) vehicle(ctx context.Context, database *mongo.Database) {
@@ -37,5 +39,25 @@ func (mon *Mon) vehicle(ctx context.Context, database *mongo.Database) {
 		oid, err = primitive.ObjectIDFromHex(id)
 		err = vehicles.FindOne(ctx, bson.M{"_id": oid}).Decode(&vehicle)
 		return vehicle, err
+	}
+
+	mon.GoVehicle.Update = func(id string, vehicle types.Vehicle) error {
+		var oid primitive.ObjectID
+		oid, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return err
+		}
+		_, err = vehicles.UpdateOne(ctx, bson.M{"_id": oid}, bson.M{"$set": vehicle})
+		return err
+	}
+
+	mon.GoVehicle.Delete = func(id string) error {
+		var oid primitive.ObjectID
+		oid, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return err
+		}
+		_, err = vehicles.DeleteOne(ctx, bson.M{"_id": oid})
+		return err
 	}
 }

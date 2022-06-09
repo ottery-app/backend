@@ -73,5 +73,33 @@ func User(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		})
 	})
 
+	router.GET("user/:username", func(c *gin.Context) {
+		username := c.Param("username")
+		userInfo, err := mon.GoUser.Get(username)
+
+		if err != nil {
+			HandleError(c, http.StatusExpectationFailed, err)
+			return
+		}
+
+		HandleSuccess(c, http.StatusOK, gin.H{
+			"user": userInfo,
+		})
+	})
+
+	router.DELETE("user/:username", func(c *gin.Context) {
+		username := c.Param("username")
+		err := mon.GoUser.Delete(username)
+
+		if err != nil {
+			HandleError(c, http.StatusExpectationFailed, err)
+			return
+		}
+
+		HandleSuccess(c, http.StatusOK, gin.H{
+			"message": "success",
+		})
+	})
+
 	return router
 }
