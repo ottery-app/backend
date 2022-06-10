@@ -10,7 +10,7 @@ import (
 )
 
 type goVehicle struct {
-	New    func(string, types.Vehicle) (string, error)
+	New    func(types.Vehicle) (string, error)
 	Get    func(string) (types.Vehicle, error)
 	Update func(string, types.Vehicle) error
 	Delete func(string) error
@@ -20,8 +20,7 @@ func (mon *Mon) vehicle(ctx context.Context, database *mongo.Database) {
 	vehicles := database.Collection("vehicles")
 	mon.GoVehicle = goVehicle{}
 
-	mon.GoVehicle.New = func(owner string, vehicle types.Vehicle) (id string, err error) {
-		vehicle.Owner = id
+	mon.GoVehicle.New = func(vehicle types.Vehicle) (id string, err error) {
 
 		res, err := vehicles.InsertOne(ctx, vehicle)
 

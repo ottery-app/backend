@@ -29,9 +29,7 @@ func User(router *gin.Engine, mon mon.Mon) *gin.Engine {
 		var err error
 
 		user, err = mon.GoUser.Get(id)
-		fmt.Println(user)
 		c.Bind(&user)
-		fmt.Println(user)
 
 		if err != nil {
 			HandleError(c, http.StatusExpectationFailed, err)

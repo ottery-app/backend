@@ -31,7 +31,9 @@ func Vehicles(router *gin.Engine, mon mon.Mon) *gin.Engine {
 			return
 		}
 
-		id, err := mon.GoVehicle.New(user.Username, vehicle)
+		vehicle.Owner = user.Username
+
+		id, err := mon.GoVehicle.New(vehicle)
 		if err != nil {
 			HandleError(c, http.StatusInternalServerError, err)
 			return
@@ -115,6 +117,7 @@ func Vehicles(router *gin.Engine, mon mon.Mon) *gin.Engine {
 
 		//get the vehicle from the database
 		vehicle, err := mon.GoVehicle.Get(vehicleId)
+		vehicle.Id = vehicleId
 		if err != nil {
 			HandleError(c, http.StatusInternalServerError, err)
 			return
@@ -202,6 +205,11 @@ func Vehicles(router *gin.Engine, mon mon.Mon) *gin.Engine {
 
 		//remove the vehicle from the user's vehicles
 		mon.GoUser.RemoveFromField(userSesh.Username, "vehicles", vehicleId)
+
+		if err != nil {
+			HandleError(c, http.StatusInternalServerError, err)
+			return
+		}
 
 		//remove the vehicle from the database
 		err = mon.GoVehicle.Delete(vehicleId)
