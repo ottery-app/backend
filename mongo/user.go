@@ -48,10 +48,13 @@ func (mon *Mon) user(ctx context.Context, database *mongo.Database) {
 		return code, err
 	}
 
-	mon.GoUser.Delete = func(username string) error {
-		_, err := users.DeleteOne(ctx, bson.M{"_id": username})
-		return err
-	}
+	/*
+		the user will be used so frequently that it would need to remove itself from all collections that use it
+		mon.GoUser.Delete = func(username string) error {
+			_, err := users.DeleteOne(ctx, bson.M{"_id": username})
+			return err
+		}
+	*/
 
 	mon.GoUser.Activate = func(username string, activationCode string) (err error) {
 		user, err := mon.GoUser.Get(username)
@@ -98,8 +101,8 @@ func (mon *Mon) user(ctx context.Context, database *mongo.Database) {
 	}
 
 	mon.GoUser.RemoveFromField = func(id string, field string, val interface{}) error {
-		//removes the first instance of the value from the array in the user
-		err := mon.updateOne(users, id, field, "$pull", bson.M{field: val})
+		fmt.Println(val)
+		err := mon.updateOne(users, id, field, "$pull", val)
 		return err
 	}
 

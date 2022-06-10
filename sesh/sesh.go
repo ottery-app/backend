@@ -23,6 +23,7 @@ var instance singleton //this may be the couse of a bug
 func GetSesh() singleton {
 	once.Do(func() { // <-- atomic, does not allow repeating
 		instance = make(singleton) // <-- thread safe
+		instance.Add("dev", User{Username: "dev", State: DefaultState})
 	})
 
 	return instance
