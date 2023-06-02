@@ -1,17 +1,25 @@
 import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException } from '@nestjs/common';
 import { classifyWithDto } from 'ottery-dto';
 
+
+function printResults(value, meta, msg) {
+  if (value) {
+    console.log(meta.type + ' ' + meta.data);
+    console.log("\tvalue: " + value);
+    console.log("\tresults: " + msg);
+  }
+}
+
 @Injectable()
 export class OtteryDtoValidationPipe implements PipeTransform {
   constructor() {}
 
   transform(value: any, metadata: ArgumentMetadata) {
+    let print = value;
+
     if (value && value.password) {
-      const print = {...value};
+      print = {...value};
       print.password = "secret";
-      console.log(print);
-    } else {
-      console.log(value);
     }
 
     if (metadata.type === "body") {
@@ -27,12 +35,12 @@ export class OtteryDtoValidationPipe implements PipeTransform {
           );
         }
       } catch (e) {
-        console.log("THROW");
+        printResults(print, metadata, "ERROR")
         throw new BadRequestException(e.message);
       }
     }
 
-    console.log("SUCCESS");
+    printResults(print, metadata, "SUCCESS");
     return value;
   }
 }

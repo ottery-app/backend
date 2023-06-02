@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ChildRequestDto, id, noId, requestStatus, requestType } from 'ottery-dto';
+import { ChildRequestDto, classifyWithDto, id, noId, requestStatus, requestType } from 'ottery-dto';
 import * as delay from 'delay';
 import { timeout, tryagain } from './tempzone.meta';
 import { ChildService } from '../child/child.service';
@@ -7,6 +7,24 @@ import { LocatableService } from '../locatable/locatable.service';
 import { ChildReqeust, ChildReqeustDocument } from './childRequest.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+
+function requestPipe(request, responce) {
+    if (responce) {
+        return responce;
+    } else {
+        const res = {
+            child: noId,
+            event: noId,
+            guardian: noId,
+            status: requestStatus.NONE,
+            type: requestType.NONE,
+            ...request,
+        }
+
+        classifyWithDto(ChildRequestDto, res, {throw:true})
+        return res;
+    }
+}
 
 @Injectable()
 export class TempZoneService {
@@ -68,7 +86,7 @@ export class TempZoneService {
         childRequest.type = type;
 
         let request = await this.saveRequest(childRequest);
-        this.delayedDeleteRequest(request, timeout + tryagain);
+        this.delayedDeleteRequest(request, timeout + 2 * tryagain);
 
         (async ()=>{
             let waittime = 0;
@@ -77,10 +95,11 @@ export class TempZoneService {
                 waittime += tryagain;
 
                 request = await this.getRequestByChildId(request.child);
+
                 if (waittime >= timeout) {
                     request = await this.declineRequest(request);
                 }
-            } while (request.status === requestStatus.INPROGRESS);
+            } while (request && request.status === requestStatus.INPROGRESS);
         })()
 
         return request;
@@ -95,11 +114,13 @@ export class TempZoneService {
     }
 
     async checkChildStatus(childId: id) {
-        return await this.getRequestByChildId(childId);
+        let res = await this.getRequestByChildId(childId);
+        return requestPipe({child:childId}, res);
     }
 
     async checkEventStatus(eventId: id) {
-        return await this.getRequestsByEventId(eventId);
+        let res = await this.getRequestsByEventId(eventId);
+        return res.map((res)=>requestPipe({event:eventId}, res));
     }
 
     async acceptRequest(childRequest: ChildRequestDto, acceptor: id) {
@@ -125,7 +146,11 @@ export class TempZoneService {
 
     async declineRequest(childRequest: ChildRequestDto) {
         const request = await this.getRequestByChildId(childRequest.child);
+        console.log(request);
         request.status = requestStatus.REJECTED;
-        return await request.save();
+        console.log(request);
+        await request.save();
+        console.log(request);
+        return request;
     }
 }
