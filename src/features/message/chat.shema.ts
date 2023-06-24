@@ -10,6 +10,9 @@ export class Chat {
   _id: id;
 
   @Prop({required:true})
+  name: string;
+
+  @Prop({required:true})
   users: id[];
 
   @Prop({required:true})

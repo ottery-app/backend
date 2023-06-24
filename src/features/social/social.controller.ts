@@ -67,16 +67,4 @@ export class SocialController {
         const selfId = this.seshService.getSeshInfo(seshId).userId;
         return (await this.socialService.updateLinkStatus(selfId, target)).history[0].state;
     }
-
-    @Post('message/:userId')
-    async sendMessage(
-        @Headers('Id') seshId: id,
-        @Param("userId") userId: id,
-        @Body() message: string,
-    ) {
-       const selfId = this.seshService.getSeshInfo(seshId).userId;
-       const msg = new MessageDto(selfId, message);
-
-       throw new Error("TODO");
-    }
 }

@@ -13,19 +13,24 @@ export class MessageService {
     constructor(
         @InjectModel(Chat.name) private readonly chatModel: Model<ChatDocument>,
         private userService: UserService,
-        private notificationService: NotificationService,
+        private notificationService: NotificationService, //TODO notify the user when a chat is updated
     ) {}
 
     private async makeChat(users:id[]) {
+        if (users.length > 2) {
+            throw new Error("Group chats are not yet supported");
+        }
+
         const chat = new this.chatModel({
+            name: "unamed",
             users: users.map(normalizeId),
             messages: []
         });
 
-
         const res = await chat.save();
 
         const userDocs = await this.userService.findManyById(users);
+        
         for (let i = 0; i < userDocs.length; i++) {
             userDocs[i].chats.push(res._id);
             userDocs[i].save();
@@ -34,31 +39,25 @@ export class MessageService {
         return res;
     }
 
-    async makeEmptyChat(users: id[]) {
-        return await (await this.makeChat(users)).save();
-    }
-
     async getById(chatId:id) {
         return await this.chatModel.findById(chatId);
     }
 
     async getByUsers(users: id[]) {
+        if (users.length > 2) {
+            throw new Error("Group chats are not yet supported");
+        }
+
         const ids = users.map(normalizeId);
         return await this.chatModel.findOne({ users: { $all: ids } });
     }
 
-    async getChats(userId: id) {
-        const user = await this.userService.findOneById(userId);
-
-        const chats = [];
-
-        if (user.chats) {
-            for (let i = 0; i < user.chats.length; i++) {
-                chats.push(await this.chatModel.findById(user.chats[i]));
+    async getForUser(userId:id) {
+        return await this.chatModel.find({
+            users:{
+                $all:[normalizeId(userId)]
             }
-        }
-
-        return chats;
+        });
     }
 
     async sendMessage(userId: id, message: MessageDto) {

@@ -12,6 +12,7 @@ import { DataModule } from './features/data/data.module';
 import { TempZoneModule } from './features/tempzone/tempzone.module';
 import { SocialModule } from './features/social/social.module';
 import { NotificationModule } from './features/notifications/notification.module';
+import { MessageModule } from './features/message/message.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { NotificationModule } from './features/notifications/notification.module
     TempZoneModule,
     SocialModule,
     NotificationModule,
+    MessageModule,
   ],
   controllers: [],
   providers: [
