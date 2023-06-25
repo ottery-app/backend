@@ -6,7 +6,7 @@ import { UserService } from '../user/user.service';
 import { CryptService } from '../crypt/crypt.service';
 import { ACTIVATION_CODE_LENGTH } from '../crypt/crypt.types';
 import { User } from '../user/user.schema';
-import {ActivationCodeDto, NewUserDto, LoginDto} from "ottery-dto";
+import {ActivationCodeDto, NewUserDto, LoginDto, noId} from "ottery-dto";
 import { token, id } from 'ottery-dto';
 import { DataService } from '../data/data.service';
 
@@ -109,7 +109,7 @@ export class AuthController {
   
     @Get("load")
     async load(
-        @Headers('Id') seshId: id,
+        @Headers('Id') seshId: id = noId,
         @Headers('Authorization') token: token,
     ) {
         let sesh: Sesh = this.seshService.getSeshInfo(seshId);

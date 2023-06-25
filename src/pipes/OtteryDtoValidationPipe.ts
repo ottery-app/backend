@@ -1,5 +1,5 @@
 import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException } from '@nestjs/common';
-import { classifyWithDto } from 'ottery-dto';
+import { classifyWithDto, isDuckDto } from 'ottery-dto';
 
 
 function printResults(value, meta, msg) {
@@ -24,7 +24,7 @@ export class OtteryDtoValidationPipe implements PipeTransform {
 
     if (metadata.type === "body") {
       try {
-        if (!Array.isArray(new metadata.metatype())) {
+        if (!Array.isArray(new metadata.metatype()) && isDuckDto(metadata.metatype)) {
           classifyWithDto(
             metadata.metatype,
             value, 
