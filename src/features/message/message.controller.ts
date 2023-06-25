@@ -32,7 +32,6 @@ export class MessageController {
     async getChatsFor(
         @Param("userId") userId: id,
     ) {
-        //THIS can just get chats from the user scema
         return await this.messageService.getForUser(userId);
     }
 }
