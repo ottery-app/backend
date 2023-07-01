@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { NotificationService } from '../notifications/notification.service';
 import { UserService } from '../user/user.service';
 import { Chat, ChatDocument } from './chat.shema';
-import { MessageDto, id } from 'ottery-dto';
+import { MakeChatDto, MessageDto, id } from 'ottery-dto';
 import { normalizeId } from 'src/functions/normalizeId';
 
 @Injectable()
@@ -16,20 +16,20 @@ export class MessageService {
         private notificationService: NotificationService, //TODO notify the user when a chat is updated
     ) {}
 
-    private async makeChat(users:id[]) {
-        if (users.length > 2) {
+    async makeChat(chatRaw:MakeChatDto) {
+        if (chatRaw.users.length > 2) {
             throw new Error("Group chats are not yet supported");
         }
 
         const chat = new this.chatModel({
-            name: "unamed",
-            users: users.map(normalizeId),
+            name: chatRaw.name,
+            users: chatRaw.users.map(normalizeId),
             messages: []
         });
 
         const res = await chat.save();
 
-        const userDocs = await this.userService.findManyById(users);
+        const userDocs = await this.userService.findManyById(chatRaw.users);
         
         for (let i = 0; i < userDocs.length; i++) {
             userDocs[i].chats.push(res._id);
@@ -59,14 +59,8 @@ export class MessageService {
             }
         });
     }
-
-    async sendMessage(userId: id, message: MessageDto) {
-        let chat = await this.getByUsers([userId, message.sender]);
-
-        if (!chat) {
-            chat = await this.makeChat([userId, message.sender]);
-        }
-
+    async sendMessage(chatId: id, message: MessageDto) {
+        let chat = await this.getById(chatId);
         chat.messages.push(message);
         return await chat.save();
     }

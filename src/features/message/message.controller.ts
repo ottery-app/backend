@@ -1,7 +1,8 @@
-import { Controller, Param, Headers, Body, Post, Get, Query, Patch } from '@nestjs/common';
-import { id, MessageDto, noId, StringDto } from 'ottery-dto';
+import { Controller, Param, Headers, Body, Get, Patch, Put } from '@nestjs/common';
+import { id, MakeChatDto, MessageDto, StringDto, classifyDto } from 'ottery-dto';
 import { SeshService } from '../sesh/sesh.service';
 import { MessageService } from './message.service';
+import { normalizeId } from 'src/functions/normalizeId';
 
 @Controller('api/message')
 export class MessageController {
@@ -10,15 +11,16 @@ export class MessageController {
         private messageService: MessageService,
     ) {}
 
-    @Patch('chat/:userId/:from')
+    @Patch('chat/direct/:chatId')
     async sendMessage(
         @Headers('Id') seshId: id,
-        @Param("userId") userId: id,
+        @Param("chatId") chatId: id,
         @Body() message: StringDto
     ) {
-        const selfId = this.seshService.getSeshInfo(seshId).userId;
+        const selfId = this.seshService.getSeshInfo(seshId).userId.toString();
         const msg = new MessageDto(selfId, message.string);
-        return await this.messageService.sendMessage(userId, msg);
+        classifyDto(msg, {throw:true});
+        return await this.messageService.sendMessage(chatId, msg);
     }
 
     @Get('chat/:chatId')
@@ -33,5 +35,12 @@ export class MessageController {
         @Param("userId") userId: id,
     ) {
         return await this.messageService.getForUser(userId);
+    }
+
+    @Put("chat/")
+    async makeChatWith(
+        @Body() makeChatDto: MakeChatDto,
+    ) {
+        return await this.messageService.makeChat(makeChatDto);
     }
 }
