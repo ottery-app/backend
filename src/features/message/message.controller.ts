@@ -1,8 +1,9 @@
-import { Controller, Param, Headers, Body, Get, Patch, Put } from '@nestjs/common';
-import { id, MakeChatDto, MessageDto, StringDto, classifyDto } from 'ottery-dto';
+import { Controller, Param, Headers, Body, Get, Patch, Put, Query } from '@nestjs/common';
+import { id, MakeChatDto, MessageDto, StringDto, classifyDto, isId } from 'ottery-dto';
 import { SeshService } from '../sesh/sesh.service';
 import { MessageService } from './message.service';
 import { normalizeId } from 'src/functions/normalizeId';
+import { ArrayValidationPipe } from 'src/pipes/ArrayValidationPipe';
 
 @Controller('api/message')
 export class MessageController {
@@ -33,8 +34,20 @@ export class MessageController {
     @Get('user/:userId')
     async getChatsFor(
         @Param("userId") userId: id,
+        @Query('requireUserIds', ArrayValidationPipe(isId)) requireUserIds: id[],
+        @Query('direct') direct: boolean,
     ) {
-        return await this.messageService.getForUser(userId);
+        let chats = await this.messageService.getForUser(userId);
+
+        if (requireUserIds?.length) {
+            chats = chats.filter((chat)=>requireUserIds.every((id)=>chat.users.includes(id)));
+        }
+
+        if (direct) {
+            chats = chats.filter(chat=>chat.users.length===2);
+        }
+
+        return chats;
     }
 
     @Put("chat/")

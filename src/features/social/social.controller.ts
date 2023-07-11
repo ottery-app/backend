@@ -65,6 +65,6 @@ export class SocialController {
         @Body() target: UpdateLinkDto,
     ) {
         const selfId = this.seshService.getSeshInfo(seshId).userId;
-        return (await this.socialService.updateLinkStatus(selfId, target)).history[0].state;
+        return (await this.socialService.updateLinkStatus(selfId, target)).history[0];
     }
 }
