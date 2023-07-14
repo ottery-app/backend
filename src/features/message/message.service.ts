@@ -43,6 +43,10 @@ export class MessageService {
         return await this.chatModel.findById(chatId);
     }
 
+    async getManyByIds(chatIds:id[]) {
+        return await this.chatModel.find({ _id: { $in: chatIds } });
+    }
+
     async getByUsers(users: id[]) {
         if (users.length > 2) {
             throw new Error("Group chats are not yet supported");
@@ -52,13 +56,6 @@ export class MessageService {
         return await this.chatModel.findOne({ users: { $all: ids } });
     }
 
-    async getForUser(userId:id) {
-        return await this.chatModel.find({
-            users:{
-                $all:[normalizeId(userId)]
-            }
-        });
-    }
     async sendMessage(chatId: id, message: MessageDto) {
         let chat = await this.getById(chatId);
         chat.messages.push(message);

@@ -95,6 +95,10 @@ export class UserService {
         return (await this.findOneById(userId)).events;
     }
 
+    async getChatsFor(userId: id) {
+        return (await this.findOneById(userId)).chats
+    }
+
     async addEventById(userId:id, eventId:id) {
         const user = await this.userModel.findById(userId).exec();
 

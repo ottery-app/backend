@@ -4,12 +4,14 @@ import { SeshService } from '../sesh/sesh.service';
 import { MessageService } from './message.service';
 import { normalizeId } from 'src/functions/normalizeId';
 import { ArrayValidationPipe } from 'src/pipes/ArrayValidationPipe';
+import { UserService } from '../user/user.service';
 
 @Controller('api/message')
 export class MessageController {
     constructor(
         private seshService: SeshService,
         private messageService: MessageService,
+        private userService: UserService,
     ) {}
 
     @Patch('chat/direct/:chatId')
@@ -37,7 +39,8 @@ export class MessageController {
         @Query('requireUserIds', ArrayValidationPipe(isId)) requireUserIds: id[],
         @Query('direct') direct: boolean,
     ) {
-        let chats = await this.messageService.getForUser(userId);
+        let chatIds = await this.userService.getChatsFor(userId);
+        let chats = await this.messageService.getManyByIds(chatIds);
 
         if (requireUserIds?.length) {
             chats = chats.filter((chat)=>requireUserIds.every((id)=>chat.users.includes(id)));
