@@ -66,14 +66,17 @@ export class NotificationService {
     async markNotificationsAsRead(userId: id) {
         const notificationDoc = await this.getDocumentByUser(userId);
 
-        for (let notification of notificationDoc.notifications) {
-            if (notification.read) {
+        for (let i in notificationDoc.notifications) {
+            if (notificationDoc.notifications[i].read) {
                 break;
             } else {
-                notification.read = true;
+                notificationDoc.notifications[i] = {
+                    ...notificationDoc.notifications[i],
+                    read: true,
+                }
             }
         }
 
-        return notificationDoc.save();
+        return await notificationDoc.save();
     }
 }
