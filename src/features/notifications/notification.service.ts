@@ -52,6 +52,7 @@ export class NotificationService {
             },
             message,
             type,
+            read:false,
             time: new Date().getTime(),
         })
 
@@ -60,5 +61,19 @@ export class NotificationService {
 
     async getNotificationsByUser(userId:id) {
         return (await this.getDocumentByUser(userId)).notifications;
+    }
+
+    async markNotificationsAsRead(userId: id) {
+        const notificationDoc = await this.getDocumentByUser(userId);
+
+        for (let notification of notificationDoc.notifications) {
+            if (notification.read) {
+                break;
+            } else {
+                notification.read = true;
+            }
+        }
+
+        return notificationDoc.save();
     }
 }

@@ -1,8 +1,6 @@
-import { Controller, Get, Post, Body, Headers, Param, Query } from '@nestjs/common';
+import { Controller, Get, Headers, Param, Patch } from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import { id } from 'ottery-dto';
-import { Notification } from './notification.schema';
-import { User } from '../user/user.schema';
 import { SeshService } from '../sesh/sesh.service';
 
 @Controller('api/notifications')
@@ -12,12 +10,18 @@ export class NotificationController {
         private notificationService: NotificationService,
     ) {}
 
-    @Get(":id")
+    @Get(":userId")
     async get(
         @Headers('Id') seshId: id,
-        @Param('id') id: id,
-        //@Query('children') childIds: id[]
+        @Param('userId') userId: id,
     ) {
-        return await this.notificationService.getNotificationsByUser(id);
+        return await this.notificationService.getNotificationsByUser(userId);
+    }
+
+    @Patch(":userId")
+    async read(
+        @Param('userId') userId: id,
+    ) {
+        return await this.notificationService.markNotificationsAsRead(userId);
     }
 }
