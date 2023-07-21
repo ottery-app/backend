@@ -13,9 +13,9 @@ export class UserController {
         private eventService: EventService,
     ) {}
 
-    @Get(':id/children')
+    @Get(':userId/children')
     async getChildren (
-        @Param('id') userId: id,
+        @Param('userId') userId: id,
         @Query('at') at?: string, //id
         @Query('notat') notAt?: string //id
     ) {
@@ -37,9 +37,9 @@ export class UserController {
         }
     }
 
-    @Get(":id/events")
+    @Get(":userId/events")
     async getEventsFor(
-        @Param('id') id: id,
+        @Param('userId') id: id,
         @Query('children', ParseBoolPipe) children: boolean = false,
         @Query('self', ParseBoolPipe) self: boolean = false,
     ) { 
@@ -66,7 +66,6 @@ export class UserController {
 
     @Get('info')
     async getInfo (
-        @Param('id') userId: id,
         @Query("users") userIds: id[]
     ) {
         const users = [];
