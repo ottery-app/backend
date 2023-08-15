@@ -4,7 +4,8 @@ import { TempZoneService } from './tempzone.service';
 import { Patch, Query } from '@nestjs/common/decorators';
 import { ArrayValidationPipe } from 'src/pipes/ArrayValidationPipe';
 import { SeshService } from '../sesh/sesh.service';
-
+import { HttpException } from '@nestjs/common/exceptions';
+import { HttpStatus } from '@nestjs/common/enums';
 
 @Controller('api/tempzone')
 export class TempZoneController {

@@ -49,22 +49,6 @@ export class TempZoneService {
         return await request.save();
     }
 
-    private delayedDeleteRequest(request: ChildRequestDto, time: number = timeout) {
-        if (request) {
-            if (this.delays.get(request.child)) {
-                clearTimeout(this.delays.get(request.child));
-            }
-
-            //it might be better to store this in a db on the child so that this doesnt occur.
-            const timeout = setTimeout(()=>{
-                this.deleteRequest(request);
-                this.delays.delete(request.child);
-            }, time);
-
-            this.delays.set(request.child, timeout);
-        }
-    }
-
     private async deleteRequest(childRequest: ChildRequestDto) {
         const request = await this.getRequestByChildId(childRequest.child);
 
@@ -82,11 +66,22 @@ export class TempZoneService {
     }
 
     private async makeRequest(childRequest: ChildRequestDto, type:requestType) {
-        childRequest.status = requestStatus.INPROGRESS;
-        childRequest.type = type;
+        let request = await this.getRequestByChildId(childRequest.child);
 
-        let request = await this.saveRequest(childRequest);
-        this.delayedDeleteRequest(request, timeout + 2 * tryagain);
+        if (request) {
+            for (const key in childRequest) {
+                request[key] = childRequest[key]; // This will output each key in the object
+            }
+
+            request.status = requestStatus.INPROGRESS;
+            request.type = type;
+
+            request = await request.save();
+        } else {
+            childRequest.status = requestStatus.INPROGRESS;
+            childRequest.type = type;
+            request = await this.saveRequest(childRequest);
+        }
 
         (async ()=>{
             let waittime = 0;
@@ -94,7 +89,7 @@ export class TempZoneService {
                 await delay(tryagain);
                 waittime += tryagain;
 
-                request = await this.getRequestByChildId(request.child);
+                request = await this.getRequestByChildId(request.child) || request;
 
                 if (waittime >= timeout) {
                     request = await this.declineRequest(request);
@@ -145,12 +140,15 @@ export class TempZoneService {
     }
 
     async declineRequest(childRequest: ChildRequestDto) {
-        const request = await this.getRequestByChildId(childRequest.child);
-        console.log(request);
-        request.status = requestStatus.REJECTED;
-        console.log(request);
-        await request.save();
-        console.log(request);
-        return request;
+        let request = await this.getRequestByChildId(childRequest.child);
+
+        if (request) {
+            request.status = requestStatus.REJECTED;
+            await request.save();
+            return request;
+        } else { // this path is broken
+            request = await this.makeRequest(childRequest, childRequest.type);
+            return await this.declineRequest(request);
+        }
     }
 }

@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { ChildRequestDto, id, requestStatus, requestType } from 'ottery-dto';
+import { id, requestStatus, requestType } from 'ottery-dto';
 
 export type ChildReqeustDocument = ChildReqeust & Document;
 
