@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Event, EventDocument } from './event.schema';
-import { EventDto, id, MultiSchemeDto, PermLinkDto } from 'ottery-dto';
+import { EventDto, id, makePermLinkDto, MultiSchemeDto, perm, PermLinkDto } from 'ottery-dto';
 import { DataService } from '../data/data.service';
 import { PermsService } from '../roles/perms.service';
 import { ChildService } from '../child/child.service';
@@ -23,11 +23,8 @@ export class EventService {
         event.attendees = [];
         event.volenteers = [];
 
-        await this.permService.addPermBetween(owner, {
-            document: event,
-            id: event._id,
-            ref: Event.name,
-        });
+        const permDoc = await this.permService.create(owner, {id: event._id, ref: Event.name}, perm.SUPER);
+        event.perms.push(makePermLinkDto({owner, perms: permDoc._id}));
 
         return event.save();
     }

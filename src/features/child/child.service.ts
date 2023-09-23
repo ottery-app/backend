@@ -1,8 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Header, Injectable, NotFoundException } from '@nestjs/common';
 import { Child, ChildDocument} from './child.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateChildDto, MultiSchemeDto, noId } from 'ottery-dto';
+import { CreateChildDto, MultiSchemeDto, makePermLinkDto, noId, perm } from 'ottery-dto';
 import { id } from 'ottery-dto';
 import { DataService } from '../data/data.service';
 import { PermsService } from '../roles/perms.service';
@@ -28,16 +28,15 @@ export class ChildService {
         this.locatableService.stamp(child, noId, owner.id);
 
         //add data page so that we can store data associated with the child
-        child.data = (await this.dataService.create({
+        const data = await this.dataService.create({
             id: child._id,
             ref: Child.name,
-        }))._id;
+        });
+        child.data = data._id;
 
-        await this.permService.addPermBetween(owner, {
-            id: child._id,
-            ref: Child.name,
-            document: child,
-        })
+        //add permissions
+        const perms = await this.permService.create(owner, {id: child._id, ref: Child.name}, perm.SUPER);
+        child.perms.push(makePermLinkDto({owner, perms: perms._id}));
 
         return await child.save();
     }
@@ -86,6 +85,6 @@ export class ChildService {
      * @param id the ID of the child to delete
      */
     async deleteChild(id: id) {
-        this.childModel.findByIdAndDelete(id);
+        await this.childModel.findByIdAndDelete(id);
     }
 }

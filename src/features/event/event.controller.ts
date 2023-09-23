@@ -8,6 +8,7 @@ import { FormFieldService } from '../form/formField.service';
 import { Patch, Query } from '@nestjs/common/decorators';
 import { User } from '../user/user.schema';
 import { compareIds } from 'src/functions/compareIds';
+import { Roles } from '../roles/roles.decorator';
 
 @Controller('api/event')
 export class EventController {

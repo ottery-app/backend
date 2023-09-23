@@ -6,9 +6,9 @@ import { UserService } from '../user/user.service';
 import { CryptService } from '../crypt/crypt.service';
 import { ACTIVATION_CODE_LENGTH } from '../crypt/crypt.types';
 import { User } from '../user/user.schema';
-import {ActivationCodeDto, NewUserDto, LoginDto, noId} from "ottery-dto";
+import {ActivationCodeDto, NewUserDto, LoginDto, noId, perm, role} from "ottery-dto";
 import { token, id } from 'ottery-dto';
-import { DataService } from '../data/data.service';
+import { Roles } from '../roles/roles.decorator';
 
 @Controller('api/auth')
 export class AuthController {
@@ -81,13 +81,15 @@ export class AuthController {
     }
   
     @Delete("logout")
+    @Roles()
     async logout(
         @Headers('id') seshId: id,
     ) {
         return this.seshService.logout(seshId);
     }
   
-    @Post("login") 
+    @Post("login")
+    @Roles()
     async login(      
         @Headers('Id') seshId: id,
         @Body() createLoginDto: LoginDto,
