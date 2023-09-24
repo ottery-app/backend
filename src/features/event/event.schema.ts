@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { id, currency, time, recurrence, location, PermLinkDto } from 'ottery-dto';
-import { PermAble } from '../roles/permission.schema';
+import { PermAble } from '../perms/permission.schema';
 
 export type EventDocument = Event & Document;
 

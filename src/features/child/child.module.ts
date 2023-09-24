@@ -5,7 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ChildController } from './child.controller';
 import { UserModule } from '../user/user.module';
 import { DataModule } from '../data/data.module';
-import { PermsModule } from '../roles/perms.module';
+import { PermsModule } from '../perms/perms.module';
 import { LocatableModule } from '../locatable/locatable.module';
 
 @Module({

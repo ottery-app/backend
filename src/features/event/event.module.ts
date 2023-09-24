@@ -7,7 +7,7 @@ import { SeshModule } from '../sesh/sesh.module';
 import { EventService } from './event.service';
 import { FormModule } from '../form/form.module';
 import { DataModule } from '../data/data.module';
-import { PermsModule } from '../roles/perms.module';
+import { PermsModule } from '../perms/perms.module';
 import { ChildModule } from '../child/child.module';
 
 @Module({

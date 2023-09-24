@@ -2,9 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Event, EventDocument } from './event.schema';
-import { EventDto, id, makePermLinkDto, MultiSchemeDto, perm, PermLinkDto } from 'ottery-dto';
+import { EventDto, id, makePermLinkDto, MultiSchemeDto, perm } from 'ottery-dto';
 import { DataService } from '../data/data.service';
-import { PermsService } from '../roles/perms.service';
+import { PermsService } from '../perms/perms.service';
 import { ChildService } from '../child/child.service';
 import { UserService } from '../user/user.service';
 

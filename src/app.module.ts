@@ -13,7 +13,7 @@ import { TempZoneModule } from './features/tempzone/tempzone.module';
 import { SocialModule } from './features/social/social.module';
 import { NotificationModule } from './features/notifications/notification.module';
 import { MessageModule } from './features/message/message.module';
-import { PermsGuardPrivider } from './features/roles/perms.guard';
+import { PermsGuardPrivider } from './features/perms/perms.guard';
 import { SeshGuardProvider } from './features/sesh/sesh.guard';
 
 @Module({

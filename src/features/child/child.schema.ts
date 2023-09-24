@@ -5,7 +5,7 @@ import { ImageDto } from 'ottery-dto';
 import { DataAble } from '../data/data.schema';
 import { SignupAble } from '../event/event.schema';
 import { LocateAble } from '../locatable/locatable.interface';
-import { PermAble } from '../roles/permission.schema';
+import { PermAble } from '../perms/permission.schema';
 
 
 export type ChildDocument = Child & Document;

@@ -5,7 +5,7 @@ import { Model } from 'mongoose';
 import { CreateChildDto, MultiSchemeDto, makePermLinkDto, noId, perm } from 'ottery-dto';
 import { id } from 'ottery-dto';
 import { DataService } from '../data/data.service';
-import { PermsService } from '../roles/perms.service';
+import { PermsService } from '../perms/perms.service';
 import { LocatableService } from '../locatable/locatable.service';
 
 @Injectable()
