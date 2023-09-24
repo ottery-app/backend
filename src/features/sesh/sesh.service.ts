@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpCode, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Sesh } from './sesh.class';
 import { CryptService } from '../crypt/crypt.service';
 import { User } from '../user/user.schema';
@@ -25,9 +25,16 @@ export class SeshService {
      * @returns true if tokens match
      */
     validateSession(seshId: id, token: token) {
-        if (this.getSeshInfo(seshId).token !== token) { //wrong token to log out with
+        const sesh = this.getSeshInfo(seshId);
+
+        if (!sesh) {
             return false;
         }
+
+        if (sesh.token !== token) { //wrong token to log out with
+            return false;
+        }
+
         return true;
     }
 
@@ -98,5 +105,21 @@ export class SeshService {
         sesh.email = user.email;
         sesh.loggedin = true;
         return sesh;
+    }
+
+    isLoggedin(seshId: id) {
+        return this.getSeshInfo(seshId).loggedin;
+    }
+
+    isActivated(seshId: id) {
+        return this.getSeshInfo(seshId).activated;
+    }
+
+    isCaretaker(seshId: id) {
+        return this.getSeshInfo(seshId).state === role.GUARDIAN;
+    }
+
+    isGuardian(seshId: id) {
+        return this.getSeshInfo(seshId).state === role.CARETAKER;
     }
 }

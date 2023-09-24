@@ -9,6 +9,7 @@ import { User } from '../user/user.schema';
 import {ActivationCodeDto, NewUserDto, LoginDto, noId, perm, role} from "ottery-dto";
 import { token, id } from 'ottery-dto';
 import { Roles } from '../roles/roles.decorator';
+import { Seshless } from '../sesh/sesh.decorator';
 
 @Controller('api/auth')
 export class AuthController {
@@ -81,7 +82,6 @@ export class AuthController {
     }
   
     @Delete("logout")
-    @Roles()
     async logout(
         @Headers('id') seshId: id,
     ) {
@@ -89,7 +89,7 @@ export class AuthController {
     }
   
     @Post("login")
-    @Roles()
+    @Seshless()
     async login(      
         @Headers('Id') seshId: id,
         @Body() createLoginDto: LoginDto,
@@ -110,6 +110,7 @@ export class AuthController {
     }
   
     @Get("load")
+    @Seshless()
     async load(
         @Headers('Id') seshId: id = noId,
         @Headers('Authorization') token: token,

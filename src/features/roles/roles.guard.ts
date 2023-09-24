@@ -3,6 +3,7 @@ import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { APP_GUARD } from '@nestjs/core';
 import { SeshService } from '../sesh/sesh.service';
+import { role } from 'ottery-dto';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -20,16 +21,41 @@ export class RolesGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const roles = this.reflector.get<string[]>('roles', context.getHandler());
 
+    console.log(roles);
+
     if (!roles) {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest();
-    console.log(request);
+    const headers = context.switchToHttp().getRequest().headers;
 
-    //TODO check that the user sesh is loggedin
-    //TODO not authenticated role check
-    //TODO check that the user has the correct roles
+    const id = headers.id;
+
+    for (let check of roles) {
+      switch(check) {
+        case role.LOGGEDIN:
+          if (!this.seshService.isLoggedin(id)) {
+            return false;
+          }
+          break;
+        case role.ACTIVATED:
+          if (!this.seshService.isActivated(id)) {
+            return false;
+          }
+          break;
+        case role.CARETAKER:
+          if (!this.seshService.isCaretaker(id)) {
+            return false;
+          }
+          break;
+        case role.GUARDIAN:
+          if (!this.seshService.isGuardian(id)) {
+            return false;
+          }
+          break;
+      }
+    }
+
     return true;
   }
 }

@@ -4,7 +4,6 @@ import { SeshService } from '../sesh/sesh.service';
 import { UserService } from '../user/user.service';
 import { id } from 'ottery-dto';
 import { CreateChildDto } from 'ottery-dto';
-import { Child } from './child.schema';
 import { User } from '../user/user.schema';
 import { DataService } from '../data/data.service';
 
@@ -25,6 +24,7 @@ export class ChildController {
         try {
             //prep
             const sesh = this.seshService.getSeshInfo(seshId);
+
             //make
             let child = await this.childService.create({
                 id: sesh.userId,
@@ -33,11 +33,6 @@ export class ChildController {
 
             //add child to user
             this.userService.addChildById(sesh.userId, child._id);
-            //set data
-            child.data = (await this.dataService.create({
-                id:child._id,
-                ref: Child.name,
-            }))._id;
 
             //update
             return child

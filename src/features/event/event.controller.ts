@@ -8,7 +8,6 @@ import { FormFieldService } from '../form/formField.service';
 import { Patch, Query } from '@nestjs/common/decorators';
 import { User } from '../user/user.schema';
 import { compareIds } from 'src/functions/compareIds';
-import { Roles } from '../roles/roles.decorator';
 
 @Controller('api/event')
 export class EventController {
@@ -29,6 +28,7 @@ export class EventController {
 
             const volIds = await this.formFieldService.createMany(createEventDto.volenteerSignUp);
             const atenIds = await this.formFieldService.createMany(createEventDto.attendeeSignUp);
+            
             const event = await this.eventService.create({
                 id: userID,
                 ref: User.name,
