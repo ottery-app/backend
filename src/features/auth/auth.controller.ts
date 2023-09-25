@@ -75,7 +75,7 @@ export class AuthController {
             createUserDto.password = await this.cryptService.hash(createUserDto.password);
             let user = await this.userService.create(createUserDto);
             this.emailService.sendActivationCode(user.email, user.activationCode);
-            return this.seshService.register(seshId, user);
+            return this.seshService.login(seshId, user);
         } catch (e) {
             throw e;
         }
@@ -128,7 +128,7 @@ export class AuthController {
 
             return sesh; // Yes, the token is valid but they are not logged in
         } else { // The user is not logged in but there are no errors
-            return this.seshService.activateSesh(); // No, the user session does not exist, so make a new session
+            return this.seshService.create(); // No, the user session does not exist, so make a new session
         }
     }
 

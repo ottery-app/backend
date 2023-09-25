@@ -1,4 +1,4 @@
-import { token, id, role, time, email } from "ottery-dto";
+import { token, id, role, time, email, noId } from "ottery-dto";
 
 export class Sesh {
     /** The ID of the session. Used elsewhere to identify the session itself */
@@ -25,9 +25,10 @@ export class Sesh {
         this.seshId = seshId;
         this.start = new Date().getTime();
         this.loggedin = false;
-        this.token = undefined;
+        this.token = noId;
         this.activated = false;
         this.state = role.GUARDIAN;
-        this.event = null;
+        this.event = noId;
+        this.userId = noId;
     }
 }

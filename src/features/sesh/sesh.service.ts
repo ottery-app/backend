@@ -52,7 +52,7 @@ export class SeshService {
      * 
      * @returns information about the session
      */
-    activateSesh() {
+    create() {
         const seshId = this.cryptService.makeSeshId();
         this.sessions.set(seshId, new Sesh(seshId));
         return this.sessions.get(seshId);
@@ -64,7 +64,7 @@ export class SeshService {
      * @param seshId the session ID to end
      * @returns true if deleted
      */
-    killSesh(seshId: id): boolean {
+    private killSesh(seshId: id): boolean {
         return this.sessions.delete(seshId);
     }
 
@@ -98,28 +98,19 @@ export class SeshService {
         return this.getSeshInfo(seshId);
     }
 
-    register(seshId: id, user: User): Sesh {
-        const sesh = this.getSeshInfo(seshId);
-        sesh.userId = user._id;
-        sesh.token = this.cryptService.makeToken(user);
-        sesh.email = user.email;
-        sesh.loggedin = true;
-        return sesh;
-    }
-
     isLoggedin(seshId: id) {
-        return this.getSeshInfo(seshId).loggedin;
+        return this.getSeshInfo(seshId)?.loggedin || false;
     }
 
     isActivated(seshId: id) {
-        return this.getSeshInfo(seshId).activated;
+        return this.getSeshInfo(seshId)?.activated || false;
     }
 
     isCaretaker(seshId: id) {
-        return this.getSeshInfo(seshId).state === role.GUARDIAN;
+        return this.getSeshInfo(seshId)?.state === role.CARETAKER || false;
     }
 
     isGuardian(seshId: id) {
-        return this.getSeshInfo(seshId).state === role.CARETAKER;
+        return this.getSeshInfo(seshId)?.state === role.GUARDIAN || false;
     }
 }
