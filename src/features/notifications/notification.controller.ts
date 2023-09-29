@@ -6,7 +6,6 @@ import { SeshService } from '../sesh/sesh.service';
 @Controller('api/notifications')
 export class NotificationController {
     constructor(
-        private seshService: SeshService,
         private notificationService: NotificationService,
     ) {}
 

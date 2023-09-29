@@ -11,7 +11,6 @@ import { Sesh } from '../sesh/Sesh.decorator';
 @Controller('api/message')
 export class MessageController {
     constructor(
-        private seshService: SeshService,
         private messageService: MessageService,
         private userService: UserService,
     ) {}

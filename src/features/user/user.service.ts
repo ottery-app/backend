@@ -5,7 +5,7 @@ import { Model } from 'mongoose';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { CryptService } from '../crypt/crypt.service';
 import { ACTIVATION_CODE_LENGTH } from '../crypt/crypt.types';
-import { activationCode, DataFieldDto, email, id, role, UserDto } from 'ottery-dto';
+import { activationCode, email, id, role, UserDto } from 'ottery-dto';
 import { DataService } from '../data/data.service';
 
 @Injectable()
@@ -167,7 +167,6 @@ export class UserService {
         }
 
 
-        console.log(user);
         return await user.save();
     }
 

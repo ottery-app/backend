@@ -119,7 +119,6 @@ export class EventController {
         @Param("id") id: id,
     ){
         try {
-            console.log("running")
             const event = await this.eventService.findOneById(id);
             //TODO this is not guarenteed to always be the case that the first element is always the owner.
             //this issue should be switched to be more clearly expressed in the data. The information
@@ -127,7 +126,6 @@ export class EventController {
             //grows it will be harder to find this info. As a result it should be saved elsewhere.
             const ownerId = event.perms[0].owner.id;
             const owner = await this.userService.findOneById(ownerId);
-            console.log("didnt break");
             return new UserInfoDto(owner);
         } catch (e) {
             throw e;

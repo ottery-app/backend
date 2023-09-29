@@ -4,9 +4,14 @@ import { classifyWithDto, isDuckDto } from 'ottery-dto';
 
 function printResults(value, meta, msg) {
   if (value) {
-    console.log(meta.type + ' ' + meta.data);
-    console.log("\tvalue: " + value);
-    console.log("\tresults: " + msg);
+    if (meta.data) {
+      console.log(meta.type + ' ' + meta.data);
+    } else {
+      console.log(meta.type);
+    }
+
+    console.log("value: \n" + value);
+    console.log("results: \n" + msg);
   }
 }
 

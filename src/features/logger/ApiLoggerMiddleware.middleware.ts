@@ -6,15 +6,16 @@ export class ApiLoggerMiddleware implements NestMiddleware {
   private logger = new Logger('HTTP');
 
   use(request: Request, response: Response, next: NextFunction): void {
-    const { ip, method, path: url } = request;
+    const { ip, method, baseUrl } = request; // Access the route object
+
     const userAgent = request.get('user-agent') || '';
 
     response.on('close', () => {
       const { statusCode } = response;
-      const contentLength = response.get('content-length');
 
+      // Include the route name in the log output
       this.logger.log(
-        `${method} ${url} ${statusCode} ${contentLength} - ${userAgent} ${ip}`
+        `${method} ${baseUrl} ${statusCode} - ${userAgent} ${ip}`
       );
     });
 

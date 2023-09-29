@@ -4,7 +4,6 @@ import { Model } from "mongoose";
 import { DataFieldDto, id, MultiSchemeDto } from "ottery-dto";
 import { Data, DataDocument } from "./data.schema";
 import { FormFieldService } from "../form/formField.service";
-import { FormField } from "../form/formField.schema";
 
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
