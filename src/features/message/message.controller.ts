@@ -5,6 +5,8 @@ import { MessageService } from './message.service';
 import { normalizeId } from 'src/functions/normalizeId';
 import { ArrayValidationPipe } from 'src/pipes/ArrayValidationPipe';
 import { UserService } from '../user/user.service';
+import { SeshDocument } from '../sesh/sesh.schema';
+import { Sesh } from '../sesh/Sesh.decorator';
 
 @Controller('api/message')
 export class MessageController {
@@ -16,11 +18,11 @@ export class MessageController {
 
     @Patch('chat/direct/:chatId')
     async sendMessage(
-        @Headers('Id') seshId: id,
+        @Sesh() sesh: SeshDocument,
         @Param("chatId") chatId: id,
         @Body() message: StringDto
     ) {
-        const selfId = this.seshService.getSeshInfo(seshId).userId.toString();
+        const selfId = sesh.userId.toString();
         const msg = new MessageDto(selfId, message.string);
         classifyDto(msg, {throw:true});
         return await this.messageService.sendMessage(chatId, msg);

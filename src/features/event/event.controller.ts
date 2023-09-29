@@ -8,23 +8,24 @@ import { FormFieldService } from '../form/formField.service';
 import { Patch, Query } from '@nestjs/common/decorators';
 import { User } from '../user/user.schema';
 import { compareIds } from 'src/functions/compareIds';
+import { Sesh } from '../sesh/Sesh.decorator';
+import { SeshDocument } from '../sesh/sesh.schema';
 
 @Controller('api/event')
 export class EventController {
     constructor(
         private userService: UserService,
-        private seshService: SeshService,
         private eventService: EventService,
         private formFieldService: FormFieldService,
     ) {}
 
     @Post()
     async create (
-        @Headers('Id') seshId: id,
+        @Sesh() sesh: SeshDocument,
         @Body() createEventDto: CreateEventDto,
     ){
         try {
-            const userID = this.seshService.getSeshInfo(seshId).userId;
+            const userID = sesh.userId;
 
             const volIds = await this.formFieldService.createMany(createEventDto.volenteerSignUp);
             const atenIds = await this.formFieldService.createMany(createEventDto.attendeeSignUp);
@@ -83,12 +84,12 @@ export class EventController {
 
     @Get(":id/is/volenteer")
     async getVolenteerStatus(
-        @Headers('Id') seshId: id,
+        @Sesh() sesh: SeshDocument,
         @Param("id") id: id,
         //can later add user id. But should first check the sesh status as plain id may be insecure.
     ) {
         try {
-            const userId = this.seshService.getSeshInfo(seshId).userId;
+            const userId = sesh.userId;
             const volenteers = await (await this.eventService.findOneById(id)).volenteers;
             for (let i = 0; i < volenteers.length; i++) {
                 if (compareIds(volenteers[i], userId)) {

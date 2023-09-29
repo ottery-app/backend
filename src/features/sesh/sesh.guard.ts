@@ -17,19 +17,23 @@ export class SeshGuard implements CanActivate {
    * @param context ???
    * @returns ???
    */
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext) {
     const ignore = this.reflector.get<string[]>('ignore-sesh', context.getHandler());
 
+    const request = context.switchToHttp().getRequest();
+
+    const id = request.headers.id;
+    const authorization = request.headers.authorization;
+
     if (ignore) {
-        return true;
+      const sesh = await this.seshService.getSeshInfo(id);
+      request.sesh = sesh;
+    } else {
+      const sesh = await this.seshService.safelyGet(id, authorization);
+      request.sesh = sesh;
     }
 
-    const headers = context.switchToHttp().getRequest().headers;
-
-    const id = headers.id;
-    const authorization = headers.authorization;
-
-    return this.seshService.validateSession(id, authorization);
+    return true;
   }
 }
 

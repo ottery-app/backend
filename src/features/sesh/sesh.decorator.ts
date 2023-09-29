@@ -1,3 +1,10 @@
-import { SetMetadata } from "@nestjs/common";
+// Create a file, sesh.decorator.ts
 
-export const Seshless = () => SetMetadata("ignore-sesh", true);
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+
+export const Sesh = createParamDecorator(
+  (data: unknown, context: ExecutionContext) => {
+    const request = context.switchToHttp().getRequest();
+    return request.sesh; // Access the "sesh" information from the request object
+  },
+);

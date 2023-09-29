@@ -25,29 +25,27 @@ export class RolesGuard implements CanActivate {
       return true;
     }
 
-    const headers = context.switchToHttp().getRequest().headers;
-
-    const id = headers.id;
+    const sesh = context.switchToHttp().getRequest().sesh;
 
     for (let check of roles) {
       switch(check) {
         case role.LOGGEDIN:
-          if (!this.seshService.isLoggedin(id)) {
+          if (!this.seshService.isLoggedin(sesh)) {
             return false;
           }
           break;
         case role.ACTIVATED:
-          if (!this.seshService.isActivated(id)) {
+          if (!this.seshService.isActivated(sesh)) {
             return false;
           }
           break;
         case role.CARETAKER:
-          if (!this.seshService.isCaretaker(id)) {
+          if (!this.seshService.isCaretaker(sesh)) {
             return false;
           }
           break;
         case role.GUARDIAN:
-          if (!this.seshService.isGuardian(id)) {
+          if (!this.seshService.isGuardian(sesh)) {
             return false;
           }
           break;

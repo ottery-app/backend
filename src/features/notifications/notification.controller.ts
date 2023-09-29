@@ -12,7 +12,6 @@ export class NotificationController {
 
     @Get(":userId")
     async get(
-        @Headers('Id') seshId: id,
         @Param('userId') userId: id,
     ) {
         return await this.notificationService.getNotificationsByUser(userId);

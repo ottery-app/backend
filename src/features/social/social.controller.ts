@@ -3,6 +3,8 @@ import { id, MessageDto, socialLinkState, UpdateLinkDto, UserInfoDto, UserSocial
 import { SeshService } from '../sesh/sesh.service';
 import { SocialService } from './social.service';
 import { UserService } from '../user/user.service';
+import { Sesh } from '../sesh/Sesh.decorator';
+import { SeshDocument } from '../sesh/sesh.schema';
 
 @Controller('api/social')
 export class SocialController {
@@ -14,11 +16,11 @@ export class SocialController {
 
     @Get('status')
     async getStatus(
-        @Headers('Id') seshId: id,
+        @Sesh() sesh: SeshDocument,
         @Query('userIds') userIds: id[], 
         @Query('types') types: socialLinkState[],
     ) {
-        const selfId:id = await this.seshService.getSeshInfo(seshId).userId;
+        const selfId:id = sesh.userId;
         let users:any = new Map();
 
         if (userIds) {
@@ -61,10 +63,10 @@ export class SocialController {
 
     @Patch('update')
     async updateStatus(
-        @Headers('Id') seshId: id,
+        @Sesh() sesh: SeshDocument,
         @Body() target: UpdateLinkDto,
     ) {
-        const selfId = this.seshService.getSeshInfo(seshId).userId;
+        const selfId = sesh.userId;
         return (await this.socialService.updateLinkStatus(selfId, target)).history[0];
     }
 }

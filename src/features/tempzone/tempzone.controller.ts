@@ -4,8 +4,8 @@ import { TempZoneService } from './tempzone.service';
 import { Patch, Query } from '@nestjs/common/decorators';
 import { ArrayValidationPipe } from 'src/pipes/ArrayValidationPipe';
 import { SeshService } from '../sesh/sesh.service';
-import { HttpException } from '@nestjs/common/exceptions';
-import { HttpStatus } from '@nestjs/common/enums';
+import { SeshDocument } from '../sesh/sesh.schema';
+import { Sesh } from '../sesh/Sesh.decorator';
 
 @Controller('api/tempzone')
 export class TempZoneController {
@@ -42,10 +42,10 @@ export class TempZoneController {
 
     @Patch("request/accept")
     async acceptRequest(
-        @Headers('Id') seshId: id,
+        @Sesh() sesh: SeshDocument,
         @Body(ArrayValidationPipe(ChildRequestDto)) requests: ChildRequestDto[] 
     ) {
-        const userId = this.seshService.getSeshInfo(seshId).userId;
+        const userId = sesh.userId;
 
         let responces: ChildRequestDto[] = [];
 

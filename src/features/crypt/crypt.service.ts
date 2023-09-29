@@ -42,14 +42,14 @@ export class CryptService {
         return result;
     }
 
-    /**
-     * Generates a random string used for session IDs
-     * 
-     * @returns a 32-character string
-     */
-    makeSeshId() {
-        return this.makeCode(32);
-    }
+    // /**
+    //  * Generates a random string used for session IDs
+    //  * 
+    //  * @returns a 32-character string
+    //  */
+    // makeSeshId() {
+    //     return this.makeCode(32);
+    // }
 
     /**
      * Generates a random string used for tokens

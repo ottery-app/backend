@@ -6,6 +6,8 @@ import { id } from 'ottery-dto';
 import { CreateChildDto } from 'ottery-dto';
 import { User } from '../user/user.schema';
 import { DataService } from '../data/data.service';
+import { SeshDocument } from '../sesh/sesh.schema';
+import { Sesh } from '../sesh/Sesh.decorator';
 
 @Controller('api/child')
 export class ChildController {
@@ -18,13 +20,10 @@ export class ChildController {
 
     @Post()
     async create (
-        @Headers('Id') seshId: id,
+        @Sesh() sesh: SeshDocument,
         @Body() createChildDto: CreateChildDto,
     ){
         try {
-            //prep
-            const sesh = this.seshService.getSeshInfo(seshId);
-
             //make
             let child = await this.childService.create({
                 id: sesh.userId,
@@ -41,10 +40,9 @@ export class ChildController {
         }
     }
 
-    //TODO this doesnt even validate the sesh :/
     @Get()
     async get (
-        @Param('id') id: id,
+        @Param('id') id: id, //what was this for?
         @Query('children') childIds: id[]
     ) {
         try {

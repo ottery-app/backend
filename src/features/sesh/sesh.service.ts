@@ -1,22 +1,20 @@
-import { HttpCode, HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Sesh } from './sesh.class';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { Sesh, SeshDocument } from './sesh.schema';
 import { CryptService } from '../crypt/crypt.service';
 import { User } from '../user/user.schema';
 import { role, id, token } from 'ottery-dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class SeshService {
-    /** A map of session and their IDs */
-    private sessions: Map<id, Sesh>;
-
     /**
      * Construct a new map of sessions
      */
     constructor(
         private cryptService: CryptService,
-    ) {
-        this.sessions = new Map<id, Sesh>();
-    }
+        @InjectModel(Sesh.name) private seshModel: Model<SeshDocument>,
+    ) {}
 
     /**
      * Compares a session token to the token in the header
@@ -24,18 +22,14 @@ export class SeshService {
      * @param token the token in the header
      * @returns true if tokens match
      */
-    validateSession(seshId: id, token: token) {
-        const sesh = this.getSeshInfo(seshId);
+    async safelyGet(seshId:token, token: token) {
+        const sesh = await this.getSeshInfo(seshId);
 
-        if (!sesh) {
-            return false;
+        if (!sesh || sesh.token !== token) { //wrong token to log out with
+            throw new HttpException('Unauthorizesd session', HttpStatus.UNAUTHORIZED);
         }
 
-        if (sesh.token !== token) { //wrong token to log out with
-            return false;
-        }
-
-        return true;
+        return sesh;
     }
 
     /**
@@ -43,8 +37,8 @@ export class SeshService {
      * @param seshId the session ID
      * @returns information about the session
      */
-    getSeshInfo(seshId: id): Sesh {
-        return this.sessions.get(seshId);
+    async getSeshInfo(seshId: id) {
+        return await this.seshModel.findById(seshId);
     }
 
     /**
@@ -52,10 +46,9 @@ export class SeshService {
      * 
      * @returns information about the session
      */
-    create() {
-        const seshId = this.cryptService.makeSeshId();
-        this.sessions.set(seshId, new Sesh(seshId));
-        return this.sessions.get(seshId);
+    async create() {
+        const newSesh = new this.seshModel();
+        return await newSesh.save();
     }
 
     /**
@@ -64,53 +57,50 @@ export class SeshService {
      * @param seshId the session ID to end
      * @returns true if deleted
      */
-    private killSesh(seshId: id): boolean {
-        return this.sessions.delete(seshId);
+    private async killSesh(seshId: id) {
+        return await this.seshModel.deleteOne({_id: seshId});
     }
 
-    switchState(seshId: id, eventId?: id): Sesh {
-        const sesh = this.getSeshInfo(seshId);
+    async switchState(sesh: SeshDocument, eventId?: id) {
         sesh.state = (sesh.state === role.GUARDIAN) ? role.CARETAKER : role.GUARDIAN;
         sesh.event = eventId;
-        return sesh;
+        return await sesh.save();
     }
 
-    logout(seshId: id): Sesh {
-        let sesh = this.getSeshInfo(seshId);
+    async logout(sesh: SeshDocument) {
         sesh.activated = false;
         sesh.loggedin = false;
-        this.killSesh(seshId);
-        return sesh;
+        await this.killSesh(sesh._id);
+        return sesh
     }
 
-    login(seshId: id, user: User): Sesh {
-        const session = this.getSeshInfo(seshId);
+    async login(session: SeshDocument, user: User) {
         session.userId = user._id;
         session.email = user.email;
         session.activated = user.activated;
         session.loggedin = true;
         session.token = this.cryptService.makeToken(user);
-        return session;
+        return await session.save();
     }
 
-    activate(seshId: id) {
-        this.getSeshInfo(seshId).activated = true;
-        return this.getSeshInfo(seshId);
+    async activate(sesh: SeshDocument) {
+        sesh.activated = true;
+        return await sesh.save();
     }
 
-    isLoggedin(seshId: id) {
-        return this.getSeshInfo(seshId)?.loggedin || false;
+    async isLoggedin(sesh: SeshDocument) {
+        return sesh.loggedin || false;
     }
 
-    isActivated(seshId: id) {
-        return this.getSeshInfo(seshId)?.activated || false;
+    async isActivated(sesh: SeshDocument) {
+        return sesh.activated || false;
     }
 
-    isCaretaker(seshId: id) {
-        return this.getSeshInfo(seshId)?.state === role.CARETAKER || false;
+    async isCaretaker(sesh: SeshDocument) {
+        return sesh.state === role.CARETAKER || false;
     }
 
-    isGuardian(seshId: id) {
-        return this.getSeshInfo(seshId)?.state === role.GUARDIAN || false;
+    async isGuardian(sesh: SeshDocument) {
+        return sesh.state === role.GUARDIAN || false;
     }
 }

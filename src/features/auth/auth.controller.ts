@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Body, Headers, HttpException, HttpStatus, Query } from '@nestjs/common';
 import { EmailService } from '../email/email.service';
 import { SeshService } from '../sesh/sesh.service';
-import { Sesh } from '../sesh/sesh.class';
 import { UserService } from '../user/user.service';
 import { CryptService } from '../crypt/crypt.service';
 import { ACTIVATION_CODE_LENGTH } from '../crypt/crypt.types';
@@ -9,7 +8,9 @@ import { User } from '../user/user.schema';
 import {ActivationCodeDto, NewUserDto, LoginDto, noId, perm, role} from "ottery-dto";
 import { token, id } from 'ottery-dto';
 import { Roles } from '../roles/roles.decorator';
-import { Seshless } from '../sesh/sesh.decorator';
+import { IgnoreSesh } from '../sesh/IgnoreSesh.decorator';
+import { Sesh } from '../sesh/Sesh.decorator';
+import { SeshDocument } from '../sesh/sesh.schema';
 
 @Controller('api/auth')
 export class AuthController {
@@ -21,11 +22,12 @@ export class AuthController {
     ) {}
 
     @Put("resend")
+    @Roles(role.LOGGEDIN)
     async resendEmail(
-        @Headers('Id') seshId: id,
+        @Sesh() sesh: SeshDocument
     ) {
         try {
-            const user = await this.userService.findOneById(this.seshService.getSeshInfo(seshId).userId);
+            const user = await this.userService.findOneById(sesh.userId);
             
             if (user.activated) {
                 throw new HttpException("Account already activated", HttpStatus.BAD_REQUEST);
@@ -44,18 +46,18 @@ export class AuthController {
     }
   
     @Put("activate")
+    @Roles(role.LOGGEDIN)
     async activateAccount(
-        @Headers('Id') seshId: id,
+        @Sesh() sesh: SeshDocument,
         @Body() createActivateDto: ActivationCodeDto
     ) {
         try {
-            //I dont think we need to return the user
             await this.userService.activate(
-                this.seshService.getSeshInfo(seshId).userId,
+                sesh.userId,
                 createActivateDto.code
             );
 
-            return this.seshService.activate(seshId);
+            return await this.seshService.activate(sesh);
         } catch (e) {
             throw e;
         }
@@ -63,35 +65,33 @@ export class AuthController {
   
 
     @Post("register")
+    @IgnoreSesh()
     async register(
-        @Headers('Id') seshId: id,
         @Body() createUserDto: NewUserDto,
+        @Sesh() sesh: SeshDocument
     ) {
-        if (!this.seshService.getSeshInfo(seshId)) {
-            throw new HttpException("Bad Request", HttpStatus.BAD_REQUEST);
-        }
-
         try {
             createUserDto.password = await this.cryptService.hash(createUserDto.password);
             let user = await this.userService.create(createUserDto);
             this.emailService.sendActivationCode(user.email, user.activationCode);
-            return this.seshService.login(seshId, user);
+            return await this.seshService.login(sesh, user);
         } catch (e) {
             throw e;
         }
     }
   
     @Delete("logout")
+    @Roles(role.LOGGEDIN)
     async logout(
-        @Headers('id') seshId: id,
+        @Sesh() sesh: SeshDocument
     ) {
-        return this.seshService.logout(seshId);
+        return await this.seshService.logout(sesh);
     }
   
     @Post("login")
-    @Seshless()
+    @IgnoreSesh()
     async login(      
-        @Headers('Id') seshId: id,
+        @Sesh() sesh: SeshDocument,
         @Body() createLoginDto: LoginDto,
     ) {
         // If email is not in the system, fail
@@ -105,36 +105,29 @@ export class AuthController {
             throw new HttpException("Invalid Email or Password", HttpStatus.BAD_REQUEST);
         } else {
             // login
-            return this.seshService.login(seshId, user);
+            return await this.seshService.login(sesh, user);
         }
     }
   
     @Get("load")
-    @Seshless()
+    @IgnoreSesh()
     async load(
-        @Headers('Id') seshId: id = noId,
-        @Headers('Authorization') token: token,
+        @Sesh() sesh: SeshDocument
     ) {
-        let sesh: Sesh = this.seshService.getSeshInfo(seshId);
-
         if (sesh) { // Does the user session exists? (they may or may not be logged in)
-            if (sesh.loggedin && token) { // Yes; have they logged in and do they have a valid token
-                if (token !== sesh.token) { // No; the token is invalid 
-                    throw new HttpException("Bad Request", HttpStatus.BAD_REQUEST);
-                }
-
-                return sesh; // Yes; the token is valid and they are logged in
-            }
-
-            return sesh; // Yes, the token is valid but they are not logged in
+            return sesh;
         } else { // The user is not logged in but there are no errors
-            return this.seshService.create(); // No, the user session does not exist, so make a new session
+            return await this.seshService.create(); // No, the user session does not exist, so make a new session
         }
     }
 
     @Get("state/switch")
+    @Roles(
+        role.LOGGEDIN,
+        role.ACTIVATED
+    )
     async switchState (
-        @Headers('Id') seshId: id,
+        @Sesh() sesh: SeshDocument,
         @Query() query: {
             event: id,
         }
@@ -144,6 +137,6 @@ export class AuthController {
             eventId = query.event;
         }
 
-        return this.seshService.switchState(seshId, eventId);
+        return await this.seshService.switchState(sesh, eventId);
     }
 }
