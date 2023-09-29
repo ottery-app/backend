@@ -18,14 +18,17 @@ export class SeshGuard implements CanActivate {
    * @returns ???
    */
   async canActivate(context: ExecutionContext) {
-    const ignore = this.reflector.get<string[]>('ignore-sesh', context.getHandler());
+    const ignore = this.reflector.get<string[]>('ignore-sesh-security', context.getHandler());
 
     const request = context.switchToHttp().getRequest();
 
     const id = request.headers.id;
     const authorization = request.headers.authorization;
 
-    if (ignore) {
+    if (!id || id === undefined || id === null || id === "") {
+      const sesh = await this.seshService.create();
+      request.sesh = sesh;
+    } else if (ignore) {
       const sesh = await this.seshService.getSeshInfo(id);
       request.sesh = sesh;
     } else {

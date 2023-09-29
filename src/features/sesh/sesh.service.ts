@@ -5,6 +5,7 @@ import { User } from '../user/user.schema';
 import { role, id, token } from 'ottery-dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { Sesh as InitSesh } from './sesh.class';
 
 @Injectable()
 export class SeshService {
@@ -47,7 +48,7 @@ export class SeshService {
      * @returns information about the session
      */
     async create() {
-        const newSesh = new this.seshModel();
+        const newSesh = new this.seshModel(new InitSesh());
         return await newSesh.save();
     }
 

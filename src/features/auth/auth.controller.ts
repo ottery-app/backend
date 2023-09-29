@@ -8,7 +8,7 @@ import { User } from '../user/user.schema';
 import {ActivationCodeDto, NewUserDto, LoginDto, noId, perm, role} from "ottery-dto";
 import { token, id } from 'ottery-dto';
 import { Roles } from '../roles/roles.decorator';
-import { IgnoreSesh } from '../sesh/IgnoreSesh.decorator';
+import { UnsecureSesh } from '../sesh/UnsecureSesh.decorator';
 import { Sesh } from '../sesh/Sesh.decorator';
 import { SeshDocument } from '../sesh/sesh.schema';
 
@@ -65,7 +65,7 @@ export class AuthController {
   
 
     @Post("register")
-    @IgnoreSesh()
+    @UnsecureSesh()
     async register(
         @Body() createUserDto: NewUserDto,
         @Sesh() sesh: SeshDocument
@@ -89,7 +89,7 @@ export class AuthController {
     }
   
     @Post("login")
-    @IgnoreSesh()
+    @UnsecureSesh()
     async login(      
         @Sesh() sesh: SeshDocument,
         @Body() createLoginDto: LoginDto,
@@ -110,15 +110,12 @@ export class AuthController {
     }
   
     @Get("load")
-    @IgnoreSesh()
+    @UnsecureSesh()
     async load(
         @Sesh() sesh: SeshDocument
     ) {
-        if (sesh) { // Does the user session exists? (they may or may not be logged in)
-            return sesh;
-        } else { // The user is not logged in but there are no errors
-            return await this.seshService.create(); // No, the user session does not exist, so make a new session
-        }
+        //the sesh is made in the sesh guard if it does not exist.
+        return sesh;
     }
 
     @Get("state/switch")

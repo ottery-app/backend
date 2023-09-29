@@ -9,25 +9,25 @@ export class Sesh {
     _id: id;
 
     @Prop({required: true})
-    start: time = new Date().getTime();
+    start: time;
 
-    @Prop({required: false})
-    loggedin: boolean = false;
+    @Prop({required: true})
+    loggedin: boolean;
 
-    @Prop({required: false})
+    @Prop({required: true})
     token: token;
 
     @Prop({required: true})
-    activated: boolean = false;
+    activated: boolean;
 
     @Prop({required: true})
-    state: role.GUARDIAN | role.CARETAKER = role.GUARDIAN;
+    state: role.GUARDIAN | role.CARETAKER;
 
     @Prop({required: true})
-    event: token = noId; 
+    event: token; 
 
     @Prop({required: true})
-    userId: token = noId;
+    userId: token;
 
     @Prop({required: false})
     email: email;
