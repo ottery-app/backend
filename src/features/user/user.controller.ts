@@ -17,7 +17,8 @@ export class UserController {
     async getChildren (
         @Param('userId') userId: id,
         @Query('at') at?: string, //id
-        @Query('notat') notAt?: string //id
+        @Query('notat') notAt?: string, //id
+        @Query('hasEvent') hasEvent?: boolean,
     ) {
         try {
             const user = await this.userService.findOneById(userId);
@@ -29,6 +30,14 @@ export class UserController {
 
             if (notAt) {
                 children = children.filter(child=>child.lastStampedLocation.at !== notAt);
+            }
+
+            if (Boolean(hasEvent) === false) {
+                children = children.filter(child=>child.events.length === 0)
+            }
+
+            if (Boolean(hasEvent) === true) {
+                children = children.filter(child=>child.events.length !== 0)
             }
 
             return children;
