@@ -4,6 +4,7 @@ import { ChildService } from '../child/child.service';
 import { UserInfoDto } from "ottery-dto";
 import { id } from 'ottery-dto';
 import { EventService } from '../event/event.service';
+import { Sesh } from '../sesh/Sesh.decorator';
 
 @Controller('api/user')
 export class UserController {
@@ -75,8 +76,17 @@ export class UserController {
 
     @Get('info')
     async getInfo (
+        @Sesh() sesh,
         @Query("users") userIds: id[]
     ) {
+        if (userIds === undefined) {
+            userIds = [];
+        }
+
+        if (userIds.length === 0) {
+            userIds.push(sesh.userId);
+        }
+
         const users = [];
 
         for (let i = 0; i < userIds.length; i++) {
