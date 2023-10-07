@@ -1,7 +1,6 @@
 import { Controller, Get, Headers, Param, Patch } from '@nestjs/common';
 import { NotificationService } from './notification.service';
-import { id } from 'ottery-dto';
-import { SeshService } from '../sesh/sesh.service';
+import { id } from '@ottery/ottery-dto';
 
 @Controller('api/notifications')
 export class NotificationController {

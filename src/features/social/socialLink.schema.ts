@@ -1,7 +1,7 @@
 
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { id, SocialLinkHistoryDto } from 'ottery-dto';
+import { id, SocialLinkHistoryDto } from '@ottery/ottery-dto';
 
 export type SocialLinkDocument = SocialLink & Document;
 

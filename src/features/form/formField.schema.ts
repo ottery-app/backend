@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { id } from 'ottery-dto';
+import { id } from '@ottery/ottery-dto';
 
 export type FormFieldDocument = FormField & Document;
 

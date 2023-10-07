@@ -5,7 +5,7 @@ import { Model } from 'mongoose';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { CryptService } from '../crypt/crypt.service';
 import { ACTIVATION_CODE_LENGTH } from '../crypt/crypt.types';
-import { activationCode, email, id, role, UserDto } from 'ottery-dto';
+import { activationCode, email, id, role, UserDto } from '@ottery/ottery-dto';
 import { DataService } from '../data/data.service';
 
 @Injectable()

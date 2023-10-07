@@ -1,5 +1,5 @@
 import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException } from '@nestjs/common';
-import { classifyWithDto, isDuckDto } from 'ottery-dto';
+import { classifyWithDto, isDuckDto } from '@ottery/ottery-dto';
 
 
 function printResults(value, meta, msg) {

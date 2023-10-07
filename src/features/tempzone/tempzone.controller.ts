@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Body, Headers, Param } from '@nestjs/common';
-import { ChildRequestDto, id, noId, requestStatus, requestType } from 'ottery-dto';
+import { Controller, Get, Post, Body } from '@nestjs/common';
+import { ChildRequestDto, id, requestStatus, requestType } from '@ottery/ottery-dto';
 import { TempZoneService } from './tempzone.service';
 import { Patch, Query } from '@nestjs/common/decorators';
 import { ArrayValidationPipe } from 'src/pipes/ArrayValidationPipe';

@@ -2,8 +2,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Perms, PermsDocument } from './permission.schema';
-import { MultiSchemeDto } from 'ottery-dto';
-import { perm } from 'ottery-dto';
+import { MultiSchemeDto } from '@ottery/ottery-dto';
+import { perm } from '@ottery/ottery-dto';
 import { OwneeSchemeDto } from './ownable.schema';
 
 @Injectable()

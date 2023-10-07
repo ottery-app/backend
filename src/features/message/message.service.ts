@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { NotificationService } from '../notifications/notification.service';
 import { UserService } from '../user/user.service';
 import { Chat, ChatDocument } from './chat.shema';
-import { MakeChatDto, MessageDto, id } from 'ottery-dto';
+import { MakeChatDto, MessageDto, id } from '@ottery/ottery-dto';
 import { normalizeId } from 'src/functions/normalizeId';
 
 @Injectable()

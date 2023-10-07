@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { id, MultiSchemeDto, perm, PermLinkDto } from 'ottery-dto';
+import { id, MultiSchemeDto, perm, PermLinkDto } from '@ottery/ottery-dto';
 
 export type PermsDocument = Perms & Document;
 

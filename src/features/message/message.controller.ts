@@ -1,8 +1,6 @@
 import { Controller, Param, Headers, Body, Get, Patch, Put, Query } from '@nestjs/common';
-import { id, MakeChatDto, MessageDto, StringDto, classifyDto, isId } from 'ottery-dto';
-import { SeshService } from '../sesh/sesh.service';
+import { id, MakeChatDto, MessageDto, StringDto, classifyDto, isId } from '@ottery/ottery-dto';
 import { MessageService } from './message.service';
-import { normalizeId } from 'src/functions/normalizeId';
 import { ArrayValidationPipe } from 'src/pipes/ArrayValidationPipe';
 import { UserService } from '../user/user.service';
 import { SeshDocument } from '../sesh/sesh.schema';

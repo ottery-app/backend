@@ -1,7 +1,7 @@
-import { noId, role } from "ottery-dto";
+import { noId, role } from "@ottery/ottery-dto";
 import { CryptService } from "../crypt/crypt.service";
 import { SeshService } from "./sesh.service";
-import { isId } from "ottery-dto";
+import { isId } from "@ottery/ottery-dto";
 import { User } from "../user/user.schema";
 
 //TODO the sesh service needs to be udpated. it assumes that most the info it needs will be

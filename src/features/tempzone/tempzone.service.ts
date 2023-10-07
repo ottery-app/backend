@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ChildRequestDto, classifyWithDto, id, noId, requestStatus, requestType } from 'ottery-dto';
+import { ChildRequestDto, classifyWithDto, id, noId, requestStatus, requestType } from '@ottery/ottery-dto';
 import * as delay from 'delay';
 import { timeout, tryagain } from './tempzone.meta';
 import { ChildService } from '../child/child.service';

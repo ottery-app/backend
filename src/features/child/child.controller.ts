@@ -2,8 +2,8 @@ import { Controller, Get, Post, Body, Headers, Param, Query } from '@nestjs/comm
 import { ChildService } from './child.service';
 import { SeshService } from '../sesh/sesh.service';
 import { UserService } from '../user/user.service';
-import { id } from 'ottery-dto';
-import { CreateChildDto } from 'ottery-dto';
+import { id } from '@ottery/ottery-dto';
+import { CreateChildDto } from '@ottery/ottery-dto';
 import { User } from '../user/user.schema';
 import { DataService } from '../data/data.service';
 import { SeshDocument } from '../sesh/sesh.schema';

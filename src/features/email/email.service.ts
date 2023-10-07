@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from "nodemailer";
 import * as fs from "fs";
-import { email, activationCode } from 'ottery-dto';
+import { email, activationCode } from '@ottery/ottery-dto';
 
 const FROM = `"Ottery-noreply" <${process.env.EMAIL_USERNAME}>`;
 

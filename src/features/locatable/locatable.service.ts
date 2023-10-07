@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { id } from 'ottery-dto';
+import { id } from '@ottery/ottery-dto';
 import { LocateAble } from './locatable.interface';
 
 @Injectable()

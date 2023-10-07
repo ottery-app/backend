@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
-import { DataFieldDto, id, MultiSchemeDto } from 'ottery-dto';
+import { DataFieldDto, id, MultiSchemeDto } from '@ottery/ottery-dto';
 import {DataService} from './data.service';
 
 @Controller('api/data')

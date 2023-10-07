@@ -1,9 +1,8 @@
 import { Controller, Post, Body, Headers, Get, Param } from '@nestjs/common';
 import { UserService } from '../user/user.service';
-import { SeshService } from "../sesh/sesh.service";
 import { EventService } from "./event.service";
-import { perm, id, UserInfoDto } from 'ottery-dto';
-import { CreateEventDto } from 'ottery-dto';
+import { id, UserInfoDto } from '@ottery/ottery-dto';
+import { CreateEventDto } from '@ottery/ottery-dto';
 import { FormFieldService } from '../form/formField.service';
 import { Patch, Query } from '@nestjs/common/decorators';
 import { User } from '../user/user.schema';

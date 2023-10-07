@@ -1,5 +1,5 @@
-import { CustomFormFieldDto, classifyDto } from "ottery-dto";
-import { inputType } from "ottery-dto/lib/types/input/input.enums";
+import { CustomFormFieldDto, classifyDto } from "@ottery/ottery-dto";
+import { inputType } from "@ottery/ottery-dto/lib/types/input/input.enums";
 
 const PFP = new CustomFormFieldDto();
 PFP.label = "profile picture";

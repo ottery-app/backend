@@ -1,4 +1,4 @@
-import { token, id, role, time, email, noId } from "ottery-dto";
+import { token, id, role, time, email, noId } from "@ottery/ottery-dto";
 
 export class Sesh {
     /** this is the id of the user that the sesh belongs to */
