@@ -1,5 +1,5 @@
-import { Controller, Get, Param, Headers, Patch, Body, Query, Post } from '@nestjs/common';
-import { id, MessageDto, socialLinkState, UpdateLinkDto, UserInfoDto, UserSocialStatusDto } from 'ottery-dto';
+import { Controller, Get, Patch, Body, Query } from '@nestjs/common';
+import { id, socialLinkState, UpdateLinkDto, UserInfoDto, UserSocialStatusDto } from '@ottery/ottery-dto';
 import { SeshService } from '../sesh/sesh.service';
 import { SocialService } from './social.service';
 import { UserService } from '../user/user.service';

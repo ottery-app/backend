@@ -1,4 +1,4 @@
-import { LocatableStampDto } from "ottery-dto";
+import { LocatableStampDto } from "@ottery/ottery-dto";
 
 export interface LocateAble {
     lastStampedLocation: LocatableStampDto;

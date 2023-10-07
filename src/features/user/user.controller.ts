@@ -1,8 +1,8 @@
 import { Body, Controller, Get, HttpException, HttpStatus, Param, ParseBoolPipe, Query } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ChildService } from '../child/child.service';
-import { UserInfoDto } from "ottery-dto";
-import { id } from 'ottery-dto';
+import { UserInfoDto } from "@ottery/ottery-dto";
+import { id } from '@ottery/ottery-dto';
 import { EventService } from '../event/event.service';
 import { Sesh } from '../sesh/Sesh.decorator';
 

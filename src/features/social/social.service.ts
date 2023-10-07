@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { dtoAssign, id, noId, SocialLinkHistoryDto, socialLinkState, UpdateLinkDto } from 'ottery-dto';
+import { dtoAssign, id, noId, SocialLinkHistoryDto, socialLinkState, UpdateLinkDto } from '@ottery/ottery-dto';
 import { compareIds } from 'src/functions/compareIds';
 import { normalizeId } from 'src/functions/normalizeId';
 import { NotificationService } from '../notifications/notification.service';

@@ -1,6 +1,6 @@
 import { Prop, Schema } from "@nestjs/mongoose";
 import { Document } from "mongoose";
-import { id, MultiSchemeDto, PermLinkDto } from "ottery-dto";
+import { id, MultiSchemeDto, PermLinkDto } from "@ottery/ottery-dto";
 
 @Schema()
 export class Ownee {

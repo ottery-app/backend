@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { id, DataFieldDto, MultiSchemeDto } from 'ottery-dto';
+import { id, DataFieldDto, MultiSchemeDto } from '@ottery/ottery-dto';
 //import { Ownee } from '../roles/Ownable.schema';
 
 

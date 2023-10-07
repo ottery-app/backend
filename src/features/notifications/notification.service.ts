@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Notification, NotificationDocument} from './notification.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { id, notification, NotificationDto } from 'ottery-dto';
+import { id, notification, NotificationDto } from '@ottery/ottery-dto';
 import { UserService } from '../user/user.service';
 import { User } from '../user/user.schema';
 

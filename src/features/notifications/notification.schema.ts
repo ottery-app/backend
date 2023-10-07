@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { id, MultiSchemeDto, NotificationDto } from 'ottery-dto';
+import { id, MultiSchemeDto, NotificationDto } from '@ottery/ottery-dto';
 
 
 export type NotificationDocument = Notification & Document; 

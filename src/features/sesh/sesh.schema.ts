@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { id, time, token, role, noId, email } from 'ottery-dto';
+import { id, time, token, role, email } from '@ottery/ottery-dto';
 
 export type SeshDocument = Sesh & Document;
 

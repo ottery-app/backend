@@ -2,9 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 //import { Event, EventDocument } from './event.schema';
-import { id } from 'ottery-dto';
-//import { CreateEventDto } from 'ottery-dto';
-import { CustomFormFieldDto } from 'ottery-dto';
+import { id } from '@ottery/ottery-dto';
+//import { CreateEventDto } from '@ottery/ottery-dto';
+import { CustomFormFieldDto } from '@ottery/ottery-dto';
 import { FormField, FormFieldDocument } from './formField.schema';
 
 @Injectable()

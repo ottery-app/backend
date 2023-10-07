@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { DataFieldDto, id, MultiSchemeDto } from "ottery-dto";
+import { DataFieldDto, id, MultiSchemeDto } from "@ottery/ottery-dto";
 import { Data, DataDocument } from "./data.schema";
 import { FormFieldService } from "../form/formField.service";
 
