@@ -5,12 +5,14 @@ import { UserService } from '../user/user.service';
 import { CryptService } from '../crypt/crypt.service';
 import { ACTIVATION_CODE_LENGTH } from '../crypt/crypt.types';
 import { User } from '../user/user.schema';
-import {ActivationCodeDto, NewUserDto, LoginDto, noId, perm, role} from "@ottery/ottery-dto";
+import {ActivationCodeDto, NewUserDto, LoginDto, role} from "@ottery/ottery-dto";
 import { token, id } from '@ottery/ottery-dto';
 import { Roles } from '../roles/roles.decorator';
 import { UnsecureSesh } from '../sesh/UnsecureSesh.decorator';
 import { Sesh } from '../sesh/Sesh.decorator';
 import { SeshDocument } from '../sesh/sesh.schema';
+
+
 
 @Controller('api/auth')
 export class AuthController {
@@ -121,7 +123,7 @@ export class AuthController {
     @Get("state/switch")
     @Roles(
         role.LOGGEDIN,
-        role.ACTIVATED
+        role.ACTIVATED,
     )
     async switchState (
         @Sesh() sesh: SeshDocument,
