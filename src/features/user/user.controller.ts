@@ -132,4 +132,28 @@ export class UserController {
       throw e;
     }
   }
+
+  @Get(':userId/mychildren')
+  async getMyChildren(@Param('userId') userId: id) {
+    try {
+      const user = await this.userService.findOneById(userId);
+      const userRoles = user.roles;
+      const requiredPermission = 'guardian';
+      if (userRoles.some((role) => role.includes(requiredPermission))) {
+        const children = await this.childService.findManyByIds(user.children);
+        return children;
+      } else {
+        throw new HttpException(
+          'You do not have permission to access these children',
+          HttpStatus.FORBIDDEN,
+        );
+      }
+    } catch (e) {
+      console.error(e);
+      throw new HttpException(
+        'Failed to get children',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }
