@@ -11,12 +11,14 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ChildService } from '../child/child.service';
-import { UserInfoDto, role } from '@ottery/ottery-dto';
+import { UserInfoDto, perm, role } from '@ottery/ottery-dto';
 import { id } from '@ottery/ottery-dto';
 import { EventService } from '../event/event.service';
 import { Sesh } from '../sesh/Sesh.decorator';
 import { Roles } from '../roles/roles.decorator';
 import { SeshDocument } from '../sesh/sesh.schema';
+import { PermsService } from '../perms/perms.service';
+import { Child } from '../child/child.schema';
 
 @Controller('api/user')
 export class UserController {
@@ -24,6 +26,7 @@ export class UserController {
     private childService: ChildService,
     private userService: UserService,
     private eventService: EventService,
+    private permsService: PermsService,
   ) {}
 
   @Get(':userId/children')
@@ -133,21 +136,22 @@ export class UserController {
     }
   }
 
-  @Get(':userId/mychildren')
+  @Get(':userId/children/primary')
   async getMyChildren(@Param('userId') userId: id) {
     try {
       const user = await this.userService.findOneById(userId);
-      const userRoles = user.roles;
-      const requiredPermission = 'guardian';
-      if (userRoles.some((role) => role.includes(requiredPermission))) {
-        const children = await this.childService.findManyByIds(user.children);
-        return children;
-      } else {
-        throw new HttpException(
-          'You do not have permission to access these children',
-          HttpStatus.FORBIDDEN,
-        );
-      }
+      const children = await this.childService.findManyByIds(user.children);
+      const filteredChildren = await Promise.all(
+        children.map(async (child) => {
+          const result = await this.permsService.checkPermissions(
+            { id: user.id, ref: 'User' },
+            child,
+            perm.SUPER,
+          );
+          return result ? child : null;
+        }),
+      );
+      return filteredChildren.filter((child) => child !== null);
     } catch (e) {
       console.error(e);
       throw new HttpException(
