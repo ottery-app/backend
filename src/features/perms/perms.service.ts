@@ -37,12 +37,10 @@ export class PermsService {
 
     async checkPermissions(owner: MultiSchemeDto, ownee: OwneeSchemeDto, ...require: perm[]) {
         const permsDoc = await this.getPermDocument(owner, ownee);
-        
         if (!permsDoc) {
             return false;
         }
-
-        return require.every((requiredPerm)=>{permsDoc.perms.includes(requiredPerm)});
+        return require.every((requiredPerm)=>permsDoc.perms.includes(requiredPerm));
     }
 
     async requirePerms(owner: MultiSchemeDto, ownee: OwneeSchemeDto, ...require: perm[]) {

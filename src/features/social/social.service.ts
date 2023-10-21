@@ -139,4 +139,18 @@ export class SocialService {
     const link = await this.findLinkById(linkId);
     return await this.checkStatusByLink(link);
   }
+
+  async blockUser(activator: id, target :id) {
+    const link = await this.findLinkByUserId(activator, target);
+    console.log(link);
+    if (link) {
+      link.history.push({
+        state: socialLinkState.BLOCKED,
+        activator: activator,
+        timestamp: new Date().getTime(),
+      });
+      return await link.save();
+    }
+    throw new Error('User not found');
+  }
 }
