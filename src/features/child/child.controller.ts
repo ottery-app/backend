@@ -5,17 +5,15 @@ import { UserService } from '../user/user.service';
 import { id } from '@ottery/ottery-dto';
 import { CreateChildDto } from '@ottery/ottery-dto';
 import { User } from '../user/user.schema';
-import { DataService } from '../data/data.service';
 import { SeshDocument } from '../sesh/sesh.schema';
 import { Sesh } from '../sesh/Sesh.decorator';
+import { PermsService } from '../perms/perms.service';
 
 @Controller('api/child')
 export class ChildController {
     constructor(
         private userService: UserService,
         private childService: ChildService,
-        private seshService: SeshService,
-        private dataService: DataService,
     ) {}
 
     @Post()
@@ -42,7 +40,6 @@ export class ChildController {
 
     @Get()
     async get (
-        @Param('id') id: id, //what was this for?
         @Query('children') childIds: id[]
     ) {
         try {

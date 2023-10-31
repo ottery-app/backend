@@ -23,7 +23,11 @@ export class ChildService {
      * @returns the new child object
      */
     async create(owner: MultiSchemeDto, createChildDto: CreateChildDto) {
-        const child = new this.childModel(createChildDto);
+        const child = new this.childModel({
+            ...createChildDto,
+            primaryGuardian: owner.id,
+            guardians: [owner.id],
+        });
 
         this.locatableService.stamp(child, noId, owner.id);
 
