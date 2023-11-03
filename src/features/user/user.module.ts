@@ -7,6 +7,7 @@ import { UserController } from './user.controller';
 import { ChildModule } from '../child/child.module';
 import { EventModule } from '../event/event.module';
 import { DataModule } from '../data/data.module';
+import { PermsModule } from '../perms/perms.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { DataModule } from '../data/data.module';
     DataModule,
     forwardRef(() => ChildModule),
     forwardRef(()=> EventModule ),
+    forwardRef(()=> PermsModule )
   ],
   controllers: [UserController],
   providers: [UserService],
