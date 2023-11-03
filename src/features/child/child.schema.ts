@@ -46,6 +46,12 @@ export class Child implements PermAble, DataAble, LocateAble, SignupAble {
 
     @Prop({required: true})
     lastStampedLocation: LocatableStampDto;
+
+    @Prop({required: true})
+    primaryGuardian: id;
+
+    @Prop({required:true})
+    guardians: [];
 }
 
 export const ChildSchema = SchemaFactory.createForClass(Child);

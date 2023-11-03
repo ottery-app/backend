@@ -11,12 +11,12 @@ import {
 } from '@ottery/ottery-dto';
 import { compareIds } from 'src/functions/compareIds';
 import { normalizeId } from 'src/functions/normalizeId';
-import { NotificationService } from '../notifications/notification.service';
 import { SocialLink, SocialLinkDocument } from './socialLink.schema';
 import { UserService } from '../user/user.service';
 
 @Injectable()
 export class SocialService {
+
   constructor(
     @InjectModel(SocialLink.name)
     private readonly socialLinkModel: Model<SocialLinkDocument>,
@@ -111,6 +111,46 @@ export class SocialService {
             );
           }
         }
+    }
+
+    async updateLinkStatus(activator:id, target:UpdateLinkDto) {
+        const link = await this.findLinkByUserId(activator, target.target);
+        const status = this.queryLinkStatus(link).state;
+
+        try {
+            if (status === socialLinkState.NONE) {
+                if (target.state === socialLinkState.REQUESTED) {
+                    return await this.updateLink(activator, target);
+                } else {
+                    throw new Error(`${socialLinkState.REQUESTED}`);
+                }
+
+            } else if (status === socialLinkState.REQUESTED) {
+                if (compareIds(link.history[0].activator, activator)) { 
+                    //canceling own reqeust
+                    if (target.state === socialLinkState.NONE) {
+                        return await this.updateLink(activator, target);
+                    } else {
+                        throw new Error(socialLinkState.NONE);
+                    }
+                } else { 
+                    //accepting anothers request
+                    if (target.state === socialLinkState.ACCEPTED
+                        || target.state === socialLinkState.NONE) {
+                        return await this.updateLink(activator, target);
+                    } else {
+                        throw new Error(`either ${socialLinkState.ACCEPTED} or ${socialLinkState.NONE}`);
+                    }
+                }
+            } else if (status === socialLinkState.ACCEPTED) {
+                if (target.state === socialLinkState.NONE) {
+                    return await this.updateLink(activator, target);
+                } else {
+                    throw new Error(`${socialLinkState.NONE}`);
+                }
+            }
+        } catch (e) {
+            throw new Error(`Not an acceptable state change. Must be ${e.message}`);
       } else if (status === socialLinkState.ACCEPTED) {
         if (
           target.state === socialLinkState.NONE ||

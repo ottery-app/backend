@@ -1,21 +1,22 @@
 import { Controller, Get, Post, Put, Delete, Body, Headers, HttpException, HttpStatus, Query } from '@nestjs/common';
-import { EmailService } from '../email/email.service';
 import { SeshService } from '../sesh/sesh.service';
 import { UserService } from '../user/user.service';
 import { CryptService } from '../crypt/crypt.service';
 import { ACTIVATION_CODE_LENGTH } from '../crypt/crypt.types';
 import { User } from '../user/user.schema';
-import {ActivationCodeDto, NewUserDto, LoginDto, noId, perm, role} from "@ottery/ottery-dto";
-import { token, id } from '@ottery/ottery-dto';
+import {ActivationCodeDto, NewUserDto, LoginDto, role} from "@ottery/ottery-dto";
+import { id } from '@ottery/ottery-dto';
 import { Roles } from '../roles/roles.decorator';
 import { UnsecureSesh } from '../sesh/UnsecureSesh.decorator';
 import { Sesh } from '../sesh/Sesh.decorator';
 import { SeshDocument } from '../sesh/sesh.schema';
+import { AlertService } from '../alert/alert.service';
+
 
 @Controller('api/auth')
 export class AuthController {
     constructor(
-        private emailService: EmailService,
+        private alertService: AlertService,
         private seshService: SeshService,
         private userService: UserService,
         private cryptService: CryptService,
@@ -36,7 +37,7 @@ export class AuthController {
             user.activationCode = this.cryptService.makeCode(ACTIVATION_CODE_LENGTH);
             this.userService.save(user);
 
-            this.emailService.sendActivationCode(
+            this.alertService.accountActivation(
                 user.email,
                 user.activationCode,
             );
@@ -73,7 +74,7 @@ export class AuthController {
         try {
             createUserDto.password = await this.cryptService.hash(createUserDto.password);
             let user = await this.userService.create(createUserDto);
-            this.emailService.sendActivationCode(user.email, user.activationCode);
+            this.alertService.accountActivation(user.email, user.activationCode);
             return await this.seshService.login(sesh, user);
         } catch (e) {
             throw e;
@@ -121,7 +122,7 @@ export class AuthController {
     @Get("state/switch")
     @Roles(
         role.LOGGEDIN,
-        role.ACTIVATED
+        role.ACTIVATED,
     )
     async switchState (
         @Sesh() sesh: SeshDocument,
