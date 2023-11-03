@@ -2,7 +2,7 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { APP_GUARD } from '@nestjs/core';
-import { SeshService } from '../sesh/sesh.service';
+import { SeshService } from './sesh.service';
 
 @Injectable()
 export class SeshGuard implements CanActivate {

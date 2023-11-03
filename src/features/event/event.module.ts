@@ -3,7 +3,7 @@ import { Event, EventSchema } from './event.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 import { EventController } from './event.controller';
 import { UserModule } from '../user/user.module';
-import { SeshModule } from '../sesh/sesh.module';
+import { SeshModule } from '../auth/sesh/sesh.module';
 import { EventService } from './event.service';
 import { FormModule } from '../form/form.module';
 import { DataModule } from '../data/data.module';

@@ -1,7 +1,6 @@
 import { Module, Global } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { NotificationModule } from '../alert/notifications/notification.module';
-import { SeshModule } from '../sesh/sesh.module';
 import { SocialController } from './social.controller';
 import { SocialService } from './social.service';
 import { SocialLink, SocialLinkSchema } from './socialLink.schema';
@@ -11,7 +10,6 @@ import { UserModule } from '../user/user.module';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: SocialLink.name, schema: SocialLinkSchema }]),
-    SeshModule,
     NotificationModule,
     UserModule,
   ],

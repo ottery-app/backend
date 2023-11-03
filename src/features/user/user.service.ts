@@ -3,22 +3,16 @@ import { User, UserDocument } from './user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { CryptService } from '../crypt/crypt.service';
-import { ACTIVATION_CODE_LENGTH } from '../crypt/crypt.types';
+import { ACTIVATION_CODE_LENGTH } from '../auth/crypt/crypt.types';
 import { activationCode, email, id, role, UserDto } from '@ottery/ottery-dto';
 import { DataService } from '../data/data.service';
+import { AuthService } from '../auth/auth.services';
+import { CreateUserDto } from './createUserDto';
 
 @Injectable()
 export class UserService {
-    /**
-     * States the needed service (cryptService) and injects a user model
-     * 
-     * @param cryptService the cryptographic service to be used
-     * @param userModel a model of a user 'object'
-     */
     constructor(
         private dataService: DataService,
-        private cryptService: CryptService,
         @InjectModel(User.name) private readonly userModel: Model<UserDocument>
     ) {}
 
@@ -28,15 +22,10 @@ export class UserService {
      * @param createUserDto A user DTO (data transfer object)
      * @returns a new user DTO
      */
-    async create(createUserDto: Partial<UserDto>): Promise<User> {
+    async create(createUserDto: CreateUserDto): Promise<User> {
         if (await this.findOneByEmail(createUserDto.email)) {
             throw new HttpException("User already exists with this email", HttpStatus.CONFLICT);
         } else {
-            //set defaults
-            //pw was hashed in controller as the rule is the instant we get a pw we hash it
-            createUserDto.activated = false;
-            createUserDto.activationCode = this.cryptService.makeCode(ACTIVATION_CODE_LENGTH);
-
             //make
             const createdUser = new this.userModel(createUserDto);
             createdUser.email = createdUser.email.toLowerCase();

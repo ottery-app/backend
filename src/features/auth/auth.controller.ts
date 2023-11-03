@@ -1,25 +1,24 @@
-import { Controller, Get, Post, Put, Delete, Body, Headers, HttpException, HttpStatus, Query } from '@nestjs/common';
-import { SeshService } from '../sesh/sesh.service';
+import { Controller, Get, Post, Put, Delete, Body, HttpException, HttpStatus, Query } from '@nestjs/common';
 import { UserService } from '../user/user.service';
-import { CryptService } from '../crypt/crypt.service';
-import { ACTIVATION_CODE_LENGTH } from '../crypt/crypt.types';
+import { ACTIVATION_CODE_LENGTH } from './crypt/crypt.types';
 import { User } from '../user/user.schema';
 import {ActivationCodeDto, NewUserDto, LoginDto, role} from "@ottery/ottery-dto";
 import { id } from '@ottery/ottery-dto';
-import { Roles } from '../roles/roles.decorator';
-import { UnsecureSesh } from '../sesh/UnsecureSesh.decorator';
-import { Sesh } from '../sesh/Sesh.decorator';
-import { SeshDocument } from '../sesh/sesh.schema';
+import { Roles } from './roles/roles.decorator';
+import { UnsecureSesh } from './sesh/UnsecureSesh.decorator';
+import { Sesh } from './sesh/Sesh.decorator';
+import { SeshDocument } from './sesh/sesh.schema';
 import { AlertService } from '../alert/alert.service';
+import { AuthService } from './auth.services';
+import { CreateUserDto } from '../user/createUserDto';
 
 
 @Controller('api/auth')
 export class AuthController {
     constructor(
         private alertService: AlertService,
-        private seshService: SeshService,
+        private authService: AuthService,
         private userService: UserService,
-        private cryptService: CryptService,
     ) {}
 
     @Put("resend")
@@ -34,7 +33,7 @@ export class AuthController {
                 throw new HttpException("Account already activated", HttpStatus.BAD_REQUEST);
             }
             
-            user.activationCode = this.cryptService.makeCode(ACTIVATION_CODE_LENGTH);
+            user.activationCode = this.authService.crypt.makeCode(ACTIVATION_CODE_LENGTH);
             this.userService.save(user);
 
             this.alertService.accountActivation(
@@ -58,7 +57,7 @@ export class AuthController {
                 createActivateDto.code
             );
 
-            return await this.seshService.activate(sesh);
+            return await this.authService.sesh.activate(sesh);
         } catch (e) {
             throw e;
         }
@@ -68,14 +67,23 @@ export class AuthController {
     @Post("register")
     @UnsecureSesh()
     async register(
-        @Body() createUserDto: NewUserDto,
+        @Body() newUserDto: NewUserDto,
         @Sesh() sesh: SeshDocument
     ) {
         try {
-            createUserDto.password = await this.cryptService.hash(createUserDto.password);
+            const createUserDto:CreateUserDto = {
+                ...newUserDto,
+                password: await this.authService.crypt.hash(newUserDto.password),
+                activated: false,
+                activationCode: this.authService.crypt.makeCode(ACTIVATION_CODE_LENGTH),
+                roles: [role.GUARDIAN, role.CARETAKER]
+            };
+
             let user = await this.userService.create(createUserDto);
+
             this.alertService.accountActivation(user.email, user.activationCode);
-            return await this.seshService.login(sesh, user);
+
+            return await this.authService.sesh.login(sesh, user);
         } catch (e) {
             throw e;
         }
@@ -86,7 +94,7 @@ export class AuthController {
     async logout(
         @Sesh() sesh: SeshDocument
     ) {
-        return await this.seshService.logout(sesh);
+        return await this.authService.sesh.logout(sesh);
     }
   
     @Post("login")
@@ -102,11 +110,11 @@ export class AuthController {
         }
 
         // confirm password given matches password in DB related to user
-        if (!await this.cryptService.compare(createLoginDto.password, user.password)) {
+        if (!await this.authService.crypt.compare(createLoginDto.password, user.password)) {
             throw new HttpException("Invalid Email or Password", HttpStatus.BAD_REQUEST);
         } else {
             // login
-            return await this.seshService.login(sesh, user);
+            return await this.authService.sesh.login(sesh, user);
         }
     }
   
@@ -135,6 +143,6 @@ export class AuthController {
             eventId = query.event;
         }
 
-        return await this.seshService.switchState(sesh, eventId);
+        return await this.authService.sesh.switchState(sesh, eventId);
     }
 }

@@ -4,8 +4,8 @@ import { UserService } from '../user/user.service';
 import { id } from '@ottery/ottery-dto';
 import { CreateChildDto } from '@ottery/ottery-dto';
 import { User } from '../user/user.schema';
-import { SeshDocument } from '../sesh/sesh.schema';
-import { Sesh } from '../sesh/Sesh.decorator';
+import { SeshDocument } from '../auth/sesh/sesh.schema';
+import { Sesh } from '../auth/sesh/Sesh.decorator';
 
 @Controller('api/child')
 export class ChildController {

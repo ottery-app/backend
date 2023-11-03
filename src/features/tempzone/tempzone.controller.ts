@@ -3,15 +3,13 @@ import { ChildRequestDto, id, requestStatus, requestType } from '@ottery/ottery-
 import { TempZoneService } from './tempzone.service';
 import { Patch, Query } from '@nestjs/common/decorators';
 import { ArrayValidationPipe } from 'src/pipes/ArrayValidationPipe';
-import { SeshService } from '../sesh/sesh.service';
-import { SeshDocument } from '../sesh/sesh.schema';
-import { Sesh } from '../sesh/Sesh.decorator';
+import { SeshDocument } from '../auth/sesh/sesh.schema';
+import { Sesh } from '../auth/sesh/Sesh.decorator';
 
 @Controller('api/tempzone')
 export class TempZoneController {
     constructor(
         private tempzoneService: TempZoneService,
-        private seshService: SeshService
     ) {}
 
     @Post("request/dropoff")

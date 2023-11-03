@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { Sesh, SeshDocument } from './sesh.schema';
 import { CryptService } from '../crypt/crypt.service';
-import { User } from '../user/user.schema';
+import { User } from '../../user/user.schema';
 import { role, id, token } from '@ottery/ottery-dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';

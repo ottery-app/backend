@@ -1,16 +1,14 @@
 import { Controller, Get, Patch, Body, Query } from '@nestjs/common';
 import { id, socialLinkState, UpdateLinkDto, UserInfoDto, UserSocialStatusDto } from '@ottery/ottery-dto';
-import { SeshService } from '../sesh/sesh.service';
 import { SocialService } from './social.service';
 import { UserService } from '../user/user.service';
-import { Sesh } from '../sesh/Sesh.decorator';
-import { SeshDocument } from '../sesh/sesh.schema';
+import { Sesh } from '../auth/sesh/Sesh.decorator';
+import { SeshDocument } from '../auth/sesh/sesh.schema';
 
 @Controller('api/social')
 export class SocialController {
     constructor(
         private socialService: SocialService,
-        private seshService: SeshService,
         private userService: UserService,
     ) {}
 

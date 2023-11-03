@@ -7,8 +7,8 @@ import { FormFieldService } from '../form/formField.service';
 import { Patch, Query } from '@nestjs/common/decorators';
 import { User } from '../user/user.schema';
 import { compareIds } from 'src/functions/compareIds';
-import { Sesh } from '../sesh/Sesh.decorator';
-import { SeshDocument } from '../sesh/sesh.schema';
+import { Sesh } from '../auth/sesh/Sesh.decorator';
+import { SeshDocument } from '../auth/sesh/sesh.schema';
 
 @Controller('api/event')
 export class EventController {

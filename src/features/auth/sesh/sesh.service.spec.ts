@@ -2,7 +2,7 @@ import { noId, role } from "@ottery/ottery-dto";
 import { CryptService } from "../crypt/crypt.service";
 import { SeshService } from "./sesh.service";
 import { isId } from "@ottery/ottery-dto";
-import { User } from "../user/user.schema";
+import { User } from "../../user/user.schema";
 
 //TODO the sesh service needs to be udpated. it assumes that most the info it needs will be
 //passsed in and it does not update based on the users true state. It shoud have an UPDATE method

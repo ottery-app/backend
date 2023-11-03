@@ -2,14 +2,14 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { APP_GUARD } from '@nestjs/core';
-import { SeshService } from '../sesh/sesh.service';
 import { role } from '@ottery/ottery-dto';
+import { AuthService } from '../auth.services';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    private seshService: SeshService
+    private authService: AuthService,
   ) {}
 
   /**
@@ -30,22 +30,22 @@ export class RolesGuard implements CanActivate {
     for (let check of roles) {
       switch(check) {
         case role.LOGGEDIN:
-          if (!this.seshService.isLoggedin(sesh)) {
+          if (!this.authService.sesh.isLoggedin(sesh)) {
             return false;
           }
           break;
         case role.ACTIVATED:
-          if (!this.seshService.isActivated(sesh)) {
+          if (!this.authService.sesh.isActivated(sesh)) {
             return false;
           }
           break;
         case role.CARETAKER:
-          if (!this.seshService.isCaretaker(sesh)) {
+          if (!this.authService.sesh.isCaretaker(sesh)) {
             return false;
           }
           break;
         case role.GUARDIAN:
-          if (!this.seshService.isGuardian(sesh)) {
+          if (!this.authService.sesh.isGuardian(sesh)) {
             return false;
           }
           break;

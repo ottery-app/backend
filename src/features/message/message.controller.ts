@@ -3,8 +3,8 @@ import { id, MakeChatDto, MessageDto, StringDto, classifyDto, isId } from '@otte
 import { MessageService } from './message.service';
 import { ArrayValidationPipe } from 'src/pipes/ArrayValidationPipe';
 import { UserService } from '../user/user.service';
-import { SeshDocument } from '../sesh/sesh.schema';
-import { Sesh } from '../sesh/Sesh.decorator';
+import { SeshDocument } from '../auth/sesh/sesh.schema';
+import { Sesh } from '../auth/sesh/Sesh.decorator';
 
 @Controller('api/message')
 export class MessageController {

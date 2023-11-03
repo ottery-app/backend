@@ -1,19 +1,26 @@
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
-import { UserModule } from '../user/user.module';
-import { CryptModule } from '../crypt/crypt.module';
-import { SeshModule } from '../sesh/sesh.module';
+import { CryptModule } from './crypt/crypt.module';
+import { SeshModule } from './sesh/sesh.module';
+import { AuthService } from './auth.services';
 import { AlertModule } from '../alert/alert.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
-    AlertModule,
+    UserModule, //TODO remove
     SeshModule,
-    UserModule,
     CryptModule,
+    AlertModule,
   ],
-  controllers: [AuthController],
-  providers: [],
-  exports: []
+  controllers: [
+    AuthController
+  ],
+  providers: [
+    AuthService
+  ],
+  exports: [
+    AuthService
+  ]
 })
 export class AuthModule {}
