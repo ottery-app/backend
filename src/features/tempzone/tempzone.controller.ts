@@ -1,104 +1,114 @@
 import { Controller, Get, Post, Body } from '@nestjs/common';
-import { ChildRequestDto, id, requestStatus, requestType } from '@ottery/ottery-dto';
+import {
+  ChildRequestDto,
+  id,
+  requestStatus,
+  requestType,
+} from '@ottery/ottery-dto';
 import { TempZoneService } from './tempzone.service';
 import { Patch, Query } from '@nestjs/common/decorators';
-import { ArrayValidationPipe } from 'src/pipes/ArrayValidationPipe';
+import { ArrayValidationPipe } from '../../pipes/ArrayValidationPipe';
 import { SeshService } from '../sesh/sesh.service';
 import { SeshDocument } from '../sesh/sesh.schema';
 import { Sesh } from '../sesh/Sesh.decorator';
 
 @Controller('api/tempzone')
 export class TempZoneController {
-    constructor(
-        private tempzoneService: TempZoneService,
-        private seshService: SeshService
-    ) {}
+  constructor(
+    private tempzoneService: TempZoneService,
+    private seshService: SeshService,
+  ) {}
 
-    @Post("request/dropoff")
-    async requestChildDropOff(
-        @Body(ArrayValidationPipe(ChildRequestDto)) requests: ChildRequestDto[]
-    ) {
-        let responces: ChildRequestDto[] = [];
+  @Post('request/dropoff')
+  async requestChildDropOff(
+    @Body(ArrayValidationPipe(ChildRequestDto)) requests: ChildRequestDto[],
+  ) {
+    let responces: ChildRequestDto[] = [];
 
-        for (let i  = 0 ; i < requests.length; i++) {
-            responces.push(await this.tempzoneService.dropOffRequest(requests[i]));
-        }
-
-        return responces;
+    for (let i = 0; i < requests.length; i++) {
+      responces.push(await this.tempzoneService.dropOffRequest(requests[i]));
     }
 
-    @Post("request/pickup")
-    async requestChildPickUp(
-        @Body(ArrayValidationPipe(ChildRequestDto)) requests: ChildRequestDto[]
-    ) {
-        let responces: ChildRequestDto[] = [];
+    return responces;
+  }
 
-        for (let i  = 0 ; i < requests.length; i++) {
-            responces.push(await this.tempzoneService.pickupRequest(requests[i]));
-        }
+  @Post('request/pickup')
+  async requestChildPickUp(
+    @Body(ArrayValidationPipe(ChildRequestDto)) requests: ChildRequestDto[],
+  ) {
+    let responces: ChildRequestDto[] = [];
 
-        return responces;
+    for (let i = 0; i < requests.length; i++) {
+      responces.push(await this.tempzoneService.pickupRequest(requests[i]));
     }
 
-    @Patch("request/accept")
-    async acceptRequest(
-        @Sesh() sesh: SeshDocument,
-        @Body(ArrayValidationPipe(ChildRequestDto)) requests: ChildRequestDto[] 
-    ) {
-        const userId = sesh.userId;
+    return responces;
+  }
 
-        let responces: ChildRequestDto[] = [];
+  @Patch('request/accept')
+  async acceptRequest(
+    @Sesh() sesh: SeshDocument,
+    @Body(ArrayValidationPipe(ChildRequestDto)) requests: ChildRequestDto[],
+  ) {
+    const userId = sesh.userId;
 
-        for (let i  = 0 ; i < requests.length; i++) {
-            responces.push(await this.tempzoneService.acceptRequest(requests[i], userId));
-        }
+    let responces: ChildRequestDto[] = [];
 
-        return responces;
+    for (let i = 0; i < requests.length; i++) {
+      responces.push(
+        await this.tempzoneService.acceptRequest(requests[i], userId),
+      );
     }
 
-    @Patch("request/decline")
-    async declineRequest(
-        @Body(ArrayValidationPipe(ChildRequestDto)) requests: ChildRequestDto[] 
-    ) {
-        let responces: ChildRequestDto[] = [];
+    return responces;
+  }
 
-        for (let i  = 0 ; i < requests.length; i++) {
-            responces.push(await this.tempzoneService.declineRequest(requests[i]));
-        }
+  @Patch('request/decline')
+  async declineRequest(
+    @Body(ArrayValidationPipe(ChildRequestDto)) requests: ChildRequestDto[],
+  ) {
+    let responces: ChildRequestDto[] = [];
 
-        return responces;
+    for (let i = 0; i < requests.length; i++) {
+      responces.push(await this.tempzoneService.declineRequest(requests[i]));
     }
 
-    @Get("request/status")
-    async checkInOnRequest(
-        //this should be able to filter based on both but rn i see no point so im not
-        @Query('children') children?: id[],
-        @Query('event') event?: id,
-        @Query('type') type?: requestType, // requestType
-        @Query('status') status?: requestStatus //
-    ) {
-        let requests = [];
+    return responces;
+  }
 
-        if (children) {
-            const ids: id[] = children;
-            for (let i = 0; i < ids.length; i++) {
-                requests.push(await this.tempzoneService.checkChildStatus(ids[i]));
-            }
-        }
+  @Get('request/status')
+  async checkInOnRequest(
+    //this should be able to filter based on both but rn i see no point so im not
+    @Query('children') children?: id[],
+    @Query('event') event?: id,
+    @Query('type') type?: requestType, // requestType
+    @Query('status') status?: requestStatus, //
+  ) {
+    let requests = [];
 
-        if (event) {
-            const id: id = event;
-            requests = [...requests, ...await this.tempzoneService.checkEventStatus(id)];
-        }
-
-        if (requests && type) {
-            requests = requests.filter(req=>req.type === type);
-        }
-
-        if (requests && status) {
-            requests = requests.filter(req=>req.status === status);
-        }
-        
-        return requests.filter(i=>i);
+    if (children) {
+      const ids: id[] = children;
+      for (let i = 0; i < ids.length; i++) {
+        requests.push(await this.tempzoneService.checkChildStatus(ids[i]));
+      }
     }
+
+    if (event) {
+      const id: id = event;
+      requests = [
+        ...requests,
+        ...(await this.tempzoneService.checkEventStatus(id)),
+      ];
+    }
+
+    if (requests && type) {
+      requests = requests.filter((req) => req.type === type);
+    }
+
+    if (requests && status) {
+      requests = requests.filter((req) => req.status === status);
+    }
+
+    return requests.filter((i) => i);
+  }
 }

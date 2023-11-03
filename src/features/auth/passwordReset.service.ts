@@ -46,7 +46,7 @@ export class PasswordResetService {
     }).save();
 
     // Send password reset link to the user
-    const link = `${process.env.CLIENT_APP_URL}://reset-password?token=${hash}&email=${email}`;
+    const link = `${process.env.CLIENT_WEB_APP_URL}/reset-password?token=${hash}&email=${email}`;
 
     return this.emailService.sendPasswordResetLink(email, link);
   }

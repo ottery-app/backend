@@ -63,7 +63,8 @@ export class EmailService {
   sendPasswordResetLink(recipient: email, link: string) {
     const to = [recipient];
     const subject = 'Forgot your password?';
+    const html = htmlInject(getTemplate('reset-password'), { link: link });
 
-    return send(to, subject, link);
+    return send(to, subject, html);
   }
 }
