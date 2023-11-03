@@ -11,10 +11,11 @@ import { FormModule } from './features/form/form.module';
 import { DataModule } from './features/data/data.module';
 import { TempZoneModule } from './features/tempzone/tempzone.module';
 import { SocialModule } from './features/social/social.module';
-import { NotificationModule } from './features/notifications/notification.module';
+import { NotificationModule } from './features/alert/notifications/notification.module';
 import { MessageModule } from './features/message/message.module';
 import { PermsGuardPrivider } from './features/perms/perms.guard';
 import { SeshGuardProvider } from './features/sesh/sesh.guard';
+import { AlertModule } from './features/alert/alert.module';
 
 @Module({
   imports: [
@@ -27,8 +28,8 @@ import { SeshGuardProvider } from './features/sesh/sesh.guard';
     FormModule,
     DataModule,
     TempZoneModule,
+    AlertModule,
     SocialModule,
-    NotificationModule,
     MessageModule,
   ],
   controllers: [],

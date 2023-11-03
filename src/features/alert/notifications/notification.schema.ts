@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { id, MultiSchemeDto, NotificationDto } from '@ottery/ottery-dto';
+import { id, NotificationDto } from '@ottery/ottery-dto';
 
 
 export type NotificationDocument = Notification & Document; 
@@ -10,7 +10,7 @@ export class Notification {
     _id: id;
 
     @Prop({required:true})
-    user: MultiSchemeDto;
+    user: id;
 
     @Prop({required:true})
     notifications: NotificationDto[]
