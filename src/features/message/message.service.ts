@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { NotificationService } from '../notifications/notification.service';
+import { NotificationService } from '../alert/notifications/notification.service';
 import { UserService } from '../user/user.service';
 import { Chat, ChatDocument } from './chat.shema';
 import { MakeChatDto, MessageDto, id } from '@ottery/ottery-dto';

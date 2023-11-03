@@ -4,7 +4,6 @@ import { Model } from 'mongoose';
 import { dtoAssign, id, noId, SocialLinkHistoryDto, socialLinkState, UpdateLinkDto } from '@ottery/ottery-dto';
 import { compareIds } from 'src/functions/compareIds';
 import { normalizeId } from 'src/functions/normalizeId';
-import { NotificationService } from '../notifications/notification.service';
 import { SocialLink, SocialLinkDocument } from './socialLink.schema';
 import { UserService } from '../user/user.service';
 
@@ -15,7 +14,6 @@ export class SocialService {
     constructor(
         @InjectModel(SocialLink.name) private readonly socialLinkModel: Model<SocialLinkDocument>,
         private userService: UserService,
-        private notificationService: NotificationService,
     ) {}
 
     private async findLinkByUserId(usera: id, userb: id) {
@@ -75,8 +73,6 @@ export class SocialService {
 
         try {
             if (status === socialLinkState.NONE) {
-                this.notificationService.sendFriendrequest(activator, target.target);
-
                 if (target.state === socialLinkState.REQUESTED) {
                     return await this.updateLink(activator, target);
                 } else {

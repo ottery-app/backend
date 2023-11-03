@@ -1,24 +1,25 @@
 import { Controller, Get, Headers, Param, Patch } from '@nestjs/common';
-import { NotificationService } from './notification.service';
 import { id } from '@ottery/ottery-dto';
+import { NotificationService } from './notifications/notification.service';
+import { AlertService } from './alert.service';
 
 @Controller('api/notifications')
-export class NotificationController {
+export class AlertController {
     constructor(
-        private notificationService: NotificationService,
+        private alertService: AlertService,
     ) {}
 
     @Get(":userId")
     async get(
         @Param('userId') userId: id,
     ) {
-        return await this.notificationService.getNotificationsByUser(userId);
+        return await this.alertService.getNotifs(userId);
     }
 
     @Patch(":userId")
     async read(
         @Param('userId') userId: id,
     ) {
-        return await this.notificationService.markNotificationsAsRead(userId);
+        return await this.alertService.readNotifs(userId);
     }
 }
