@@ -3,7 +3,6 @@ import { ChildService } from './child.service';
 import { UserService } from '../user/user.service';
 import { id } from '@ottery/ottery-dto';
 import { CreateChildDto } from '@ottery/ottery-dto';
-import { User } from '../user/user.schema';
 import { SeshDocument } from '../../auth/sesh/sesh.schema';
 import { Sesh } from '../../auth/sesh/Sesh.decorator';
 

@@ -3,7 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { id, email, password, name, role, activationCode, ImageDto, DataFieldDto } from '@ottery/ottery-dto';
 import { SignupAble } from '../event/event.schema';
-import { DataAble } from '../data.make_interface/data.interface';
+import { DataAble } from '../data/data.interface';
 
 export type UserDocument = User & Document;
 

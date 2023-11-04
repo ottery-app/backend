@@ -3,7 +3,7 @@ import { Document } from 'mongoose';
 import { id, gender, name, time, LocatableStampDto } from '@ottery/ottery-dto';
 import { ImageDto } from '@ottery/ottery-dto';
 import { SignupAble } from '../event/event.schema';
-import { LocateAble } from 'src/features/locatable/locatable.interface';
+import { LocateAble } from 'src/features/location/locatable/locatable.interface';
 
 
 export type ChildDocument = Child & Document;

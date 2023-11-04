@@ -1,6 +1,6 @@
 import { id, perm } from "@ottery/ottery-dto"
 
-export interface Permission {
+export interface PermissionAble {
     perms: PermLink[]
 }
 

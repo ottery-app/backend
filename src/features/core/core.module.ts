@@ -16,11 +16,6 @@ import { CoreService } from './core.service';
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MongooseModule.forFeature([{ name: Child.name, schema: ChildSchema }]),
     MongooseModule.forFeature([{ name: Event.name, schema: EventSchema }]),
-    
-    // DataModule, //should not be an interface or sum
-    // PermsModule, //should be in auth
-    // LocatableModule, //should be an interface or sum
-    // FormModule, //not sure but this doesnt seem right
   ],
   controllers: [
     UserController,

@@ -6,7 +6,7 @@ import { LocatableService } from '../locatable/locatable.service';
 import { ChildReqeust, ChildReqeustDocument } from './childRequest.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { CoreService } from '../core/core.service';
+import { CoreService } from '../../core/core.service';
 
 function requestPipe(request, responce) {
     if (responce) {

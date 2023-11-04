@@ -4,7 +4,7 @@ import { TempZoneController } from './tempzone.controller';
 import { LocatableModule } from '../locatable/locatable.module';
 import { ChildReqeust, ChildReqeustSchema } from './childRequest.schema';
 import { MongooseModule } from '@nestjs/mongoose';
-import { CoreModule } from '../core/core.module';
+import { CoreModule } from '../../core/core.module';
 
 @Module({
   imports: [
@@ -13,9 +13,7 @@ import { CoreModule } from '../core/core.module';
     MongooseModule.forFeature([{ name: ChildReqeust.name, schema: ChildReqeustSchema }]),
   ],
   controllers: [TempZoneController],
-  providers: [
-    TempZoneService,
-  ],
+  providers: [TempZoneService],
   exports: [TempZoneService],
 })
 export class TempZoneModule {}
