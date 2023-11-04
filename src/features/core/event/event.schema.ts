@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { id, currency, time, recurrence, location } from '@ottery/ottery-dto';
+import { PermissionAble, PermLink } from 'src/features/auth/perms/perms.interface';
 
 export type EventDocument = Event & Document;
 
@@ -9,7 +10,7 @@ export interface SignupAble {
 }
 
 @Schema()
-export class Event {
+export class Event implements PermissionAble {
     _id?: id;
 
     @Prop({required: true})
@@ -49,8 +50,8 @@ export class Event {
     @Prop({required: true})
     public: boolean;
 
-    // @Prop({required: true})
-    // perms: PermLinkDto[];
+    @Prop({required: true})
+    perms: PermLink[];
 
     // @Prop({required: true})
     // volenteerSignUp: id[]; //these are links to the fields 

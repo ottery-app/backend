@@ -1,16 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { id, gender, name, time, LocatableStampDto } from '@ottery/ottery-dto';
+import { id, gender, name, time, LocatableStampDto, PermsDto } from '@ottery/ottery-dto';
 import { ImageDto } from '@ottery/ottery-dto';
 import { SignupAble } from '../event/event.schema';
 import { LocateAble } from 'src/features/location/locatable/locatable.interface';
-
+import { PermissionAble, PermLink } from 'src/features/auth/perms/perms.interface';
 
 export type ChildDocument = Child & Document;
 
-
 @Schema()
-export class Child implements SignupAble, LocateAble {
+export class Child implements SignupAble, LocateAble, PermissionAble {
     _id: id;
 
     @Prop({required: true})
@@ -40,13 +39,8 @@ export class Child implements SignupAble, LocateAble {
     @Prop({required:true})
     guardians: [];
 
-    // @Prop({required: true})
-    // //its kinda stupid to have this seperated into another service since its only accessed via this id... 
-    // //which means lost time. might fix later.
-    // perms: PermLinkDto[];
-
-    // @Prop({required: true})
-    // data: id;
+    @Prop({required:true})
+    perms: PermLink[];
 
     @Prop({required: true})
     lastStampedLocation: LocatableStampDto;
