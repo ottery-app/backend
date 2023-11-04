@@ -8,6 +8,14 @@ import { PermsGuardPrivider } from './features/perms/perms.guard';
 import { SeshGuardProvider } from './features/auth/sesh/sesh.guard';
 import { AlertModule } from './features/alert/alert.module';
 import { CoreModule } from './features/core/core.module';
+import { SocialModule } from './features/social/social.module';
+import { UserModule } from './features/user/user.module';
+import { ChildModule } from './features/child/child.module';
+import { EventModule } from './features/event/event.module';
+import { FormModule } from './features/form/form.module';
+import { DataModule } from './features/data/data.module';
+import { TempZoneModule } from './features/tempzone/tempzone.module';
+import { MessageModule } from './features/message/message.module';
 
 @Module({
   imports: [
@@ -15,7 +23,15 @@ import { CoreModule } from './features/core/core.module';
     DbModule,
     AuthModule,
     AlertModule,
-    CoreModule,
+    //CoreModule,
+    UserModule,
+    ChildModule,
+    EventModule,
+    FormModule,
+    DataModule,
+    TempZoneModule,
+    SocialModule,
+    MessageModule,
   ],
   controllers: [],
   providers: [
