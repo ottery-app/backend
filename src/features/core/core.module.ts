@@ -7,13 +7,9 @@ import { ChildController } from './child/child.controller';
 import { EventController } from './event/event.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './user/user.schema';
-import { PermsModule } from '../perms/perms.module';
-import { LocatableModule } from '../locatable/locatable.module';
 import { Child, ChildSchema } from './child/child.schema';
 import { EventSchema } from './event/event.schema';
-import { FormModule } from '../form/form.module';
 import { CoreService } from './core.service';
-import { DataModule } from './data.make_interface/data.module';
 
 @Module({
   imports: [

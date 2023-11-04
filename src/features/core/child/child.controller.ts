@@ -21,10 +21,7 @@ export class ChildController {
     ){
         try {
             //make
-            let child = await this.childService.create({
-                id: sesh.userId,
-                ref: User.name, 
-            }, createChildDto);
+            let child = await this.childService.create(sesh.userId, createChildDto);
 
             //add child to user
             this.userService.addChildById(sesh.userId, child._id);

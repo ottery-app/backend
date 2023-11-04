@@ -1,9 +1,9 @@
 
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { id, email, password, name, role, activationCode, ImageDto } from '@ottery/ottery-dto';
-import { DataAble } from '../data.make_interface/data.schema';
+import { id, email, password, name, role, activationCode, ImageDto, DataFieldDto } from '@ottery/ottery-dto';
 import { SignupAble } from '../event/event.schema';
+import { DataAble } from '../data.make_interface/data.interface';
 
 export type UserDocument = User & Document;
 
@@ -70,7 +70,7 @@ export class User implements DataAble, SignupAble {
   events: id[];
 
   @Prop()
-  data: id;
+  data: DataFieldDto[];
 
   @Prop()
   socialLinks: id[];
