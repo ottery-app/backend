@@ -4,13 +4,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { activationCode, email, id, role } from '@ottery/ottery-dto';
-import { DataService } from '../../data.make_interface/data.service';
+import { DataService } from '../data.make_interface/data.service';
 import { CreateUserDto } from './createUserDto';
 
 @Injectable()
 export class UserService {
     constructor(
-        private dataService: DataService,
+        //private dataService: DataService,
         @InjectModel(User.name) private readonly userModel: Model<UserDocument>
     ) {}
 
@@ -32,10 +32,10 @@ export class UserService {
 
             //attach other pages
             //make data page
-            createdUser.data = (await this.dataService.create({
-                id: createdUser._id,
-                ref: User.name,
-            }))._id;
+            // createdUser.data = (await this.dataService.create({
+            //     id: createdUser._id,
+            //     ref: User.name,
+            // }))._id;
 
             return await createdUser.save();
         }

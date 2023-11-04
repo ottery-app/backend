@@ -2,15 +2,15 @@ import { Controller, Param, Headers, Body, Get, Patch, Put, Query } from '@nestj
 import { id, MakeChatDto, MessageDto, StringDto, classifyDto, isId } from '@ottery/ottery-dto';
 import { MessageService } from './message.service';
 import { ArrayValidationPipe } from 'src/pipes/ArrayValidationPipe';
-import { UserService } from '../user/user.service';
 import { SeshDocument } from '../auth/sesh/sesh.schema';
 import { Sesh } from '../auth/sesh/Sesh.decorator';
+import { CoreService } from '../core/core.service';
 
 @Controller('api/message')
 export class MessageController {
     constructor(
         private messageService: MessageService,
-        private userService: UserService,
+        private coreService: CoreService,
     ) {}
 
     @Patch('chat/direct/:chatId')
@@ -38,7 +38,7 @@ export class MessageController {
         @Query('requireUserIds', ArrayValidationPipe(isId)) requireUserIds: id[],
         @Query('direct') direct: boolean,
     ) {
-        let chatIds = await this.userService.getChatsFor(userId);
+        let chatIds = await this.coreService.user.getChatsFor(userId);
         let chats = await this.messageService.getManyByIds(chatIds);
 
         if (requireUserIds?.length) {

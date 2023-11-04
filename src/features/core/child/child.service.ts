@@ -4,16 +4,16 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateChildDto, MultiSchemeDto, makePermLinkDto, noId, perm } from '@ottery/ottery-dto';
 import { id } from '@ottery/ottery-dto';
-import { DataService } from '../../data.make_interface/data.service';
-import { PermsService } from '../../auth/perms.make_interface/perms.service';
-import { LocatableService } from '../../locatable/locatable.service';
+// import { DataService } from '../data.make_interface/data.service';
+// import { PermsService } from '../../auth/perms.make_interface/perms.service';
+// import { LocatableService } from '../../locatable/locatable.service';
 
 @Injectable()
 export class ChildService {
     constructor(
-        private permService: PermsService,
-        private dataService: DataService,
-        private locatableService: LocatableService,
+        // private permService: PermsService,
+        // private dataService: DataService,
+        // private locatableService: LocatableService,
         @InjectModel(Child.name) private childModel: Model<ChildDocument>,
     ){}
 
@@ -29,18 +29,18 @@ export class ChildService {
             guardians: [owner.id],
         });
 
-        this.locatableService.stamp(child, noId, owner.id);
+        //this.locatableService.stamp(child, noId, owner.id);
 
         //add data page so that we can store data associated with the child
-        const data = await this.dataService.create({
-            id: child._id,
-            ref: Child.name,
-        });
-        child.data = data._id;
+        // const data = await this.dataService.create({
+        //     id: child._id,
+        //     ref: Child.name,
+        // });
+        // child.data = data._id;
 
         //add permissions
-        const perms = await this.permService.create(owner, {id: child._id, ref: Child.name}, perm.SUPER);
-        child.perms.push(makePermLinkDto({owner, perms: perms._id}));
+        // const perms = await this.permService.create(owner, {id: child._id, ref: Child.name}, perm.SUPER);
+        // child.perms.push(makePermLinkDto({owner, perms: perms._id}));
 
         return await child.save();
     }

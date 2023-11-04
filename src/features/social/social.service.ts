@@ -5,7 +5,7 @@ import { dtoAssign, id, noId, SocialLinkHistoryDto, socialLinkState, UpdateLinkD
 import { compareIds } from 'src/functions/compareIds';
 import { normalizeId } from 'src/functions/normalizeId';
 import { SocialLink, SocialLinkDocument } from './socialLink.schema';
-import { UserService } from '../user/user.service';
+import { CoreService } from '../core/core.service';
 
 
 @Injectable()
@@ -13,7 +13,7 @@ export class SocialService {
 
     constructor(
         @InjectModel(SocialLink.name) private readonly socialLinkModel: Model<SocialLinkDocument>,
-        private userService: UserService,
+        private coreService: CoreService,
     ) {}
 
     private async findLinkByUserId(usera: id, userb: id) {
@@ -48,8 +48,8 @@ export class SocialService {
                 history: [stamp]
             });
 
-            await this.userService.addSocialLink(activator, link._id);
-            await this.userService.addSocialLink(target.target, link._id);
+            await this.coreService.user.addSocialLink(activator, link._id);
+            await this.coreService.user.addSocialLink(target.target, link._id);
         }
 
         return await link.save();

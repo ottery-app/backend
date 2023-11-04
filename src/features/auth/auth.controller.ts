@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Body, HttpException, HttpStatus, Query } from '@nestjs/common';
-import { UserService } from '../user/user.service';
 import { ACTIVATION_CODE_LENGTH } from './crypt/crypt.types';
-import { User } from '../user/user.schema';
+import { User } from '../core/user/user.schema';
 import {ActivationCodeDto, NewUserDto, LoginDto, role} from "@ottery/ottery-dto";
 import { id } from '@ottery/ottery-dto';
 import { Roles } from './roles/roles.decorator';
@@ -10,7 +9,8 @@ import { Sesh } from './sesh/Sesh.decorator';
 import { SeshDocument } from './sesh/sesh.schema';
 import { AlertService } from '../alert/alert.service';
 import { AuthService } from './auth.services';
-import { CreateUserDto } from '../user/createUserDto';
+import { CreateUserDto } from '../core/user/createUserDto';
+import { CoreService } from '../core/core.service';
 
 
 @Controller('api/auth')
@@ -18,7 +18,7 @@ export class AuthController {
     constructor(
         private alertService: AlertService,
         private authService: AuthService,
-        private userService: UserService,
+        private coreService: CoreService,
     ) {}
 
     @Put("resend")
@@ -27,14 +27,14 @@ export class AuthController {
         @Sesh() sesh: SeshDocument
     ) {
         try {
-            const user = await this.userService.findOneById(sesh.userId);
+            const user = await this.coreService.user.findOneById(sesh.userId);
             
             if (user.activated) {
                 throw new HttpException("Account already activated", HttpStatus.BAD_REQUEST);
             }
             
             user.activationCode = this.authService.crypt.makeCode(ACTIVATION_CODE_LENGTH);
-            this.userService.save(user);
+            this.coreService.user.save(user);
 
             this.alertService.accountActivation(
                 user.email,
@@ -52,7 +52,7 @@ export class AuthController {
         @Body() createActivateDto: ActivationCodeDto
     ) {
         try {
-            await this.userService.activate(
+            await this.coreService.user.activate(
                 sesh.userId,
                 createActivateDto.code
             );
@@ -79,7 +79,7 @@ export class AuthController {
                 roles: [role.GUARDIAN, role.CARETAKER]
             };
 
-            let user = await this.userService.create(createUserDto);
+            let user = await this.coreService.user.create(createUserDto);
 
             this.alertService.accountActivation(user.email, user.activationCode);
 
@@ -104,7 +104,7 @@ export class AuthController {
         @Body() createLoginDto: LoginDto,
     ) {
         // If email is not in the system, fail
-        const user: User = await this.userService.findOneByEmail(createLoginDto.email)
+        const user: User = await this.coreService.user.findOneByEmail(createLoginDto.email)
         if (!user) {
             throw new HttpException("Invalid Email or Password", HttpStatus.BAD_REQUEST);
         }

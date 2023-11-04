@@ -4,14 +4,14 @@ import { NotificationModule } from '../alert/notifications/notification.module';
 import { SocialController } from './social.controller';
 import { SocialService } from './social.service';
 import { SocialLink, SocialLinkSchema } from './socialLink.schema';
-import { UserModule } from '../user/user.module';
+import { CoreModule } from '../core/core.module';
 
 @Global()
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: SocialLink.name, schema: SocialLinkSchema }]),
     NotificationModule,
-    UserModule,
+    CoreModule,
   ],
   controllers: [SocialController],
   providers: [SocialService],

@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { id, gender, name, time, PermLinkDto, LocatableStampDto } from '@ottery/ottery-dto';
 import { ImageDto } from '@ottery/ottery-dto';
-import { DataAble } from '../../data.make_interface/data.schema';
+import { DataAble } from '../data.make_interface/data.schema';
 import { SignupAble } from '../event/event.schema';
 import { LocateAble } from '../../locatable/locatable.interface';
 import { PermAble } from '../../auth/perms.make_interface/permission.schema';
