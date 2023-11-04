@@ -2,18 +2,16 @@ import { Header, Injectable, NotFoundException } from '@nestjs/common';
 import { Child, ChildDocument} from './child.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateChildDto, MultiSchemeDto, makePermLinkDto, noId, perm } from '@ottery/ottery-dto';
+import { CreateChildDto } from '@ottery/ottery-dto';
 import { id } from '@ottery/ottery-dto';
-import { DataService } from '../data/data.service';
-import { PermsService } from '../perms/perms.service';
-import { LocatableService } from '../locatable/locatable.service';
+import { CoreService } from '../core.service';
+// import { DataService } from '../data.make_interface/data.service';
+// import { PermsService } from '../../auth/perms.make_interface/perms.service';
+// import { LocatableService } from '../../locatable/locatable.service';
 
 @Injectable()
 export class ChildService {
     constructor(
-        private permService: PermsService,
-        private dataService: DataService,
-        private locatableService: LocatableService,
         @InjectModel(Child.name) private childModel: Model<ChildDocument>,
     ){}
 
@@ -22,25 +20,26 @@ export class ChildService {
      * @param createChildDto A DTO of the child class
      * @returns the new child object
      */
-    async create(owner: MultiSchemeDto, createChildDto: CreateChildDto) {
+    async create(parent: id, createChildDto: CreateChildDto) {
         const child = new this.childModel({
             ...createChildDto,
-            primaryGuardian: owner.id,
-            guardians: [owner.id],
+            primaryGuardian: parent,
+            guardians: [parent],
+            events: []
         });
 
-        this.locatableService.stamp(child, noId, owner.id);
+        //this.locatableService.stamp(child, noId, owner.id);
 
         //add data page so that we can store data associated with the child
-        const data = await this.dataService.create({
-            id: child._id,
-            ref: Child.name,
-        });
-        child.data = data._id;
+        // const data = await this.dataService.create({
+        //     id: child._id,
+        //     ref: Child.name,
+        // });
+        // child.data = data._id;
 
         //add permissions
-        const perms = await this.permService.create(owner, {id: child._id, ref: Child.name}, perm.SUPER);
-        child.perms.push(makePermLinkDto({owner, perms: perms._id}));
+        // const perms = await this.permService.create(owner, {id: child._id, ref: Child.name}, perm.SUPER);
+        // child.perms.push(makePermLinkDto({owner, perms: perms._id}));
 
         return await child.save();
     }

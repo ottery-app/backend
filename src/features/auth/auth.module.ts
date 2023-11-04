@@ -4,11 +4,11 @@ import { CryptModule } from './crypt/crypt.module';
 import { SeshModule } from './sesh/sesh.module';
 import { AuthService } from './auth.services';
 import { AlertModule } from '../alert/alert.module';
-import { UserModule } from '../user/user.module';
+import { CoreModule } from '../core/core.module';
 
 @Module({
   imports: [
-    UserModule, //TODO remove
+    CoreModule, //TODO remove
     SeshModule,
     CryptModule,
     AlertModule,

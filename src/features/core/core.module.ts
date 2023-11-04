@@ -1,26 +1,36 @@
 import { Module } from '@nestjs/common';
-import { UserModule } from '../user/user.module';
-import { ChildModule } from '../child/child.module';
-import { EventModule } from '../event/event.module';
-import { FormModule } from '../form/form.module';
-import { DataModule } from '../data/data.module';
-import { SocialModule } from '../social/social.module';
-import { MessageModule } from '../message/message.module';
-import { TempZoneModule } from '../tempzone/tempzone.module';
+import { UserService } from './user/user.service';
+import { ChildService } from './child/child.service';
+import { EventService } from './event/event.service';
+import { UserController } from './user/user.controller';
+import { ChildController } from './child/child.controller';
+import { EventController } from './event/event.controller';
+import { MongooseModule } from '@nestjs/mongoose';
+import { User, UserSchema } from './user/user.schema';
+import { Child, ChildSchema } from './child/child.schema';
+import { EventSchema } from './event/event.schema';
+import { CoreService } from './core.service';
 
 @Module({
   imports: [
-    UserModule,
-    ChildModule,
-    EventModule,
-    FormModule,
-    DataModule,
-    TempZoneModule,
-    SocialModule,
-    MessageModule,
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([{ name: Child.name, schema: ChildSchema }]),
+    MongooseModule.forFeature([{ name: Event.name, schema: EventSchema }]),
   ],
-  controllers: [],
-  providers: [],
-  exports: [],
+  controllers: [
+    UserController,
+    ChildController,
+    EventController,
+  ],
+  providers: [
+    CoreService,
+
+    UserService,
+    ChildService,
+    EventService,
+  ],
+  exports: [
+    CoreService
+  ],
 })
 export class CoreModule {}

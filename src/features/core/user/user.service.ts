@@ -3,16 +3,12 @@ import { User, UserDocument } from './user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { ACTIVATION_CODE_LENGTH } from '../auth/crypt/crypt.types';
-import { activationCode, email, id, role, UserDto } from '@ottery/ottery-dto';
-import { DataService } from '../data/data.service';
-import { AuthService } from '../auth/auth.services';
+import { activationCode, email, id, role } from '@ottery/ottery-dto';
 import { CreateUserDto } from './createUserDto';
 
 @Injectable()
 export class UserService {
     constructor(
-        private dataService: DataService,
         @InjectModel(User.name) private readonly userModel: Model<UserDocument>
     ) {}
 
@@ -34,10 +30,10 @@ export class UserService {
 
             //attach other pages
             //make data page
-            createdUser.data = (await this.dataService.create({
-                id: createdUser._id,
-                ref: User.name,
-            }))._id;
+            // createdUser.data = (await this.dataService.create({
+            //     id: createdUser._id,
+            //     ref: User.name,
+            // }))._id;
 
             return await createdUser.save();
         }
@@ -157,12 +153,5 @@ export class UserService {
 
 
         return await user.save();
-    }
-
-    /**
-     * TESTING ONLY
-     */
-    async deleteTestAccount() {
-        return await this.userModel.findOneAndDelete({email: 'test@gmail.com'});
     }
 }

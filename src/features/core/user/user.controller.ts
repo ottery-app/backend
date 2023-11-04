@@ -4,7 +4,7 @@ import { ChildService } from '../child/child.service';
 import { UserInfoDto } from "@ottery/ottery-dto";
 import { id } from '@ottery/ottery-dto';
 import { EventService } from '../event/event.service';
-import { Sesh } from '../auth/sesh/Sesh.decorator';
+import { Sesh } from '../../auth/sesh/Sesh.decorator';
 
 @Controller('api/user')
 export class UserController {

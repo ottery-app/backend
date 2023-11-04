@@ -3,9 +3,8 @@ import { ChildService } from './child.service';
 import { UserService } from '../user/user.service';
 import { id } from '@ottery/ottery-dto';
 import { CreateChildDto } from '@ottery/ottery-dto';
-import { User } from '../user/user.schema';
-import { SeshDocument } from '../auth/sesh/sesh.schema';
-import { Sesh } from '../auth/sesh/Sesh.decorator';
+import { SeshDocument } from '../../auth/sesh/sesh.schema';
+import { Sesh } from '../../auth/sesh/Sesh.decorator';
 
 @Controller('api/child')
 export class ChildController {
@@ -21,10 +20,7 @@ export class ChildController {
     ){
         try {
             //make
-            let child = await this.childService.create({
-                id: sesh.userId,
-                ref: User.name, 
-            }, createChildDto);
+            let child = await this.childService.create(sesh.userId, createChildDto);
 
             //add child to user
             this.userService.addChildById(sesh.userId, child._id);

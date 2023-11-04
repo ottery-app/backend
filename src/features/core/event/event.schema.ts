@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { id, currency, time, recurrence, location, PermLinkDto } from '@ottery/ottery-dto';
-import { PermAble } from '../perms/permission.schema';
+import { id, currency, time, recurrence, location } from '@ottery/ottery-dto';
+import { PermissionAble, PermLink } from 'src/features/auth/perms/perms.interface';
 
 export type EventDocument = Event & Document;
 
@@ -10,7 +10,7 @@ export interface SignupAble {
 }
 
 @Schema()
-export class Event implements PermAble {
+export class Event implements PermissionAble {
     _id?: id;
 
     @Prop({required: true})
@@ -34,15 +34,12 @@ export class Event implements PermAble {
     @Prop({required: true})
     recurrence: recurrence[];
 
-    @Prop({required: true})
-    volenteerSignUp: id[]; //these are links to the fields 
-
-    @Prop({required: true})
-    attendeeSignUp: id[]; //these are links to the fields 
-
     //TODO this should also be able to be not children
     @Prop({required: true})
     attendees: id[]; //these are the children that are signed up
+
+    @Prop({required: true})
+    managers: id[];
 
     @Prop({required: true})
     volenteers: id[]; //these are the people that are signed up
@@ -54,7 +51,13 @@ export class Event implements PermAble {
     public: boolean;
 
     @Prop({required: true})
-    perms: PermLinkDto[];
+    perms: PermLink[];
+
+    // @Prop({required: true})
+    // volenteerSignUp: id[]; //these are links to the fields 
+
+    // @Prop({required: true})
+    // attendeeSignUp: id[]; //these are links to the fields 
 }
 
 export const EventSchema = SchemaFactory.createForClass(Event);

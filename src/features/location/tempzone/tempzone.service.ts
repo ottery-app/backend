@@ -2,11 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { ChildRequestDto, classifyWithDto, id, noId, requestStatus, requestType } from '@ottery/ottery-dto';
 import * as delay from 'delay';
 import { timeout, tryagain } from './tempzone.meta';
-import { ChildService } from '../child/child.service';
 import { LocatableService } from '../locatable/locatable.service';
 import { ChildReqeust, ChildReqeustDocument } from './childRequest.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { CoreService } from '../../core/core.service';
 
 function requestPipe(request, responce) {
     if (responce) {
@@ -32,7 +32,7 @@ export class TempZoneService {
     private delays = new Map<id, any>();
     
     constructor(
-        private childService: ChildService,
+        private coreService: CoreService,
         private locatableService: LocatableService,
         @InjectModel(ChildReqeust.name) private childRequestModel: Model<ChildReqeustDocument>,
     ) {}
@@ -125,7 +125,7 @@ export class TempZoneService {
         request = await request.save();
 
         //stamp da homie
-        const child = await this.childService.findOneById(childRequest.child);
+        const child = await this.coreService.child.findOneById(childRequest.child);
 
         if (childRequest.type === requestType.PICKUP) {
             this.locatableService.stamp(child, noId, acceptor);
