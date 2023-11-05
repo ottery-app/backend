@@ -1,62 +1,32 @@
-import { Controller, Get, Patch, Body, Query } from '@nestjs/common';
-import { id, socialLinkState, UpdateLinkDto, UserInfoDto, UserSocialStatusDto } from '@ottery/ottery-dto';
+import { Controller, Get, Patch, Body, Query, Param } from '@nestjs/common';
+import { id, socialLinkState, UpdateLinkDto } from '@ottery/ottery-dto';
 import { SocialService } from './social.service';
 import { Sesh } from '../auth/sesh/Sesh.decorator';
 import { SeshDocument } from '../auth/sesh/sesh.schema';
-import { CoreService } from '../core/core.service';
 
 @Controller('api/social')
 export class SocialController {
     constructor(
         private socialService: SocialService,
-        private coreService: CoreService,
     ) {}
 
-    @Get('status')
-    async getStatus(
+    @Get('status/user/:userId')
+    async getByUser(
         @Sesh() sesh: SeshDocument,
-        @Query('userIds') userIds: id[], 
-        @Query('types') types: socialLinkState[],
+        @Param('userId') userId: id,
     ) {
-        const selfId:id = sesh.userId;
-        let users:any = new Map();
+        return await this.socialService.findLinkBetween(sesh.userId, userId);
+    }
 
-        if (userIds) {
-            const found = await this.coreService.user.findManyById(userIds);
-            found.forEach((user)=>{
-                users.set(user._id, user);
-            });
-        }
-
-        if (types) {
-            const user = await this.coreService.user.findOneById(selfId);
-
-            if (user.socialLinks) {
-                for (let i = 0 ; i < user.socialLinks.length; i++) {
-                    const linkId = user.socialLinks[i];
-                    const link = await this.socialService.findLinkById(linkId);
     
-                    if (types.includes((await this.socialService.checkStatusByLink(link)).state)) {
-                        const linkedUserId = await this.socialService.getOtherLinkedUser(link, selfId);
-                        const linkedUser = await this.coreService.user.findOneById(linkedUserId);
-                        users.set(linkedUser._id, linkedUser);
-                    }
-                }
-            }
-        }
-
-        const responce:UserSocialStatusDto[] = [];
-
-        users = [...users.values()];
-        for (let i = 0 ; i < users.length; i++) {
-            const status = await this.socialService.checkStatusOfUsers(selfId, users[i]);
-            responce.push({
-                user: new UserInfoDto(users[i]),
-                state: status,
-            });
-        }
-
-        return responce;
+    @Get('status/type/:type')
+    async getByType(
+        @Sesh() sesh: SeshDocument,
+        @Param('type') type: socialLinkState,
+    ) {
+        let links = await this.socialService.getLinksForUser(sesh.userId)
+        links = links.filter((link)=>type === (link.history[0].state));
+        return links;
     }
 
     @Patch('update')
@@ -65,6 +35,6 @@ export class SocialController {
         @Body() target: UpdateLinkDto,
     ) {
         const selfId = sesh.userId;
-        return (await this.socialService.updateLinkStatus(selfId, target)).history[0];
+        return (await this.socialService.updateUserLink(selfId, target.target, target.state));
     }
 }

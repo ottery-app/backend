@@ -37,7 +37,7 @@ export class Child implements SignupAble, LocateAble, PermissionAble {
     primaryGuardian: id;
 
     @Prop({required:true})
-    guardians: [];
+    guardians: id[];
 
     @Prop({required:true})
     perms: PermLink[];

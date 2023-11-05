@@ -125,7 +125,7 @@ export class TempZoneService {
         request = await request.save();
 
         //stamp da homie
-        const child = await this.coreService.child.findOneById(childRequest.child);
+        const child = await this.coreService.child.get(childRequest.child);
 
         if (childRequest.type === requestType.PICKUP) {
             this.locatableService.stamp(child, noId, acceptor);

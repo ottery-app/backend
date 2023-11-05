@@ -27,7 +27,7 @@ export class MessageService {
 
         const res = await chat.save();
 
-        const userDocs = await this.coreService.user.findManyById(chatRaw.users);
+        const userDocs = await this.coreService.user.getMany(chatRaw.users);
         
         for (let i = 0; i < userDocs.length; i++) {
             userDocs[i].chats.push(res._id);
