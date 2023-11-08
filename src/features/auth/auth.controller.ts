@@ -22,6 +22,7 @@ import {
   LoginDto,
   role,
   EmailDto,
+  ResetPasswordDto,
 } from '@ottery/ottery-dto';
 import { id } from '@ottery/ottery-dto';
 import { Roles } from '../roles/roles.decorator';
@@ -87,7 +88,7 @@ export class AuthController {
       createUserDto.password = await this.cryptService.hash(
         createUserDto.password,
       );
-      let user = await this.userService.create(createUserDto);
+      const user = await this.userService.create(createUserDto);
       this.emailService.sendActivationCode(user.email, user.activationCode);
       return await this.seshService.login(sesh, user);
     } catch (e) {
@@ -157,5 +158,11 @@ export class AuthController {
   @UnsecureSesh()
   async storePasswordResetToken(@Body() emailDto: EmailDto) {
     return this.passwordResetTokenService.setPasswordResetToken(emailDto);
+  }
+
+  @Post('reset-password')
+  @UnsecureSesh()
+  async storeNewPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.passwordResetTokenService.setNewPassword(resetPasswordDto);
   }
 }
