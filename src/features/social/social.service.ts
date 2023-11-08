@@ -9,19 +9,17 @@ import {
   socialLinkState,
   UpdateLinkDto,
 } from '@ottery/ottery-dto';
-import { compareIds } from '../../functions/compareIds';
-import { normalizeId } from '../../functions/normalizeId';
-import { NotificationService } from '../notifications/notification.service';
+import { compareIds } from 'src/functions/compareIds';
+import { normalizeId } from 'src/functions/normalizeId';
 import { SocialLink, SocialLinkDocument } from './socialLink.schema';
-import { UserService } from '../user/user.service';
+import { CoreService } from '../core/core.service';
 
 @Injectable()
 export class SocialService {
   constructor(
     @InjectModel(SocialLink.name)
     private readonly socialLinkModel: Model<SocialLinkDocument>,
-    private userService: UserService,
-    private notificationService: NotificationService,
+    private coreService: CoreService,
   ) {}
 
   private async findLinkByUserId(usera: id, userb: id) {
@@ -58,8 +56,8 @@ export class SocialService {
         history: [stamp],
       });
 
-      await this.userService.addSocialLink(activator, link._id);
-      await this.userService.addSocialLink(target.target, link._id);
+      await this.coreService.user.addSocialLink(activator, link._id);
+      await this.coreService.user.addSocialLink(target.target, link._id);
     }
 
     return await link.save();
@@ -83,8 +81,6 @@ export class SocialService {
 
     try {
       if (status === socialLinkState.NONE) {
-        this.notificationService.sendFriendrequest(activator, target.target);
-
         if (target.state === socialLinkState.REQUESTED) {
           return await this.updateLink(activator, target);
         } else {

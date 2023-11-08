@@ -1,17 +1,15 @@
 import { Controller, Get, Patch, Body, Query } from '@nestjs/common';
 import { id, socialLinkState, UpdateLinkDto, UserInfoDto, UserSocialStatusDto } from '@ottery/ottery-dto';
-import { SeshService } from '../sesh/sesh.service';
 import { SocialService } from './social.service';
-import { UserService } from '../user/user.service';
-import { Sesh } from '../sesh/Sesh.decorator';
-import { SeshDocument } from '../sesh/sesh.schema';
+import { Sesh } from '../auth/sesh/Sesh.decorator';
+import { SeshDocument } from '../auth/sesh/sesh.schema';
+import { CoreService } from '../core/core.service';
 
 @Controller('api/social')
 export class SocialController {
     constructor(
         private socialService: SocialService,
-        private seshService: SeshService,
-        private userService: UserService,
+        private coreService: CoreService,
     ) {}
 
     @Get('status')
@@ -24,14 +22,14 @@ export class SocialController {
         let users:any = new Map();
 
         if (userIds) {
-            const found = await this.userService.findManyById(userIds);
+            const found = await this.coreService.user.findManyById(userIds);
             found.forEach((user)=>{
                 users.set(user._id, user);
             });
         }
 
         if (types) {
-            const user = await this.userService.findOneById(selfId);
+            const user = await this.coreService.user.findOneById(selfId);
 
             if (user.socialLinks) {
                 for (let i = 0 ; i < user.socialLinks.length; i++) {
@@ -40,7 +38,7 @@ export class SocialController {
     
                     if (types.includes((await this.socialService.checkStatusByLink(link)).state)) {
                         const linkedUserId = await this.socialService.getOtherLinkedUser(link, selfId);
-                        const linkedUser = await this.userService.findOneById(linkedUserId);
+                        const linkedUser = await this.coreService.user.findOneById(linkedUserId);
                         users.set(linkedUser._id, linkedUser);
                     }
                 }

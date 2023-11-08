@@ -1,18 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { NotificationService } from '../notifications/notification.service';
-import { UserService } from '../user/user.service';
 import { Chat, ChatDocument } from './chat.shema';
 import { MakeChatDto, MessageDto, id } from '@ottery/ottery-dto';
-import { normalizeId } from '../../functions/normalizeId';
+import { normalizeId } from 'src/functions/normalizeId';
+import { CoreService } from '../core/core.service';
 
 @Injectable()
 export class MessageService {
   constructor(
     @InjectModel(Chat.name) private readonly chatModel: Model<ChatDocument>,
-    private userService: UserService,
-    private notificationService: NotificationService, //TODO notify the user when a chat is updated
+    private coreService: CoreService,
   ) {}
 
   async makeChat(chatRaw: MakeChatDto) {
@@ -28,7 +26,7 @@ export class MessageService {
 
     const res = await chat.save();
 
-    const userDocs = await this.userService.findManyById(chatRaw.users);
+    const userDocs = await this.coreService.user.findManyById(chatRaw.users);
 
     for (let i = 0; i < userDocs.length; i++) {
       userDocs[i].chats.push(res._id);
