@@ -23,9 +23,12 @@ export class EventController {
             // const volIds = await this.formFieldService.createMany(createEventDto.volenteerSignUp);
             // const atenIds = await this.formFieldService.createMany(createEventDto.attendeeSignUp);
             
-            const event = await this.coreService.event.create(userID, createEventDto);
+            const event = await this.coreService.event.create({
+                ...createEventDto,
+                leadManager: userID,
+            });
 
-            await this.coreService.user.addEventById(userID, event._id);
+            await this.coreService.user.addEvent(userID, event._id);
 
             return event;
         } catch (e) {
@@ -38,7 +41,7 @@ export class EventController {
         @Param('id') id: id,
     ) {
         try {
-            return await this.coreService.event.findOneById(id);
+            return await this.coreService.event.get(id);
         } catch (e) {
             throw e;
         }
@@ -50,7 +53,7 @@ export class EventController {
         @Query("ids") eventIds: id[],
     ) {
         try {
-            return await this.coreService.event.findManyByIds(eventIds);
+            return await this.coreService.event.getMany(eventIds);
         } catch (e) {
             throw e;
         }
@@ -76,7 +79,7 @@ export class EventController {
     ) {
         try {
             const userId = sesh.userId;
-            const volenteers = await (await this.coreService.event.findOneById(id)).volenteers;
+            const volenteers = (await this.coreService.event.get(id)).volenteers;
             for (let i = 0; i < volenteers.length; i++) {
                 if (compareIds(volenteers[i], userId)) {
                     return true;
@@ -105,12 +108,12 @@ export class EventController {
         @Param("id") id: id,
     ){
         try {
-            const event = await this.coreService.event.findOneById(id);
+            const event = await this.coreService.event.get(id);
             //TODO this is not guarenteed to always be the case that the first element is always the owner.
             //this issue should be switched to be more clearly expressed in the data. The information
             //of who is in charge is held in the source code right here which is bad practice because as the code
             //grows it will be harder to find this info. As a result it should be saved elsewhere.
-            const owner = await this.coreService.user.findOneById(event.managers[0]);
+            const owner = await this.coreService.user.get(event.leadManager || event.managers[0]);
             return new UserInfoDto(owner);
         } catch (e) {
             throw e;

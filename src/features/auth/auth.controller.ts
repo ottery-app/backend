@@ -44,7 +44,7 @@ export class AuthController {
   @Roles(role.LOGGEDIN)
   async resendEmail(@Sesh() sesh: SeshDocument) {
     try {
-      const user = await this.coreService.user.findOneById(sesh.userId);
+      const user = await this.coreService.user.get(sesh.userId);
 
       if (user.activated) {
         throw new HttpException(
@@ -56,7 +56,7 @@ export class AuthController {
       user.activationCode = this.authService.crypt.makeCode(
         ACTIVATION_CODE_LENGTH,
       );
-      this.coreService.user.save(user);
+      this.coreService.user.update(user._id, user);
 
       this.alertService.accountActivation(user.email, user.activationCode);
     } catch (e) {
@@ -111,7 +111,7 @@ export class AuthController {
   @UnsecureSesh()
   async login(@Sesh() sesh: SeshDocument, @Body() createLoginDto: LoginDto) {
     // If email is not in the system, fail
-    const user: User = await this.coreService.user.findOneByEmail(
+    const user: User = await this.coreService.user.getByEmail(
       createLoginDto.email,
     );
     if (!user) {

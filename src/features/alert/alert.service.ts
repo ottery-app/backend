@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import {
-  MultiSchemeDto,
   activationCode,
   email,
   id,
@@ -28,7 +27,7 @@ export class AlertService {
     this.emailService.sendActivationCode(recipient, code);
   }
 
-  friendRequest(sendterName: string, activator: MultiSchemeDto, target: id) {
+  friendRequest(sendterName: string, activator: id, target: id) {
     this.notificationService.send(target, {
       sender: activator,
       type: notification.friendrequest,

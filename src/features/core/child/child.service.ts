@@ -5,12 +5,15 @@ import { Model } from 'mongoose';
 import { CreateChildDto } from '@ottery/ottery-dto';
 import { id } from '@ottery/ottery-dto';
 import { CoreService } from '../core.service';
+import { CrudService } from 'src/features/interfaces/crud.service.inerface';
+import { CreateChild } from './CreateChild';
+
 // import { DataService } from '../data.make_interface/data.service';
 // import { PermsService } from '../../auth/perms.make_interface/perms.service';
 // import { LocatableService } from '../../locatable/locatable.service';
 
 @Injectable()
-export class ChildService {
+export class ChildService implements CrudService {
     constructor(
         @InjectModel(Child.name) private childModel: Model<ChildDocument>,
     ){}
@@ -20,12 +23,12 @@ export class ChildService {
      * @param createChildDto A DTO of the child class
      * @returns the new child object
      */
-    async create(parent: id, createChildDto: CreateChildDto) {
+    async create(createChildDto: CreateChild) {
+        //make sure the primary guardian is in the dto
         const child = new this.childModel({
             ...createChildDto,
-            primaryGuardian: parent,
-            guardians: [parent],
-            events: []
+            guardians: [createChildDto.primaryGuardian],
+            events: [],
         });
 
         //this.locatableService.stamp(child, noId, owner.id);
@@ -44,14 +47,20 @@ export class ChildService {
         return await child.save();
     }
 
+    async addGuardians(childId:id, ids:id[]) {
+        let child = await this.get(childId);
+        child.guardians.push(...ids.filter((id)=>!child.guardians.includes(id)));
+        return await child.save();
+    }
+
     /**
      * Updates a given child
      * @param child the updated child information
      * @returns the updated database entry of the child
      */
-    async update(child: Child) {
+    async update(childId: id, child: Child) {
         // overwrite is false so only modified fields are updated
-        const updated = await this.childModel.findByIdAndUpdate(child._id, child).setOptions({overwrite: false, new: true});
+        const updated = await this.childModel.findByIdAndUpdate(childId, child).setOptions({overwrite: false, new: true});
         if (!updated) {
             throw new NotFoundException();
         } else {
@@ -64,7 +73,7 @@ export class ChildService {
      * @param id the id to search for
      * @returns a child class
      */
-    async findOneById(id: id) {
+    async get(id: id) {
         const found = await this.childModel.findById(id);
 
         if (!found) {
@@ -79,7 +88,7 @@ export class ChildService {
      * @param ids the ids to search for
      * @returns a list of child objects found
      */
-    async findManyByIds(ids: id[]) {
+    async getMany(ids: id[]) {
         return await this.childModel.find({'_id': { $in: ids }});
     }
 
@@ -87,7 +96,7 @@ export class ChildService {
      * Only intended to be used in testing
      * @param id the ID of the child to delete
      */
-    async deleteChild(id: id) {
+    async delete(id: id) {
         await this.childModel.findByIdAndDelete(id);
     }
 }

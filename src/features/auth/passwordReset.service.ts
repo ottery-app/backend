@@ -24,7 +24,7 @@ export class PasswordResetService {
   async setPasswordResetToken(emailDto: EmailDto) {
     const email = emailDto.email;
 
-    const user = await this.coreService.user.findOneByEmail(email);
+    const user = await this.coreService.user.getByEmail(email);
     if (!user) {
       throw new HttpException(
         'The user with this email does not exist',

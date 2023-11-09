@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, Param } from '@nestjs/common';
 import { ChildService } from './child.service';
 import { UserService } from '../user/user.service';
-import { id } from '@ottery/ottery-dto';
+import { IdArrayDto, IdDto, id } from '@ottery/ottery-dto';
 import { CreateChildDto } from '@ottery/ottery-dto';
 import { SeshDocument } from '../../auth/sesh/sesh.schema';
 import { Sesh } from '../../auth/sesh/Sesh.decorator';
+import { SocialService } from 'src/features/social/social.service';
 
 @Controller('api/child')
 export class ChildController {
@@ -20,10 +21,13 @@ export class ChildController {
     ){
         try {
             //make
-            let child = await this.childService.create(sesh.userId, createChildDto);
+            let child = await this.childService.create({
+                ...createChildDto,
+                primaryGuardian: sesh.userId,
+            });
 
             //add child to user
-            this.userService.addChildById(sesh.userId, child._id);
+            this.userService.addChild(sesh.userId, child._id);
 
             //update
             return child
@@ -37,9 +41,18 @@ export class ChildController {
         @Query('children') childIds: id[]
     ) {
         try {
-            return await this.childService.findManyByIds(childIds);
+            return await this.childService.getMany(childIds);
         } catch (e) {
             throw e;
         }
+    }
+
+    @Post(":childId/addGuardians")
+    async  addGuardians(
+        @Param('childId') childId: id,
+        @Body() body: IdArrayDto,
+    ) {
+        const ids = (await this.userService.getMany(body.ids)).map(user=>user._id);
+        this.childService.addGuardians(childId, ids);
     }
 }

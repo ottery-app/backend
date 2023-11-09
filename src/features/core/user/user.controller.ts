@@ -22,8 +22,8 @@ export class UserController {
         @Query('hasEvent') hasEvent?: boolean,
     ) {
         try {
-            const user = await this.userService.findOneById(userId);
-            let children = await this.childService.findManyByIds(user.children);
+            const user = (await this.userService.get(userId));
+            let children = await this.childService.getMany(user.children);
             
             if (at) {
                 children = children.filter((child)=>child.lastStampedLocation.at === at);
@@ -57,8 +57,8 @@ export class UserController {
             const eventIds = new Set<id>();
 
             if (children) {
-                const childIds = await this.userService.getChildrenFor(id);
-                const children = await this.childService.findManyByIds(childIds);
+                const childIds = await this.userService.getChildren(id);
+                const children = await this.childService.getMany(childIds);
                 children.forEach(child=>child.events.forEach(id=>eventIds.add(id)));
             }
 
@@ -67,7 +67,7 @@ export class UserController {
                 events.forEach(id=>eventIds.add(id));
             }
 
-            return await this.eventService.findManyByIds(Array.from(eventIds));
+            return await this.eventService.getMany(Array.from(eventIds));
         } catch (e) {
             throw e;
         }
@@ -90,7 +90,7 @@ export class UserController {
         const users = [];
 
         for (let i = 0; i < userIds.length; i++) {
-            const user = await this.userService.findOneById(userIds[i]);
+            const user = await this.userService.get(userIds[i]);
             //make the data safe. probably could do this in a pipe?
             const userInfo = new UserInfoDto(user);
             users.push(userInfo);

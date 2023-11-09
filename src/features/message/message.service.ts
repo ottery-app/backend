@@ -8,29 +8,30 @@ import { CoreService } from '../core/core.service';
 
 @Injectable()
 export class MessageService {
+
   constructor(
-    @InjectModel(Chat.name) private readonly chatModel: Model<ChatDocument>,
-    private coreService: CoreService,
+      @InjectModel(Chat.name) private readonly chatModel: Model<ChatDocument>,
+      private coreService: CoreService,
   ) {}
 
-  async makeChat(chatRaw: MakeChatDto) {
+  async makeChat(chatRaw:MakeChatDto) {
     if (chatRaw.users.length > 2) {
-      throw new Error('Group chats are not yet supported');
+        throw new Error("Group chats are not yet supported");
     }
 
     const chat = new this.chatModel({
-      name: chatRaw.name,
-      users: chatRaw.users.map(normalizeId),
-      messages: [],
+        name: chatRaw.name,
+        users: chatRaw.users.map(normalizeId),
+        messages: []
     });
 
     const res = await chat.save();
 
-    const userDocs = await this.coreService.user.findManyById(chatRaw.users);
-
+    const userDocs = await this.coreService.user.getMany(chatRaw.users);
+    
     for (let i = 0; i < userDocs.length; i++) {
-      userDocs[i].chats.push(res._id);
-      userDocs[i].save();
+        userDocs[i].chats.push(res._id);
+        userDocs[i].save();
     }
 
     return res;
