@@ -27,14 +27,14 @@ export class AuthController {
         @Sesh() sesh: SeshDocument
     ) {
         try {
-            const user = await this.coreService.user.findOneById(sesh.userId);
+            const user = await this.coreService.user.get(sesh.userId);
             
             if (user.activated) {
                 throw new HttpException("Account already activated", HttpStatus.BAD_REQUEST);
             }
             
             user.activationCode = this.authService.crypt.makeCode(ACTIVATION_CODE_LENGTH);
-            this.coreService.user.save(user);
+            this.coreService.user.update(user._id, user);
 
             this.alertService.accountActivation(
                 user.email,
@@ -104,7 +104,7 @@ export class AuthController {
         @Body() createLoginDto: LoginDto,
     ) {
         // If email is not in the system, fail
-        const user: User = await this.coreService.user.findOneByEmail(createLoginDto.email)
+        const user: User = await this.coreService.user.getByEmail(createLoginDto.email)
         if (!user) {
             throw new HttpException("Invalid Email or Password", HttpStatus.BAD_REQUEST);
         }

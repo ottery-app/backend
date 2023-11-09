@@ -39,6 +39,9 @@ export class Event implements PermissionAble {
     attendees: id[]; //these are the children that are signed up
 
     @Prop({required: true})
+    leadManager: id;
+
+    @Prop({required: true})
     managers: id[];
 
     @Prop({required: true})

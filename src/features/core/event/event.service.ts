@@ -3,18 +3,22 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Event, EventDocument } from './event.schema';
 import { CreateEventDto, id} from '@ottery/ottery-dto';
+import { CrudService } from 'src/features/interfaces/crud.service.inerface';
+import { CreateEvent } from './CreateEvent';
 
 @Injectable()
-export class EventService {
+export class EventService implements CrudService {
     constructor(
         @InjectModel(Event.name) private eventModel: Model<EventDocument>,
     ){}
 
-    async create(manager: id, eventDto: CreateEventDto) {
-        const event = new this.eventModel(eventDto);
-        event.attendees = [];
-        event.volenteers = [];
-        event.managers = [manager];
+    async create(eventDto: CreateEvent) {
+        const event = new this.eventModel({
+            ...eventDto,
+            attendees: [],
+            volenteers: [],
+            managers: [eventDto.leadManager],
+        });
 
         // const permDoc = await this.permService.create(owner, {id: event._id, ref: Event.name}, perm.SUPER);
         // event.perms.push(makePermLinkDto({owner, perms: permDoc._id}));
@@ -22,29 +26,21 @@ export class EventService {
         return event.save();
     }
 
-     async update(event: Event) {
+     async update(eventId: id, event: Event) {
         // overwrite is false so only modified fields are updated
-        const updated = await this.eventModel.findByIdAndUpdate(event._id, event).setOptions({overwrite: false, new: true});
-        
-        if (!updated) {
-            throw new NotFoundException();
-        } else {
-            return updated;
-        }
+        return await this.eventModel.findByIdAndUpdate(eventId, event).setOptions({overwrite: false, new: true});
     }
 
-    async findOneById(id: id) {
-        const found = await this.eventModel.findById(id);
-
-        if (!found) {
-            throw new NotFoundException();
-        } else {
-            return found;
-        }
+    async get(id: id) {
+        return await this.eventModel.findById(id);
     }
 
-    async findManyByIds(ids: id[]) {
+    async getMany(ids: id[]) {
         return await this.eventModel.find({'_id': { $in: ids }});
+    }
+
+    async delete(id: id) {
+        throw new Error("delete not yet implemented");
     }
 
     // async signUpVolenteers(eventId:id, ids:id[]) {
