@@ -3,7 +3,7 @@ import { User, UserDocument } from './user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { activationCode, email, id, role } from '@ottery/ottery-dto';
+import { activationCode, email, id, password, role } from '@ottery/ottery-dto';
 import { CreateUserDto } from './createUserDto';
 import { CrudService } from 'src/features/interfaces/crud.service.inerface';
 
@@ -120,6 +120,23 @@ export class UserService implements CrudService{
 
     async getMany(ids: id[]) {
         return await this.userModel.find({'_id': { $in: ids }});
+    }
+
+    /**
+     *
+     * @param email
+     * @param password
+     * @returns updated user document
+     */
+    async setPasswordByEmail(
+      email: email,
+      password: password,
+    ): Promise<UserDocument> {
+      return this.userModel.findOneAndUpdate(
+        { email },
+        { $set: { password } },
+        { new: true },
+      );
     }
 
     // /**

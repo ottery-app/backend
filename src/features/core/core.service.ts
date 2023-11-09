@@ -5,19 +5,19 @@ import { ChildService } from './child/child.service';
 
 @Injectable()
 export class CoreService implements OnApplicationBootstrap {
-    user: UserService;
-    event: EventService;
-    child: ChildService;
+  user: UserService;
+  event: EventService;
+  child: ChildService;
 
-    constructor(
-        private userService: UserService,
-        private eventService: EventService,
-        private childService: ChildService,
-    ) {}
+  constructor(
+    private userService: UserService,
+    private eventService: EventService,
+    private childService: ChildService,
+  ) {}
 
-    onApplicationBootstrap() {
-        this.user = this.userService;
-        this.event = this.eventService;
-        this.child = this.childService;
-    }
+  onApplicationBootstrap() {
+    this.user = this.userService;
+    this.event = this.eventService;
+    this.child = this.childService;
+  }
 }
