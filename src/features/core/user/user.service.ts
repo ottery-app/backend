@@ -6,12 +6,16 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import { activationCode, email, id, password, role } from '@ottery/ottery-dto';
 import { CreateUserDto } from './createUserDto';
 import { CrudService } from 'src/features/interfaces/crud.service.inerface';
+import { ImageFileService } from 'src/features/images/imageFile.service';
 
 @Injectable()
 export class UserService implements CrudService{
     constructor(
-        @InjectModel(User.name) private readonly userModel: Model<UserDocument>
-    ) {}
+      private imageFileService: ImageFileService,
+      @InjectModel(User.name) private readonly userModel: Model<UserDocument>
+    ) {
+      console.log(imageFileService);
+    }
 
     /**
      * Creates a new user
