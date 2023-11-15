@@ -3,32 +3,17 @@ import { AuthModule } from './features/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { RolesGuardProvider } from './features/auth/roles/roles.guard';
 import { DbModule } from './features/db/db.module';
+
 import { ApiLoggerMiddleware } from './features/logger/ApiLoggerMiddleware.middleware';
+
 import { SeshGuardProvider } from './features/auth/sesh/sesh.guard';
-import { AlertModule } from './features/alert/alert.module';
-import { CoreModule } from './features/core/core.module';
-import { SocialModule } from './features/social/social.module';
-import { TempZoneModule } from './features/location/tempzone/tempzone.module';
-import { MessageModule } from './features/message/message.module';
 import { PermsGuardPrivider } from './features/auth/perms/perms.guard';
+import { CoreModule } from './features/core/core.module';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot(),
-    DbModule,
-    AuthModule,
-    AlertModule,
-    CoreModule,
-    TempZoneModule,
-    SocialModule,
-    MessageModule,
-  ],
+  imports: [ConfigModule.forRoot(), DbModule, AuthModule, CoreModule],
   controllers: [],
-  providers: [
-    SeshGuardProvider,
-    RolesGuardProvider,
-    PermsGuardPrivider,
-  ],
+  providers: [SeshGuardProvider, RolesGuardProvider, PermsGuardPrivider],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {

@@ -1,10 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  activationCode,
-  email,
-  id,
-  notification,
-} from '@ottery/ottery-dto';
+import { activationCode, email, id, notification } from '@ottery/ottery-dto';
 import { EmailService } from './email/email.service';
 import { NotificationService } from './notifications/notification.service';
 
@@ -38,6 +33,22 @@ export class AlertService {
   }
 
   sendPasswordResetLink(recipient: email, link: string) {
-    this.emailService.sendPasswordResetLink(recipient, link);
+    return this.emailService.sendPasswordResetLink(recipient, link);
+  }
+
+  sendInviteGuardianLink(
+    recipient: email,
+    link: string,
+    invitorName: string,
+    invitorPfp: string,
+    childName: string,
+  ) {
+    return this.emailService.sendInviteGuardianLink(
+      recipient,
+      link,
+      invitorName,
+      invitorPfp,
+      childName,
+    );
   }
 }

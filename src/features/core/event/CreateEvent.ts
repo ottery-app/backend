@@ -1,5 +1,5 @@
-import { CreateEventDto, id } from "@ottery/ottery-dto"
+import { CreateEventDto, id } from '@ottery/ottery-dto';
 
 export interface CreateEvent extends CreateEventDto {
-    leadManager: id,
+  leadManager: id;
 }
