@@ -12,12 +12,14 @@
       "runtimeArgs": [
         "--nolazy",
         "-r",
-        "tsconfig-paths/register",
+        "ts-node/register",
         "-r",
-        "ts-node/register"
+        "tsconfig-paths/register"
       ],
       "sourceMaps": true,
+      "envFile": "${workspaceFolder}/.env",
       "cwd": "${workspaceRoot}",
+      "console": "integratedTerminal",
       "protocol": "inspector"
     }
   ]

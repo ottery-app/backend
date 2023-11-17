@@ -20,13 +20,13 @@ import { MessageService } from './message.service';
 import { ArrayValidationPipe } from 'src/pipes/ArrayValidationPipe';
 import { SeshDocument } from '../auth/sesh/sesh.schema';
 import { Sesh } from '../auth/sesh/Sesh.decorator';
-import { UserService } from '../core/user/user.service';
+import { CoreService } from '../core/core.service';
 
 @Controller('api/message')
 export class MessageController {
   constructor(
     private messageService: MessageService,
-    private userService: UserService,
+    private coreService: CoreService,
   ) {}
 
   @Patch('chat/direct/:chatId')
@@ -52,7 +52,7 @@ export class MessageController {
     @Query('requireUserIds', ArrayValidationPipe(isId)) requireUserIds: id[],
     @Query('direct') direct: boolean,
   ) {
-    const chatIds = await this.userService.getChatsFor(userId);
+    const chatIds = await this.coreService.user.getChatsFor(userId);
     let chats = await this.messageService.getManyByIds(chatIds);
 
     if (requireUserIds?.length) {

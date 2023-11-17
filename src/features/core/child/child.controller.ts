@@ -46,19 +46,14 @@ export class ChildController {
   }
 
   @Post(':childId/invite-guardian')
-  // @Roles(role.LOGGEDIN)
-  // @Roles(role.GUARDIAN)
+  @Roles(role.LOGGEDIN)
+  @Roles(role.GUARDIAN)
   async inviteGuardian(
-    // @Sesh() sesh: SeshDocument,
+    @Sesh() sesh: SeshDocument,
     @Param('childId') childId: id,
     @Body() emailDto: EmailDto,
   ) {
-    // return this.childService.inviteGuardian(sesh.userId, childId, emailDto);
-    return this.childService.inviteGuardian(
-      '6529153792cd533489f44aae',
-      childId,
-      emailDto,
-    );
+    return this.childService.inviteGuardian(sesh.userId, childId, emailDto);
   }
 
   @Post(':childId/addGuardians')

@@ -9,9 +9,18 @@ import { ApiLoggerMiddleware } from './features/logger/ApiLoggerMiddleware.middl
 import { SeshGuardProvider } from './features/auth/sesh/sesh.guard';
 import { PermsGuardPrivider } from './features/auth/perms/perms.guard';
 import { CoreModule } from './features/core/core.module';
+import { SocialModule } from './features/social/social.module';
+import { MessageModule } from './features/message/message.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), DbModule, AuthModule, CoreModule],
+  imports: [
+    ConfigModule.forRoot(),
+    DbModule,
+    AuthModule,
+    CoreModule,
+    SocialModule,
+    MessageModule,
+  ],
   controllers: [],
   providers: [SeshGuardProvider, RolesGuardProvider, PermsGuardPrivider],
 })

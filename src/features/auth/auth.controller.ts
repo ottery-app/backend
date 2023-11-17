@@ -29,7 +29,6 @@ import { AlertService } from '../alert/alert.service';
 import { AuthService } from './auth.services';
 import { CreateUserDto } from '../core/user/CreateUserDto';
 import { PasswordResetService } from './passwordReset.service';
-import { UserService } from '../core/user/user.service';
 import { CoreService } from '../core/core.service';
 
 @Controller('api/auth')
