@@ -11,10 +11,12 @@ import { Child, ChildSchema } from './child/child.schema';
 import { EventSchema } from './event/event.schema';
 import { CoreService } from './core.service';
 import { ImageFileModule } from '../images/imageFile.module';
+import { LocatableModule } from '../location/locatable/locatable.module';
 
 @Module({
   imports: [
     ImageFileModule,
+    LocatableModule,
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MongooseModule.forFeature([{ name: Child.name, schema: ChildSchema }]),
     MongooseModule.forFeature([{ name: Event.name, schema: EventSchema }]),

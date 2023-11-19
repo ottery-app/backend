@@ -2,12 +2,11 @@ import { Header, Injectable, NotFoundException } from '@nestjs/common';
 import { Child, ChildDocument} from './child.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateChildDto } from '@ottery/ottery-dto';
+import { CreateChildDto, noId } from '@ottery/ottery-dto';
 import { id } from '@ottery/ottery-dto';
-import { CoreService } from '../core.service';
 import { CrudService } from 'src/features/interfaces/crud.service.inerface';
 import { CreateChild } from './CreateChild';
-
+import { LocatableService } from 'src/features/location/locatable/locatable.service';
 // import { DataService } from '../data.make_interface/data.service';
 // import { PermsService } from '../../auth/perms.make_interface/perms.service';
 // import { LocatableService } from '../../locatable/locatable.service';
@@ -16,6 +15,7 @@ import { CreateChild } from './CreateChild';
 export class ChildService implements CrudService {
     constructor(
         @InjectModel(Child.name) private childModel: Model<ChildDocument>,
+        private locatableService: LocatableService,
     ){}
 
     /**
@@ -29,9 +29,15 @@ export class ChildService implements CrudService {
             ...createChildDto,
             guardians: [createChildDto.primaryGuardian],
             events: [],
+            //SHOULD PROBABLY USE THE SERVICE BUT IT NEEDS TO BE CALLED BEFORE THE MODULE IS MADE
+            lastStampedLocation: {
+                at: noId,
+                with: createChildDto.primaryGuardian,
+                time: new Date().getTime(),
+            }
         });
 
-        //this.locatableService.stamp(child, noId, owner.id);
+        // this.locatableService.stamp(createChildDto, noId, createChildDto.primaryGuardian);
 
         //add data page so that we can store data associated with the child
         // const data = await this.dataService.create({
