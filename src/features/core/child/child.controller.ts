@@ -5,7 +5,6 @@ import { IdArrayDto, IdDto, id } from '@ottery/ottery-dto';
 import { CreateChildDto } from '@ottery/ottery-dto';
 import { SeshDocument } from '../../auth/sesh/sesh.schema';
 import { Sesh } from '../../auth/sesh/Sesh.decorator';
-import { SocialService } from 'src/features/social/social.service';
 
 @Controller('api/child')
 export class ChildController {
