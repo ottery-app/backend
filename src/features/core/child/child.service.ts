@@ -27,8 +27,7 @@ export class ChildService implements CrudService {
     async create(createChildDto: CreateChild) {
         //make sure the primary guardian is in the dto
 
-        createChildDto.pfp.src = (await this.imageService.uploadImageFile(createChildDto.pfp.src)).url;
-        console.log(createChildDto);
+        createChildDto.pfp.src = (await this.imageService.uploadPublicFile(createChildDto.pfp.src)).url;
 
         const child = new this.childModel({
             ...createChildDto,
