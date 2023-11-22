@@ -11,14 +11,20 @@ export class ImageFileService {
         @InjectModel(ImageFile.name) private readonly imageFileModel: Model<ImageFileDocument>,
     ) {}
 
-    async uploadPublicFile(dataBuffer: Buffer, filename: string) {
+    async uploadPublicFile(imageBase64: string) {
+        const contentType = imageBase64.split(';')[0].split(':')[1];
+        const type = contentType.split("/")[1];//.split("+")[0];
+
         const s3 = new S3();
+        var buf = Buffer.from(imageBase64.replace(/^data:image\/\w+;base64,/, ""),'base64');
+
         const uploadResult = await s3.upload({
           Bucket: process.env.AWS_PUBLIC_BUCKET_NAME,
-          Body: dataBuffer,
-          Key: `${uuid()}-${filename}`
-        })
-          .promise();
+          Body: buf,
+          Key: `${uuid()}.${type}`,
+          ContentEncoding: 'base64',
+          ContentType: contentType,
+        }).promise();
      
         const newFile = await this.imageFileModel.create({
           key: uploadResult.Key,
