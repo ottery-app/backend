@@ -49,4 +49,16 @@ export class AlertService {
       childName,
     );
   }
+
+  sendInviteCaretakerToEvent(
+    recipient: string,
+    link:string,
+    eventName: string,
+  ) {
+    return this.emailService.sendCaretakerInviteToEvent(
+      recipient,
+      link,
+      eventName,
+    );
+  }
 }

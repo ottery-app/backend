@@ -1,38 +1,76 @@
 import { Controller, Get, Param } from '@nestjs/common';
+import { CreateEventDto, EmailDto, id, role, UserInfoDto } from '@ottery/ottery-dto';
 import { Body, Post, Query } from '@nestjs/common/decorators';
-import { CreateEventDto, id, UserInfoDto } from '@ottery/ottery-dto';
-
 import { compareIds } from 'src/functions/compareIds';
 import { SeshDocument } from 'src/features/auth/sesh/sesh.schema';
 import { Sesh } from 'src/features/auth/sesh/Sesh.decorator';
 import { CoreService } from '../core.service';
+import { Roles } from 'src/features/auth/roles/roles.decorator';
+import { DeeplinkService } from 'src/features/deeplink/deeplink.service';
+import { TokenService } from 'src/features/token/token.service';
+import { TokenType } from 'src/features/token/token.schema';
+import { AlertService } from 'src/features/alert/alert.service';
 
 @Controller('api/event')
 export class EventController {
-  constructor(private coreService: CoreService) {}
+    constructor(
+        private coreService: CoreService,
+        private alertService: AlertService, 
+        private deeplinkService: DeeplinkService,
+        private tokenService: TokenService,
+    ) {}
 
-  @Post()
-  async create(
-    @Sesh() sesh: SeshDocument,
-    @Body() createEventDto: CreateEventDto,
-  ) {
-    try {
-      const userID = sesh.userId;
+    @Post(':eventId/invite/caretaker')
+    @Roles(role.LOGGEDIN)
+    async inviteCaretaker(
+      @Sesh() sesh: SeshDocument,
+      @Param('eventId') eventId: id,
+      @Body() emailDto: EmailDto,
+    ) {
+        const email = emailDto.email;
+        const token = await this.tokenService.setToken(
+            email,
+            TokenType.INVITE_CARETAKER_TO_EVENT,
+        );
 
-      // const volIds = await this.formFieldService.createMany(createEventDto.volenteerSignUp);
-      // const atenIds = await this.formFieldService.createMany(createEventDto.attendeeSignUp);
+        const link = this.deeplinkService.createLink("/event/:eventId/accept/caretaker", {
+            eventId,
+            token,
+            email,
+        });
 
-      const event = await this.coreService.event.create({
-        ...createEventDto,
-        leadManager: userID,
-      });
+        const event = await this.coreService.event.get(eventId);
 
-      await this.coreService.user.addEvent(userID, event._id);
-
-      return event;
-    } catch (e) {
-      throw e;
+        return await this.alertService.sendInviteCaretakerToEvent(
+            email,
+            link,
+            event.summary,
+        );
     }
+  
+
+    @Post()
+    async create (
+        @Sesh() sesh: SeshDocument,
+        @Body() createEventDto: CreateEventDto,
+    ){
+        try {
+            const userID = sesh.userId;
+
+            // const volIds = await this.formFieldService.createMany(createEventDto.volenteerSignUp);
+            // const atenIds = await this.formFieldService.createMany(createEventDto.attendeeSignUp);
+
+            const event = await this.coreService.event.create({
+            ...createEventDto,
+            leadManager: userID,
+            });
+
+            await this.coreService.user.addEvent(userID, event._id);
+
+            return event;
+        } catch (e) {
+            throw e;
+        }
   }
 
   @Get(':id')

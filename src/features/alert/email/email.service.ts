@@ -75,11 +75,26 @@ export class EmailService {
     childName: string,
   ) {
     const to = [recipient];
-    const subject = 'Invitation for a guardian';
+    const subject = 'Signup as a guardian';
     const html = htmlInject(getTemplate('invite-guardian-for-child'), {
       link,
       invitorName,
       childName,
+    });
+
+    return send(to, subject, html);
+  }
+
+  sendCaretakerInviteToEvent(
+    recipent: email,
+    link: string,
+    eventName: string,
+  ) {
+    const to = [recipent];
+    const subject = "Signup for an event";
+    const html = htmlInject(getTemplate('invite-caretaker-to-event'), {
+      link,
+      event: eventName,
     });
 
     return send(to, subject, html);
