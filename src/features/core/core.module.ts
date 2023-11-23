@@ -16,7 +16,6 @@ import { LocatableModule } from '../location/locatable/locatable.module';
 @Module({
   imports: [
     ImageFileModule,
-    LocatableModule,
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MongooseModule.forFeature([{ name: Child.name, schema: ChildSchema }]),
     MongooseModule.forFeature([{ name: Event.name, schema: EventSchema }]),

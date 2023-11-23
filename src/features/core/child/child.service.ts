@@ -7,6 +7,7 @@ import { id } from '@ottery/ottery-dto';
 import { CrudService } from 'src/features/interfaces/crud.service.inerface';
 import { CreateChild } from './CreateChild';
 import { LocatableService } from 'src/features/location/locatable/locatable.service';
+import { ImageFileService } from 'src/features/images/imageFile.service';
 // import { DataService } from '../data.make_interface/data.service';
 // import { PermsService } from '../../auth/perms.make_interface/perms.service';
 // import { LocatableService } from '../../locatable/locatable.service';
@@ -15,7 +16,7 @@ import { LocatableService } from 'src/features/location/locatable/locatable.serv
 export class ChildService implements CrudService {
     constructor(
         @InjectModel(Child.name) private childModel: Model<ChildDocument>,
-        private locatableService: LocatableService,
+        private imageService: ImageFileService,
     ){}
 
     /**
@@ -25,6 +26,9 @@ export class ChildService implements CrudService {
      */
     async create(createChildDto: CreateChild) {
         //make sure the primary guardian is in the dto
+
+        createChildDto.pfp.src = (await this.imageService.uploadPublicFile(createChildDto.pfp.src)).url;
+
         const child = new this.childModel({
             ...createChildDto,
             guardians: [createChildDto.primaryGuardian],
