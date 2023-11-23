@@ -6,12 +6,19 @@ import { CreateChildDto } from '@ottery/ottery-dto';
 import { SeshDocument } from '../../auth/sesh/sesh.schema';
 import { Sesh } from '../../auth/sesh/Sesh.decorator';
 import { Roles } from 'src/features/auth/roles/roles.decorator';
+import { TokenService } from 'src/features/token/token.service';
+import { TokenType } from 'src/features/token/token.schema';
+import { AlertService } from 'src/features/alert/alert.service';
+import { DeeplinkService } from 'src/features/deeplink/deeplink.service';
 
 @Controller('api/child')
 export class ChildController {
   constructor(
     private userService: UserService,
     private childService: ChildService,
+    private tokenService: TokenService,
+    private alertService: AlertService,
+    private deeplinkService: DeeplinkService,
   ) {}
 
   @Post()
@@ -53,7 +60,27 @@ export class ChildController {
     @Param('childId') childId: id,
     @Body() emailDto: EmailDto,
   ) {
-    return this.childService.inviteGuardian(sesh.userId, childId, emailDto);
+    const email = emailDto.email;
+    const token = await this.tokenService.setToken(
+        email,
+        TokenType.INVITE_GUARDIAN_FOR_CHILD
+    );
+
+    const {firstName, lastName} = await this.userService.get(sesh.userId);
+    const invitorName = `${firstName} ${lastName}`;
+
+    const { firstName: childFirstName, lastName: childLastName } = await this.childService.get(childId);
+    const childName = `${childFirstName} ${childLastName}`;
+
+    // Send invite guardian link to the user
+    const link = this.deeplinkService.createLink("/child/:childId/acceptguardianinvite", {token, email, childId});
+
+    return await this.alertService.sendInviteGuardianForChildLink(
+        email,
+        link,
+        invitorName,
+        childName,
+    );
   }
 
   @Post(':childId/addGuardians')

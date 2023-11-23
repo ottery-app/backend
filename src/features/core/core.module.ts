@@ -19,11 +19,13 @@ import { ChildController } from './child/child.controller';
 import { User, UserSchema } from './user/user.schema';
 import { EventSchema } from './event/event.schema';
 import { Child, ChildSchema } from './child/child.schema';
+import { DeeplinkModule } from '../deeplink/deeplink.module';
 
 @Module({
   imports: [
     ImageFileModule,
     LocatableModule,
+    DeeplinkModule,
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: Event.name, schema: EventSchema },

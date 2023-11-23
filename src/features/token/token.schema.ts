@@ -3,7 +3,8 @@ import { Document, now } from 'mongoose';
 
 export enum TokenType {
   RESET_PASSWORD = 'RESET_PASSWORD',
-  INVITE_GUARDIAN = 'INVITE_GUARDIAN',
+  INVITE_GUARDIAN_FOR_CHILD = 'INVITE_GUARDIAN_FOR_CHILD',
+  INVITE_CARETAKER_TO_EVENT = "INVITE_CARETAKER_TO_EVENT",
 }
 
 export type TokenDocument = Token & Document;

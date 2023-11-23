@@ -61,40 +61,6 @@ export class ChildService implements CrudService {
     return await child.save();
   }
 
-  async inviteGuardian(invitorId: id, childId: id, emailDto: EmailDto) {
-    const email = emailDto.email;
-    const token = await this.tokenService.setToken(
-      email,
-      TokenType.INVITE_GUARDIAN,
-    );
-
-    // Prepare data for the email template
-    // User name, pfp
-    const {
-      firstName,
-      lastName,
-      pfp: invitorPfp,
-    } = await this.userService.get(invitorId);
-    const invitorName = `${firstName} ${lastName}`;
-
-    // Child name
-    const { firstName: childFirstName, lastName: childLastName } =
-      await this.get(childId);
-    const childName = `${childFirstName} ${childLastName}`;
-
-    // Send invite guardian link to the user
-    const link = `${process.env.CLIENT_WEB_APP_URL}/${childId}/add-guardian?token=${token}&email=${email}`;
-
-    return this.alertService.sendInviteGuardianLink(
-      email,
-      link,
-      invitorName,
-      invitorPfp?.src ||
-        'https://raw.githubusercontent.com/ottery-app/global-data/main/images/icons/pfp.svg',
-      childName,
-    );
-  }
-
   async addGuardians(childId: id, ids: id[]) {
     const child = await this.get(childId);
     child.guardians.push(...ids.filter((id) => !child.guardians.includes(id)));

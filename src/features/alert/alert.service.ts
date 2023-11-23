@@ -36,18 +36,16 @@ export class AlertService {
     return this.emailService.sendPasswordResetLink(recipient, link);
   }
 
-  sendInviteGuardianLink(
+  sendInviteGuardianForChildLink(
     recipient: email,
     link: string,
     invitorName: string,
-    invitorPfp: string,
     childName: string,
   ) {
-    return this.emailService.sendInviteGuardianLink(
+    return this.emailService.sendInviteGuardianForChildLink(
       recipient,
       link,
       invitorName,
-      invitorPfp,
       childName,
     );
   }

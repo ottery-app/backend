@@ -68,19 +68,17 @@ export class EmailService {
     return send(to, subject, html);
   }
 
-  sendInviteGuardianLink(
+  sendInviteGuardianForChildLink(
     recipient: email,
     link: string,
     invitorName: string,
-    invitorPfp: string,
     childName: string,
   ) {
     const to = [recipient];
     const subject = 'Invitation for a guardian';
-    const html = htmlInject(getTemplate('invite-guardian'), {
+    const html = htmlInject(getTemplate('invite-guardian-for-child'), {
       link,
       invitorName,
-      invitorPfp,
       childName,
     });
 

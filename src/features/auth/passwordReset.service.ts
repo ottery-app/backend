@@ -5,6 +5,7 @@ import { AuthService } from './auth.services';
 import { AlertService } from '../alert/alert.service';
 import { TokenService } from '../token/token.service';
 import { CoreService } from '../core/core.service';
+import { DeeplinkService } from '../deeplink/deeplink.service';
 
 @Injectable()
 export class PasswordResetService {
@@ -13,6 +14,7 @@ export class PasswordResetService {
     private alertService: AlertService,
     private tokenService: TokenService,
     private authService: AuthService,
+    private deeplinkService: DeeplinkService,
   ) {}
 
   async setPasswordResetToken(emailDto: EmailDto) {
@@ -29,7 +31,7 @@ export class PasswordResetService {
     const token = await this.tokenService.setToken(email);
 
     // Send password reset link to the user
-    const link = `${process.env.CLIENT_WEB_APP_URL}/reset-password?token=${token}&email=${email}`;
+    const link = this.deeplinkService.createLink("/auth/reset-password", {token, email});
 
     return this.alertService.sendPasswordResetLink(email, link);
   }
