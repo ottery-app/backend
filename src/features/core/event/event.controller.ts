@@ -1,16 +1,29 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { CreateEventDto, id, UserInfoDto } from '@ottery/ottery-dto';
+import { CreateEventDto, EmailDto, id, role, UserInfoDto } from '@ottery/ottery-dto';
 import { Body, Post, Query } from '@nestjs/common/decorators';
 import { compareIds } from 'src/functions/compareIds';
 import { Sesh } from '../../auth/sesh/Sesh.decorator';
 import { SeshDocument } from '../../auth/sesh/sesh.schema';
 import { CoreService } from '../core.service';
+import { Roles } from 'src/features/auth/roles/roles.decorator';
 
 @Controller('api/event')
 export class EventController {
     constructor(
         private coreService: CoreService,
     ) {}
+
+    @Post(':eventId/invite/caretaker')
+    @Roles(role.LOGGEDIN)
+    async inviteCaretaker(
+      @Sesh() sesh: SeshDocument,
+      @Param('eventId') eventId: id,
+      @Body() emailDto: EmailDto,
+    ) {
+      //TODO use the otherservices here to invite the guardian
+      //return this.childService.inviteGuardian(sesh.userId, childId, emailDto);
+    }
+  
 
     @Post()
     async create (
