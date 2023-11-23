@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
-import { id, time, token, role, email } from '@ottery/ottery-dto';
+import { Document, now } from 'mongoose';
+import { id, token, role, email } from '@ottery/ottery-dto';
 
 export type SeshDocument = Sesh & Document;
 
@@ -9,7 +9,8 @@ export class Sesh {
     _id: id;
 
     @Prop({required: true})
-    start: time;
+    @Prop({ default: now(), expires: 2629746000 })
+    start: Date;
 
     @Prop({required: true})
     loggedin: boolean;
