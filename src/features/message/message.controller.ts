@@ -1,7 +1,6 @@
 import {
   Controller,
   Param,
-  Headers,
   Body,
   Get,
   Patch,
@@ -16,6 +15,7 @@ import {
   classifyDto,
   isId,
 } from '@ottery/ottery-dto';
+
 import { MessageService } from './message.service';
 import { ArrayValidationPipe } from 'src/pipes/ArrayValidationPipe';
 import { SeshDocument } from '../auth/sesh/sesh.schema';
@@ -52,7 +52,7 @@ export class MessageController {
     @Query('requireUserIds', ArrayValidationPipe(isId)) requireUserIds: id[],
     @Query('direct') direct: boolean,
   ) {
-    let chatIds = await this.coreService.user.getChatsFor(userId);
+    const chatIds = await this.coreService.user.getChatsFor(userId);
     let chats = await this.messageService.getManyByIds(chatIds);
 
     if (requireUserIds?.length) {

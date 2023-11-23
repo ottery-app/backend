@@ -1,4 +1,3 @@
-
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { SocialLinkHistoryDto, id } from '@ottery/ottery-dto';
@@ -14,10 +13,13 @@ export class SocialLink {
    */
   _id: id;
 
-  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: User.name }], required:true})
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: User.name }],
+    required: true,
+  })
   users: id[]; //this should only be two users
 
-  @Prop({required:true})
+  @Prop({ required: true })
   history: SocialLinkHistoryDto[];
 }
 

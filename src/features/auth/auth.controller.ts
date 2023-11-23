@@ -10,7 +10,7 @@ import {
   Query,
 } from '@nestjs/common';
 
-import { ACTIVATION_CODE_LENGTH } from './crypt/crypt.types';
+import { ACTIVATION_CODE_LENGTH } from '../crypt/crypt.types';
 import { User } from '../core/user/user.schema';
 import {
   ActivationCodeDto,
@@ -28,15 +28,15 @@ import { SeshDocument } from './sesh/sesh.schema';
 import { AlertService } from '../alert/alert.service';
 import { AuthService } from './auth.services';
 import { CreateUserDto } from '../core/user/CreateUserDto';
-import { CoreService } from '../core/core.service';
 import { PasswordResetService } from './passwordReset.service';
+import { CoreService } from '../core/core.service';
 
 @Controller('api/auth')
 export class AuthController {
   constructor(
+    private coreService: CoreService,
     private alertService: AlertService,
     private authService: AuthService,
-    private coreService: CoreService,
     private passwordResetTokenService: PasswordResetService,
   ) {}
 

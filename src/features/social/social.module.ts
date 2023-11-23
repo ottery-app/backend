@@ -8,7 +8,9 @@ import { SocialLink, SocialLinkSchema } from './social.schema';
 @Global()
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: SocialLink.name, schema: SocialLinkSchema }]),
+    MongooseModule.forFeature([
+      { name: SocialLink.name, schema: SocialLinkSchema },
+    ]),
     NotificationModule,
   ],
   controllers: [SocialController],

@@ -1,16 +1,19 @@
 import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+
+import { CoreModule } from 'src/features/core/core.module';
+import { LocatableModule } from '../locatable/locatable.module';
 import { TempZoneService } from './tempzone.service';
 import { TempZoneController } from './tempzone.controller';
-import { LocatableModule } from '../locatable/locatable.module';
 import { ChildReqeust, ChildReqeustSchema } from './childRequest.schema';
-import { MongooseModule } from '@nestjs/mongoose';
-import { CoreModule } from '../../core/core.module';
 
 @Module({
   imports: [
+    MongooseModule.forFeature([
+      { name: ChildReqeust.name, schema: ChildReqeustSchema },
+    ]),
     LocatableModule,
     CoreModule,
-    MongooseModule.forFeature([{ name: ChildReqeust.name, schema: ChildReqeustSchema }]),
   ],
   controllers: [TempZoneController],
   providers: [TempZoneService],

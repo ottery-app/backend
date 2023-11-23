@@ -1,5 +1,5 @@
 import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
-import { CryptService } from './crypt/crypt.service';
+import { CryptService } from '../crypt/crypt.service';
 import { SeshService } from './sesh/sesh.service';
 
 @Injectable()

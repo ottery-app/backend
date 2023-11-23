@@ -1,6 +1,6 @@
 import { Module, Global } from '@nestjs/common';
 import { SeshService } from './sesh.service';
-import { CryptModule } from '../crypt/crypt.module';
+import { CryptModule } from '../../crypt/crypt.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Sesh, SeshSchema } from './sesh.schema';
 
@@ -8,7 +8,7 @@ import { Sesh, SeshSchema } from './sesh.schema';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Sesh.name, schema: SeshSchema }]),
-    CryptModule
+    CryptModule,
   ],
   controllers: [],
   providers: [SeshService],
