@@ -1,5 +1,6 @@
 import { Module, Global } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+
 import { NotificationModule } from '../alert/notifications/notification.module';
 import { SeshModule } from '../auth/sesh/sesh.module';
 import { Chat, ChatSchema } from './chat.shema';

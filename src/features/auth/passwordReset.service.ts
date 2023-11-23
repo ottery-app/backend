@@ -1,24 +1,20 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-
-import {
-  PasswordResetToken,
-  PasswordResetTokenDocument,
-} from './passwordResetToken.schema';
-import { Model, now } from 'mongoose';
 import { EmailDto, ResetPasswordDto } from '@ottery/ottery-dto';
-import { CoreService } from '../core/core.service';
+
 import { AuthService } from './auth.services';
 import { AlertService } from '../alert/alert.service';
+import { TokenService } from '../token/token.service';
+import { CoreService } from '../core/core.service';
+import { DeeplinkService } from '../deeplink/deeplink.service';
 
 @Injectable()
 export class PasswordResetService {
   constructor(
-    @InjectModel(PasswordResetToken.name)
-    private passwordResetTokenModel: Model<PasswordResetTokenDocument>,
     private coreService: CoreService,
-    private authService: AuthService,
     private alertService: AlertService,
+    private tokenService: TokenService,
+    private authService: AuthService,
+    private deeplinkService: DeeplinkService,
   ) {}
 
   async setPasswordResetToken(emailDto: EmailDto) {
@@ -32,50 +28,21 @@ export class PasswordResetService {
       );
     }
 
-    if (await this.passwordResetTokenModel.findOne({ email: email })) {
-      await this.passwordResetTokenModel.deleteOne({ email: email });
-    }
-
-    // Create a reset token and save
-    const token = this.authService.crypt.makeCode(32);
-    const hash = await this.authService.crypt.hash(token);
-
-    await this.passwordResetTokenModel.create({
-      email,
-      token: hash,
-      createdAt: now(),
-    });
+    const token = await this.tokenService.setToken(email);
 
     // Send password reset link to the user
-    const link = `${process.env.CLIENT_WEB_APP_URL}/reset-password?token=${hash}&email=${email}`;
+    const link = this.deeplinkService.createLink("/auth/reset-password", {token, email});
 
     return this.alertService.sendPasswordResetLink(email, link);
   }
 
   async setNewPassword({ email, password, token }: ResetPasswordDto) {
-    // Check token's validity
-    const dbToken = await this.passwordResetTokenModel.findOne({
-      email,
-    });
-
-    if (!dbToken) {
-      throw new HttpException(
-        'Invalid or expired password reset token',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    if (token !== dbToken.token) {
-      throw new HttpException(
-        'Invalid password reset token',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    const dbToken = await this.tokenService.validateToken(email, token);
 
     const hash = await this.authService.crypt.hash(password);
 
     await this.coreService.user.setPasswordByEmail(email, hash);
-    await this.passwordResetTokenModel.deleteOne();
+    await dbToken.deleteOne();
 
     return 'success';
   }

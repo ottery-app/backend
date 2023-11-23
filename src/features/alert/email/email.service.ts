@@ -63,7 +63,39 @@ export class EmailService {
   sendPasswordResetLink(recipient: email, link: string) {
     const to = [recipient];
     const subject = 'Forgot your password?';
-    const html = htmlInject(getTemplate('reset-password'), { link: link });
+    const html = htmlInject(getTemplate('reset-password'), { link });
+
+    return send(to, subject, html);
+  }
+
+  sendInviteGuardianForChildLink(
+    recipient: email,
+    link: string,
+    invitorName: string,
+    childName: string,
+  ) {
+    const to = [recipient];
+    const subject = 'Signup as a guardian';
+    const html = htmlInject(getTemplate('invite-guardian-for-child'), {
+      link,
+      invitorName,
+      childName,
+    });
+
+    return send(to, subject, html);
+  }
+
+  sendCaretakerInviteToEvent(
+    recipent: email,
+    link: string,
+    eventName: string,
+  ) {
+    const to = [recipent];
+    const subject = "Signup for an event";
+    const html = htmlInject(getTemplate('invite-caretaker-to-event'), {
+      link,
+      event: eventName,
+    });
 
     return send(to, subject, html);
   }

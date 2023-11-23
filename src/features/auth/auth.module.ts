@@ -1,28 +1,20 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+
+import { SeshModule } from './sesh/sesh.module';
+import { CryptModule } from '../crypt/crypt.module';
+import { AlertModule } from '../alert/alert.module';
+import { TokenModule } from '../token/token.module';
 
 import { AuthController } from './auth.controller';
-import { SeshModule } from './sesh/sesh.module';
-import { CryptModule } from './crypt/crypt.module';
-import { AuthService } from './auth.services';
-import { AlertModule } from '../alert/alert.module';
-import { CoreModule } from '../core/core.module';
 
-import {
-  PasswordResetToken,
-  PasswordResetTokenSchema,
-} from './passwordResetToken.schema';
+import { AuthService } from './auth.services';
+
 import { PasswordResetService } from './passwordReset.service';
+import { CoreModule } from '../core/core.module';
+import { DeeplinkModule } from '../deeplink/deeplink.module';
+
 @Module({
-  imports: [
-    CoreModule, //TODO remove
-    SeshModule,
-    CryptModule,
-    AlertModule,
-    MongooseModule.forFeature([
-      { name: PasswordResetToken.name, schema: PasswordResetTokenSchema },
-    ]),
-  ],
+  imports: [CoreModule, SeshModule, CryptModule, AlertModule, TokenModule, DeeplinkModule],
   controllers: [AuthController],
   providers: [AuthService, PasswordResetService],
   exports: [AuthService],
