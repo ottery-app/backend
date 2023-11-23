@@ -11,7 +11,7 @@ import { TokenService } from 'src/features/token/token.service';
 import { TokenType } from 'src/features/token/token.schema';
 import { UserService } from '../user/user.service';
 import { AlertService } from 'src/features/alert/alert.service';
-
+import { ImageFileService } from 'src/features/images/imageFile.service';
 // import { DataService } from '../data.make_interface/data.service';
 // import { PermsService } from '../../auth/perms.make_interface/perms.service';
 // import { LocatableService } from '../../locatable/locatable.service';
@@ -26,24 +26,27 @@ export class ChildService implements CrudService {
     private readonly alertService: AlertService,
   ) {}
 
-  /**
-   * Creates a new child and saves it to the database
-   * @param createChildDto A DTO of the child class
-   * @returns the new child object
-   */
-  async create(createChildDto: CreateChild) {
-    //make sure the primary guardian is in the dto
-    const child = new this.childModel({
-      ...createChildDto,
-      guardians: [createChildDto.primaryGuardian],
-      events: [],
-      //SHOULD PROBABLY USE THE SERVICE BUT IT NEEDS TO BE CALLED BEFORE THE MODULE IS MADE
-      lastStampedLocation: {
-        at: noId,
-        with: createChildDto.primaryGuardian,
-        time: new Date().getTime(),
-      },
-    });
+    /**
+     * Creates a new child and saves it to the database
+     * @param createChildDto A DTO of the child class
+     * @returns the new child object
+     */
+    async create(createChildDto: CreateChild) {
+        //make sure the primary guardian is in the dto
+
+        createChildDto.pfp.src = (await this.imageService.uploadPublicFile(createChildDto.pfp.src)).url;
+
+        const child = new this.childModel({
+            ...createChildDto,
+            guardians: [createChildDto.primaryGuardian],
+            events: [],
+            //SHOULD PROBABLY USE THE SERVICE BUT IT NEEDS TO BE CALLED BEFORE THE MODULE IS MADE
+            lastStampedLocation: {
+                at: noId,
+                with: createChildDto.primaryGuardian,
+                time: new Date().getTime(),
+            }
+        });
 
     //this.locatableService.stamp(child, noId, owner.id);
 
