@@ -1,5 +1,5 @@
 import { Controller, Post, Body, Param } from '@nestjs/common';
-import { EmailDto, id, role } from '@ottery/ottery-dto';
+import { EmailDto, id, role, AcceptGuardianshipDto } from '@ottery/ottery-dto';
 import { SeshDocument } from '../auth/sesh/sesh.schema';
 import { Sesh } from '../auth/sesh/Sesh.decorator';
 import { Roles } from 'src/features/auth/roles/roles.decorator';
@@ -47,5 +47,14 @@ export class InviteGuardianController {
         invitorName,
         childName,
     );
+  }
+
+  @Post("accept/:userId")
+  async acceptGuardianship(
+    @Sesh() sesh: SeshDocument,
+    @Param('userId') userId: id,
+    @Body() acceptGuardianshipDto: AcceptGuardianshipDto,
+  ) {
+    console.warn(acceptGuardianshipDto)
   }
 }
