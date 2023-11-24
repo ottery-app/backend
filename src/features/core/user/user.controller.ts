@@ -1,15 +1,17 @@
 import {
+  Body,
   Controller,
   Get,
   HttpException,
   HttpStatus,
   Param,
   ParseBoolPipe,
+  Post,
   Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ChildService } from '../child/child.service';
-import { UserInfoDto } from '@ottery/ottery-dto';
+import { ImageDto, UserInfoDto } from '@ottery/ottery-dto';
 import { id } from '@ottery/ottery-dto';
 import { EventService } from '../event/event.service';
 import { Sesh } from '../../auth/sesh/Sesh.decorator';
@@ -21,6 +23,18 @@ export class UserController {
     private userService: UserService,
     private eventService: EventService,
   ) {}
+
+
+  @Post(":userId/pfp")
+  async updateProfileImage(
+    //@Sesh() sesh,
+    @Param('userId') userId: id,
+    @Body() pfp: ImageDto,
+  ) {
+    const user = await this.userService.get(userId);
+    user.pfp = pfp;
+    await this.userService.update(userId, user);
+  }
 
   @Get(':userId/children')
   async getChildren(
