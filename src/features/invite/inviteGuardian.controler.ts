@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Param } from '@nestjs/common';
+import { Controller, Post, Body, Param, HttpException, HttpCode, HttpStatus } from '@nestjs/common';
 import { EmailDto, id, role, AcceptGuardianshipDto } from '@ottery/ottery-dto';
 import { SeshDocument } from '../auth/sesh/sesh.schema';
 import { Sesh } from '../auth/sesh/Sesh.decorator';
@@ -39,7 +39,7 @@ export class InviteGuardianController {
     const childName = `${childFirstName} ${childLastName}`;
 
     // Send invite guardian link to the user
-    const link = this.deeplinkService.createLink("/child/:childId/acceptguardianinvite", {token, email, childId});
+    const link = this.deeplinkService.createLink("/child/:childId/acceptguardianinvite", {token, key:email, childId});
 
     return await this.alertService.sendInviteGuardianForChildLink(
         email,
@@ -55,6 +55,16 @@ export class InviteGuardianController {
     @Param('userId') userId: id,
     @Body() acceptGuardianshipDto: AcceptGuardianshipDto,
   ) {
-    console.warn(acceptGuardianshipDto)
+    if (await this.tokenService.validateToken(acceptGuardianshipDto.key, acceptGuardianshipDto.token, TokenType.INVITE_GUARDIAN_FOR_CHILD, true)) {
+      this.coreService.child.addGuardians(acceptGuardianshipDto.childId, [userId]);
+      this.coreService.user.addChild(userId, acceptGuardianshipDto.childId);
+
+      return "success"
+    } else {
+      throw new HttpException(
+        'Not a valid invite',
+        HttpStatus.BAD_REQUEST,
+      );
+    };
   }
 }

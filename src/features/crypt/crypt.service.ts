@@ -16,12 +16,12 @@ export class CryptService {
 
   /**
    * Compares a submitted password with a hashed password
-   * @param bodyPassword the password in the body of the request
-   * @param userPassword the hashed password in the database
+   * @param unhashed the password in the body of the request
+   * @param hashed the hashed password in the database
    * @returns true if the passwords match
    */
-  async compare(bodyPassword: string, userPassword: string) {
-    return await bcrypt.compare(bodyPassword, userPassword);
+  async compare(unhashed: string, hashed: string) {
+    return await bcrypt.compare(unhashed, hashed);
   }
 
   /**

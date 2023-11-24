@@ -6,6 +6,7 @@ import { AlertService } from '../alert/alert.service';
 import { TokenService } from '../token/token.service';
 import { CoreService } from '../core/core.service';
 import { DeeplinkService } from '../deeplink/deeplink.service';
+import { TokenType } from '../token/token.schema';
 
 @Injectable()
 export class PasswordResetService {
@@ -37,13 +38,12 @@ export class PasswordResetService {
   }
 
   async setNewPassword({ email, password, token }: ResetPasswordDto) {
-    const dbToken = await this.tokenService.validateToken(email, token);
+    if (await this.tokenService.validateToken(email, token, TokenType.RESET_PASSWORD, true)) {
+      const hash = await this.authService.crypt.hash(password);
 
-    const hash = await this.authService.crypt.hash(password);
+      await this.coreService.user.setPasswordByEmail(email, hash);
 
-    await this.coreService.user.setPasswordByEmail(email, hash);
-    await dbToken.deleteOne();
-
-    return 'success';
+      return 'success';
+    };
   }
 }

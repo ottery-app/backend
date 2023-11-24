@@ -15,6 +15,7 @@ import { ImageDto, UserInfoDto } from '@ottery/ottery-dto';
 import { id } from '@ottery/ottery-dto';
 import { EventService } from '../event/event.service';
 import { Sesh } from '../../auth/sesh/Sesh.decorator';
+import { ImageFileService } from 'src/features/images/imageFile.service';
 
 @Controller('api/user')
 export class UserController {
@@ -22,6 +23,7 @@ export class UserController {
     private childService: ChildService,
     private userService: UserService,
     private eventService: EventService,
+    private imageService: ImageFileService,
   ) {}
 
 
@@ -32,7 +34,11 @@ export class UserController {
     @Body() pfp: ImageDto,
   ) {
     const user = await this.userService.get(userId);
-    user.pfp = pfp;
+    await this.imageService.deletePublicFile(user.pfp.src);
+    user.pfp = {
+      aspectRatio: pfp.aspectRatio,
+      src: (await this.imageService.uploadPublicFile(pfp.src)).url,
+    };
     await this.userService.update(userId, user);
   }
 
