@@ -11,6 +11,7 @@ import { PermsGuardPrivider } from './features/auth/perms/perms.guard';
 import { CoreModule } from './features/core/core.module';
 import { SocialModule } from './features/social/social.module';
 import { MessageModule } from './features/message/message.module';
+import { InviteModule } from './features/invite/invite.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { MessageModule } from './features/message/message.module';
     CoreModule,
     SocialModule,
     MessageModule,
+    InviteModule,
   ],
   controllers: [],
   providers: [SeshGuardProvider, RolesGuardProvider, PermsGuardPrivider],

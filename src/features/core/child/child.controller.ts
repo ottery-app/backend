@@ -51,38 +51,7 @@ export class ChildController {
       throw e;
     }
   }
-
-  @Post(':childId/invite-guardian')
-  @Roles(role.LOGGEDIN)
-  @Roles(role.GUARDIAN)
-  async inviteGuardian(
-    @Sesh() sesh: SeshDocument,
-    @Param('childId') childId: id,
-    @Body() emailDto: EmailDto,
-  ) {
-    const email = emailDto.email;
-    const token = await this.tokenService.setToken(
-        email,
-        TokenType.INVITE_GUARDIAN_FOR_CHILD
-    );
-
-    const {firstName, lastName} = await this.userService.get(sesh.userId);
-    const invitorName = `${firstName} ${lastName}`;
-
-    const { firstName: childFirstName, lastName: childLastName } = await this.childService.get(childId);
-    const childName = `${childFirstName} ${childLastName}`;
-
-    // Send invite guardian link to the user
-    const link = this.deeplinkService.createLink("/child/:childId/acceptguardianinvite", {token, email, childId});
-
-    return await this.alertService.sendInviteGuardianForChildLink(
-        email,
-        link,
-        invitorName,
-        childName,
-    );
-  }
-
+  
   @Post(':childId/addGuardians')
   async addGuardians(@Param('childId') childId: id, @Body() body: IdArrayDto) {
     const ids = (await this.userService.getMany(body.ids)).map(
