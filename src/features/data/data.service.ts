@@ -1,6 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
+import { FormFieldService } from "../form/form.service";
+import { DataAble } from "./data.interface";
+import { DataFieldDto, id } from "@ottery/ottery-dto";
+import { FormField } from "../form/form.schema";
+import { Data } from "aws-sdk/clients/pi";
 
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
@@ -8,7 +13,17 @@ const ObjectId = mongoose.Types.ObjectId;
 @Injectable()
 export class DataService {
     constructor(
+        private formService: FormFieldService,
     ) {}
+
+    async getMissingFields(dataPage: DataAble, desired: id[]) {
+        const missing = desired.filter((id)=>{
+            return dataPage.data.filter((data)=>data.formField == id).length === 0;
+        });
+
+        const ret = await this.formService.getMany(missing);
+        return ret;
+    }
 
     // /**
     //  * this is used to create a data page

@@ -20,35 +20,6 @@ export class EventController {
         private tokenService: TokenService,
     ) {}
 
-    @Post(':eventId/invite/caretaker')
-    @Roles(role.LOGGEDIN)
-    async inviteCaretaker(
-      @Sesh() sesh: SeshDocument,
-      @Param('eventId') eventId: id,
-      @Body() emailDto: EmailDto,
-    ) {
-        const email = emailDto.email;
-        const token = await this.tokenService.setToken(
-            email,
-            TokenType.INVITE_CARETAKER_TO_EVENT,
-        );
-
-        const link = this.deeplinkService.createLink("/event/:eventId/accept/caretaker", {
-            eventId,
-            token,
-            email,
-        });
-
-        const event = await this.coreService.event.get(eventId);
-
-        return await this.alertService.sendInviteCaretakerToEvent(
-            email,
-            link,
-            event.summary,
-        );
-    }
-  
-
     @Post()
     async create (
         @Sesh() sesh: SeshDocument,
