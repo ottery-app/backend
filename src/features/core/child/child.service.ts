@@ -12,7 +12,7 @@ import { ImageFileService } from 'src/features/images/imageFile.service';
 export class ChildService implements CrudService {
   constructor(
     @InjectModel(Child.name) private childModel: Model<ChildDocument>,
-    private readonly imageService: ImageFileService
+    private readonly imageService: ImageFileService,
   ) {}
 
   /**
@@ -23,18 +23,20 @@ export class ChildService implements CrudService {
   async create(createChildDto: CreateChild) {
     //make sure the primary guardian is in the dto
 
-    createChildDto.pfp.src = (await this.imageService.uploadPublicFile(createChildDto.pfp.src)).url;
+    createChildDto.pfp.src = (
+      await this.imageService.uploadPublicFile(createChildDto.pfp.src)
+    ).url;
 
     const child = new this.childModel({
-        ...createChildDto,
-        guardians: [createChildDto.primaryGuardian],
-        events: [],
-        //SHOULD PROBABLY USE THE SERVICE BUT IT NEEDS TO BE CALLED BEFORE THE MODULE IS MADE
-        lastStampedLocation: {
-            at: noId,
-            with: createChildDto.primaryGuardian,
-            time: new Date().getTime(),
-        }
+      ...createChildDto,
+      guardians: [createChildDto.primaryGuardian],
+      events: [],
+      //SHOULD PROBABLY USE THE SERVICE BUT IT NEEDS TO BE CALLED BEFORE THE MODULE IS MADE
+      lastStampedLocation: {
+        at: noId,
+        with: createChildDto.primaryGuardian,
+        time: new Date().getTime(),
+      },
     });
 
     return await child.save();
