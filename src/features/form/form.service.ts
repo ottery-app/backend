@@ -26,7 +26,7 @@ export class FormFieldService implements CrudService {
 
     }
 
-    async getMany(ids:id[]) {
+    async getMany(ids:id[]): Promise<FormField[]> {
         return [];
     }
  

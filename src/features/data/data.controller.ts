@@ -1,45 +1,7 @@
-import { Controller } from '@nestjs/common';
-import {DataService} from './data.service';
+import {DataFieldDto, id} from "@ottery/ottery-dto";
 
-@Controller('api/data')
-export class DataController {
-    constructor(
-        private dataService: DataService,
-    ) {}
-
-    // @Get('id/:id/missing')
-    // async getMissingFieldsbyId(
-    //     @Param('id') dataId: id,
-    //     @Query('desired') desired: id[],
-    // ) {
-    //     desired = desired || [];
-    //     return await this.dataService.findMissingDataForId(dataId, desired);
-    // }
-
-    // @Get('owner/:id/missing')
-    // async getMissingFieldByOwner(
-    //     @Param('id') ownerId: id,
-    //     @Query('desired') desired: id[],
-    // ) {
-    //     desired = desired || [];
-    //     return await this.dataService.findMissingDataForOwner(ownerId, desired);
-    // }
-
-    // @Patch('id/:id')
-    // async addDataFieldsById(
-    //     @Param('id') dataId: id,
-    //     @Body() dataFieldDtos: DataFieldDto[],
-    // ) {
-    //     dataFieldDtos = dataFieldDtos || [];
-    //     return await this.dataService.setDataById(dataId, dataFieldDtos);
-    // }
-
-    // @Patch('owner/:id')
-    // async addDataFieldsByOwner(
-    //     @Param('id') ownerId: id,
-    //     @Body() dataFieldDtos: DataFieldDto[],
-    // ) {
-    //     dataFieldDtos = dataFieldDtos || [];
-    //     return await this.dataService.setDataByOwner(ownerId, dataFieldDtos);
-    // }
+export interface DataController {
+    getData(id:id):Promise<any>
+    getMissingData(id:id, desired:id[]):Promise<any[]>
+    updateData(id:id, data:DataFieldDto[]):Promise<any>
 }
