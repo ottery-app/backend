@@ -13,7 +13,7 @@ export class TokenService {
     private cryptService: CryptService,
   ) {}
 
-  async setToken(email: string, type: TokenType = TokenType.RESET_PASSWORD) {
+  async setToken(key: string, type: TokenType = TokenType.RESET_PASSWORD) {
     // const user = await this.userService.getByEmail(email);
     // if (!user) {
     //   throw new HttpException(
@@ -24,12 +24,12 @@ export class TokenService {
 
     if (
       await this.tokenModel.findOne({
-        email,
+        key,
         type,
       })
     ) {
       await this.tokenModel.deleteOne({
-        email,
+        key,
         type,
       });
     }
@@ -40,7 +40,7 @@ export class TokenService {
 
     await this.tokenModel.create({
       type,
-      email,
+      key,
       token: hash,
       createdAt: now(),
     });
@@ -49,13 +49,14 @@ export class TokenService {
   }
 
   async validateToken(
-    email: string,
+    key: string,
     token: string,
     type: TokenType = TokenType.RESET_PASSWORD,
+    deltoken: boolean,
   ) {
     // Check token's validity
     const dbToken = await this.tokenModel.findOne({
-      email,
+      key,
       type,
     });
 
@@ -66,10 +67,14 @@ export class TokenService {
       );
     }
 
-    if (token !== dbToken.token) {
+    const isEqual = await this.cryptService.compare(token, dbToken.token)
+    if (isEqual === false) {
       throw new HttpException('Invalid token', HttpStatus.BAD_REQUEST);
+    } else {
+      if (deltoken) {
+        await dbToken.deleteOne();
+      }
+      return isEqual;
     }
-
-    return dbToken;
   }
 }

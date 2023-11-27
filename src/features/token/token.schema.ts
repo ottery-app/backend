@@ -15,12 +15,12 @@ export class Token {
   type: TokenType;
 
   @Prop()
-  email: string;
+  key: string;
 
   @Prop()
   token: string;
 
-  @Prop({ default: now(), expires: 3600 })
+  @Prop({ default: now(), expires: 86000000 })
   createdAt: Date;
 }
 

@@ -34,13 +34,16 @@ export class ImageFileService {
         return await newFile.save();
     }
 
-    async deletePublicFile(fileId: number) {
-      const file = await this.imageFileModel.findById(fileId);
-      const s3 = new S3();
-      await s3.deleteObject({
-        Bucket: process.env.AWS_PUBLIC_BUCKET_NAME,
-        Key: file.key,
-      }).promise();
-      await this.imageFileModel.findByIdAndDelete(fileId);
+    async deletePublicFile(url: string) {
+      const file = await this.imageFileModel.findOne({url:url});
+
+      if (file) {
+        const s3 = new S3();
+          await s3.deleteObject({
+            Bucket: process.env.AWS_PUBLIC_BUCKET_NAME,
+            Key: file.key,
+          }).promise();
+          await this.imageFileModel.findByIdAndDelete(file._id);
+        }
     }
 }

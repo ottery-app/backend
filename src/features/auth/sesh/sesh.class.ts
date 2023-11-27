@@ -6,7 +6,7 @@ export class Sesh {
     /** A token attached to the session??? */
     token: token; //done
     /** When the session began */
-    start: time; //done
+    start: Date; //done
     /** If the user is logged in */
     loggedin: boolean; //done
     /** The email of the user */
@@ -20,7 +20,7 @@ export class Sesh {
     event: id; //done
 
     constructor() {
-        this.start = new Date().getTime();
+        this.start = new Date();
         this.loggedin = false;
         this.token = noId;
         this.activated = false;
