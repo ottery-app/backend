@@ -7,6 +7,7 @@ import { AlertModule } from '../alert/alert.module';
 import { DeeplinkModule } from '../deeplink/deeplink.module';
 import { CoreModule } from '../core/core.module';
 import { InviteGuardianController } from './inviteGuardian.controler';
+import { InviteCaretakerController } from './inviteCaretaker.controler';
 
 @Module({
   imports: [
@@ -16,7 +17,7 @@ import { InviteGuardianController } from './inviteGuardian.controler';
     AlertModule,
     CoreModule,
   ],
-  controllers: [InviteGuardianController],
+  controllers: [InviteGuardianController, InviteCaretakerController],
   providers: [],
   exports: [],
 })

@@ -20,6 +20,7 @@ import { User, UserSchema } from './user/user.schema';
 import { EventSchema } from './event/event.schema';
 import { Child, ChildSchema } from './child/child.schema';
 import { DeeplinkModule } from '../deeplink/deeplink.module';
+import { DataModule } from '../data/data.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { DeeplinkModule } from '../deeplink/deeplink.module';
     CryptModule,
     TokenModule,
     AlertModule,
+    DataModule,
   ],
   controllers: [UserController, EventController, ChildController],
   providers: [UserService, EventService, ChildService, CoreService],

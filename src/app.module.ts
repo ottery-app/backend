@@ -12,6 +12,7 @@ import { CoreModule } from './features/core/core.module';
 import { SocialModule } from './features/social/social.module';
 import { MessageModule } from './features/message/message.module';
 import { InviteModule } from './features/invite/invite.module';
+import { SignupModule } from './features/signup/signup.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { InviteModule } from './features/invite/invite.module';
     SocialModule,
     MessageModule,
     InviteModule,
+    SignupModule,
   ],
   controllers: [],
   providers: [SeshGuardProvider, RolesGuardProvider, PermsGuardPrivider],

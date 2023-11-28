@@ -56,11 +56,11 @@ export class Event implements PermissionAble {
     @Prop({required: true})
     perms: PermLink[];
 
-    // @Prop({required: true})
-    // volenteerSignUp: id[]; //these are links to the fields 
+    @Prop({required: true})
+    volenteerSignUp: id[]; //these are links to the fields 
 
-    // @Prop({required: true})
-    // attendeeSignUp: id[]; //these are links to the fields 
+    @Prop({required: true})
+    attendeeSignUp: id[]; //these are links to the fields 
 }
 
 export const EventSchema = SchemaFactory.createForClass(Event);

@@ -8,24 +8,52 @@ import {
   ParseBoolPipe,
   Post,
   Query,
+  Patch
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ChildService } from '../child/child.service';
-import { ImageDto, UserInfoDto } from '@ottery/ottery-dto';
+import { DataFieldDto, IdArrayDto, ImageDto, UserInfoDto } from '@ottery/ottery-dto';
 import { id } from '@ottery/ottery-dto';
 import { EventService } from '../event/event.service';
 import { Sesh } from '../../auth/sesh/Sesh.decorator';
 import { ImageFileService } from 'src/features/images/imageFile.service';
+import { DataController } from 'src/features/data/data.controller';
+import { DataService } from 'src/features/data/data.service';
 
 @Controller('api/user')
-export class UserController {
+export class UserController implements DataController {
   constructor(
     private childService: ChildService,
     private userService: UserService,
     private eventService: EventService,
     private imageService: ImageFileService,
+    private dataService: DataService,
   ) {}
 
+  @Get(":userId/data")
+  async getData(
+    @Param('userId') userId: id,
+  ) {
+    return (await this.userService.get(userId)).data;
+  }
+
+  @Get(":userId/data/missing")
+  async getMissingData(
+    @Param('userId') userId: id,
+    @Query("desired") desired:id[],
+  ) {
+    const user  = await this.userService.get(userId);
+    const missing = await this.dataService.getMissingFields(user, desired);
+    return missing;
+  }
+
+  @Patch(":userId/data")
+  async updateData(
+    @Param('userId') userId: id,
+    @Body() data: DataFieldDto[]
+  ) {
+    throw new Error('Method not implemented.');
+  }
 
   @Post(":userId/pfp")
   async updateProfileImage(
