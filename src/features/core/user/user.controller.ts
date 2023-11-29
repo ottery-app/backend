@@ -43,8 +43,7 @@ export class UserController implements DataController {
     @Query("desired") desired:id[],
   ) {
     const user  = await this.userService.get(userId);
-    const missing = await this.dataService.getMissingFields(user, desired);
-    return missing;
+    return await this.dataService.getMissingFields(user, desired);
   }
 
   @Patch(":userId/data")

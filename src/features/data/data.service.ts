@@ -7,8 +7,6 @@ import { DataFieldDto, id } from "@ottery/ottery-dto";
 import { FormField } from "../form/form.schema";
 import { Data } from "aws-sdk/clients/pi";
 
-const mongoose = require("mongoose");
-const ObjectId = mongoose.Types.ObjectId;
 
 @Injectable()
 export class DataService {
@@ -20,7 +18,7 @@ export class DataService {
         const missing = desired.filter((id)=>{
             return dataPage.data.filter((data)=>data.formField == id).length === 0;
         });
-
+        
         const ret = await this.formService.getMany(missing);
         return ret;
     }
