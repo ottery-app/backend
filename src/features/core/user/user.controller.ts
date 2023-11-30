@@ -51,7 +51,9 @@ export class UserController implements DataController {
     @Param('userId') userId: id,
     @Body() data: DataFieldDto[]
   ) {
-    throw new Error('Method not implemented.');
+    const user = await this.userService.get(userId);
+    user.data = await this.dataService.update(user, data);
+    await this.userService.update(userId, user);
   }
 
   @Post(":userId/pfp")

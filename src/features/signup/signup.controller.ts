@@ -23,11 +23,16 @@ export class SignupController {
     const missing = await this.dataService.getMissingFields(user, event.volenteerSignUp);
 
     if (missing.length) {
-        throw new HttpException("error", HttpStatus.BAD_REQUEST);
+      throw new HttpException("Missing user data", HttpStatus.BAD_REQUEST);
+    }
+
+    if (event.volenteers.includes(user._id)) {
+      return;
     }
 
     event.volenteers.push(user._id);
     user.events.push(event._id);
+    
     //TODO apply volenteer permissions?
     await this.coreService.event.update(event._id, event);
     await this.coreService.user.update(user._id, user);
