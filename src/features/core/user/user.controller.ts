@@ -63,10 +63,11 @@ export class UserController implements DataController {
     @Body() pfp: ImageDto,
   ) {
     const user = await this.userService.get(userId);
-    await this.imageService.deletePublicFile(user.pfp.src);
+    user?.pfp?.src && await this.imageService.deletePublicFile(user.pfp.src);
+    const asset = await this.imageService.uploadPublicFile(pfp.src);
     user.pfp = {
       aspectRatio: pfp.aspectRatio,
-      src: (await this.imageService.uploadPublicFile(pfp.src)).url,
+      src: asset.url,
     };
     await this.userService.update(userId, user);
   }
