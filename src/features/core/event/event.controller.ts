@@ -94,20 +94,10 @@ export class EventController {
     }
   }
 
-  // @Get(":id/signup/attendee")
-  // async getAttendeeSignup(
-  //     @Param("id") id: id,
-  // ) {
-  //     try {
-  //         const event = await this.coreService.event.findOneById(id);
-  //         return event.attendeeSignUp;
-  //     } catch (e) {
-  //         throw e;
-  //     }
-  // }
-
   @Get(':id/owner')
-  async getOwner(@Param('id') id: id) {
+  async getOwner(
+    @Param('id') id: id
+  ) {
     try {
       const event = await this.coreService.event.get(id);
       //TODO this is not guarenteed to always be the case that the first element is always the owner.
