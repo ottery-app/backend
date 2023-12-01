@@ -82,6 +82,11 @@ export class UserController implements DataController {
       const user = await this.userService.get(userId);
       let children = await this.childService.getMany(user.children);
 
+      console.log(children);
+      console.log(notAt);
+      console.log(at);
+      console.log(hasEvent);
+
       if (at) {
         children = children.filter(
           (child) => child.lastStampedLocation.at === at,
@@ -94,12 +99,14 @@ export class UserController implements DataController {
         );
       }
 
-      if (Boolean(hasEvent) === false) {
-        children = children.filter((child) => child.events.length === 0);
-      }
-
-      if (Boolean(hasEvent) === true) {
-        children = children.filter((child) => child.events.length !== 0);
+      if (hasEvent !== undefined) {
+        if (Boolean(hasEvent) === false) {
+          children = children.filter((child) => child.events.length === 0);
+        }
+  
+        if (Boolean(hasEvent) === true) {
+          children = children.filter((child) => child.events.length !== 0);
+        }
       }
 
       return children;
