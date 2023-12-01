@@ -122,28 +122,4 @@ export class EventController {
       throw e;
     }
   }
-
-  // @Patch(":id/signup/volenteer")
-  // async signupVolenteers(
-  //     @Param("id") id: id,
-  //     @Body() ids: id[],
-  // ) {
-  //     try {
-  //         return await this.eventService.signUpVolenteers(id, ids);
-  //     } catch (e) {
-  //         throw e;
-  //     }
-  // }
-
-  // @Patch(":id/signup/attendee")
-  // async signupAttendees(
-  //     @Param("id") id: id,
-  //     @Body() ids: id[],
-  // ) {
-  //     try {
-  //         return await this.eventService.signUpAttendees(id, ids);
-  //     } catch (e) {
-  //         throw e;
-  //     }
-  // }
 }

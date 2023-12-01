@@ -10,7 +10,7 @@ export class DataService {
         private formService: FormFieldService,
     ) {}
 
-    async getMissingFields(dataPage: DataAble, desired: id[]) {
+    async getMissingFields(dataPage: DataAble, desired: id[]=[]) {
         const missing = desired.filter((id)=>{
             return dataPage.data.filter((data)=>data.formField == id).length === 0;
         });
