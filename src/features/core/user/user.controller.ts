@@ -43,8 +43,7 @@ export class UserController implements DataController {
     @Query("desired") desired:id[],
   ) {
     const user  = await this.userService.get(userId);
-    const missing = await this.dataService.getMissingFields(user, desired);
-    return missing;
+    return await this.dataService.getMissingFields(user, desired);
   }
 
   @Patch(":userId/data")
@@ -52,7 +51,9 @@ export class UserController implements DataController {
     @Param('userId') userId: id,
     @Body() data: DataFieldDto[]
   ) {
-    throw new Error('Method not implemented.');
+    const user = await this.userService.get(userId);
+    user.data = await this.dataService.update(user, data);
+    await this.userService.update(userId, user);
   }
 
   @Post(":userId/pfp")

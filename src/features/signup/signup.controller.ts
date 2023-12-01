@@ -1,4 +1,4 @@
-import { Controller, Param, HttpException, HttpStatus, Patch } from '@nestjs/common';
+import { Controller, Param, HttpException, HttpStatus, Patch, Query } from '@nestjs/common';
 import { id } from '@ottery/ottery-dto';
 import { SeshDocument } from '../auth/sesh/sesh.schema';
 import { Sesh } from '../auth/sesh/Sesh.decorator';
@@ -23,13 +23,42 @@ export class SignupController {
     const missing = await this.dataService.getMissingFields(user, event.volenteerSignUp);
 
     if (missing.length) {
-        throw new HttpException("error", HttpStatus.BAD_REQUEST);
+      throw new HttpException("Missing user data", HttpStatus.BAD_REQUEST);
     }
 
-    event.volenteers.push(user._id);
-    user.events.push(event._id);
-    //TODO apply volenteer permissions?
-    await this.coreService.event.update(event._id, event);
-    await this.coreService.user.update(user._id, user);
+    if (!event.volenteers.includes(user._id)) {
+      event.volenteers.push(user._id);
+      await this.coreService.event.update(event._id, event);
+    }
+
+    if (!user.events.includes(event._id)) {
+      user.events.push(event._id);
+      await this.coreService.user.update(user._id, user);
+    }
+  }
+
+  @Patch('attendee/:eventId')
+  async Attendee(
+    @Sesh() sesh: SeshDocument,
+    @Param('eventId') eventId: id,
+    @Query('childId') childId: id,
+  ) {
+    const child = await this.coreService.child.get(childId);
+    const event = await this.coreService.event.get(eventId);
+    const missing = await this.dataService.getMissingFields(child, event.attendeeSignUp);
+
+    if (missing.length) {
+      throw new HttpException("Missing child data", HttpStatus.BAD_REQUEST);
+    }
+
+    if (!event.attendees.includes(child._id)) {
+      event.attendees.push(childId);
+      await this.coreService.event.update(event._id, event);
+    }
+
+    if (!child.events.includes(event._id)) {
+      child.events.push(eventId);
+      await this.coreService.child.update(child._id, child);
+    }
   }
 }

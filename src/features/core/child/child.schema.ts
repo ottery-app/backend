@@ -8,6 +8,7 @@ import {
   time,
   LocatableStampDto,
   ImageDto,
+  DataFieldDto,
 } from '@ottery/ottery-dto';
 
 import { SignupAble } from '../event/event.schema';
@@ -16,11 +17,12 @@ import {
   PermissionAble,
   PermLink,
 } from 'src/features/auth/perms/perms.interface';
+import { DataAble } from 'src/features/data/data.interface';
 
 export type ChildDocument = Child & Document;
 
 @Schema()
-export class Child implements SignupAble, LocateAble, PermissionAble {
+export class Child implements DataAble, SignupAble, LocateAble, PermissionAble {
   _id: id;
 
   @Prop({ required: true })
@@ -55,6 +57,9 @@ export class Child implements SignupAble, LocateAble, PermissionAble {
 
   @Prop({ required: true })
   lastStampedLocation: LocatableStampDto;
+
+  @Prop()
+  data: DataFieldDto[];  
 }
 
 export const ChildSchema = SchemaFactory.createForClass(Child);

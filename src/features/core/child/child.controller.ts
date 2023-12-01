@@ -1,25 +1,46 @@
-import { Controller, Get, Post, Body, Query, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, Param, Patch } from '@nestjs/common';
 import { ChildService } from './child.service';
 import { UserService } from '../user/user.service';
-import { EmailDto, IdArrayDto, id, role } from '@ottery/ottery-dto';
+import { DataFieldDto, IdArrayDto, id } from '@ottery/ottery-dto';
 import { CreateChildDto } from '@ottery/ottery-dto';
 import { SeshDocument } from '../../auth/sesh/sesh.schema';
 import { Sesh } from '../../auth/sesh/Sesh.decorator';
-import { Roles } from 'src/features/auth/roles/roles.decorator';
-import { TokenService } from 'src/features/token/token.service';
-import { TokenType } from 'src/features/token/token.schema';
-import { AlertService } from 'src/features/alert/alert.service';
-import { DeeplinkService } from 'src/features/deeplink/deeplink.service';
+import { DataController } from 'src/features/data/data.controller';
+import { DataService } from 'src/features/data/data.service';
 
 @Controller('api/child')
-export class ChildController {
+export class ChildController implements DataController {
   constructor(
     private userService: UserService,
     private childService: ChildService,
-    private tokenService: TokenService,
-    private alertService: AlertService,
-    private deeplinkService: DeeplinkService,
+    private dataService: DataService,
   ) {}
+
+  @Get(":childId/data")
+  async getData(
+    @Param('childId') childId: id,
+  ) {
+    return (await this.childService.get(childId)).data;
+  }
+
+  @Get(":childId/data/missing")
+  async getMissingData(
+    @Param('childId') childId: id,
+    @Query("desired") desired:id[],
+  ) {
+    const child  = await this.childService.get(childId);
+    return await this.dataService.getMissingFields(child, desired);
+  }
+
+  @Patch(":childId/data")
+  async updateData(
+    @Param('childId') childId: id,
+    @Body() data: DataFieldDto[]
+  ) {
+    const child = await this.childService.get(childId);
+    child.data = await this.dataService.update(child, data);
+    await this.childService.update(childId, child);
+  }
 
   @Post()
   async create(

@@ -55,6 +55,8 @@ export class ChildService implements CrudService {
    */
   async update(childId: id, child: Child) {
     // overwrite is false so only modified fields are updated
+    console.log("UPDATING");
+    console.log(child);
     const updated = await this.childModel
       .findByIdAndUpdate(childId, child)
       .setOptions({ overwrite: false, new: true });

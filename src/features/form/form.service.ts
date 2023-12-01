@@ -27,7 +27,7 @@ export class FormFieldService implements CrudService {
     }
 
     async getMany(ids:id[]): Promise<FormField[]> {
-        return [];
+        return await Promise.all(ids.map((id)=>this.formFieldModel.findById(id)));
     }
  
     async create(customFormFieldDto: CustomFormFieldDto) {
