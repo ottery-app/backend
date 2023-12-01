@@ -82,11 +82,6 @@ export class UserController implements DataController {
       const user = await this.userService.get(userId);
       let children = await this.childService.getMany(user.children);
 
-      console.log(children);
-      console.log(notAt);
-      console.log(at);
-      console.log(hasEvent);
-
       if (at) {
         children = children.filter(
           (child) => child.lastStampedLocation.at === at,
