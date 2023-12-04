@@ -9,7 +9,7 @@ import {
 } from '@ottery/ottery-dto';
 import * as delay from 'delay';
 import { timeout, tryagain } from './tempzone.meta';
-import { LocatableService } from '../locatable/locatable.service';
+import { LocatableService } from '../../locatable/locatable.service';
 import { ChildReqeust, ChildReqeustDocument } from './childRequest.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
