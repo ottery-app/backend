@@ -99,4 +99,19 @@ export class EmailService {
 
     return send(to, subject, html);
   }
+
+  sendAttendeeInviteToEvent(
+    recipent: email,
+    link: string,
+    eventName: string,
+  ) {
+    const to = [recipent];
+    const subject = "Signup for an event";
+    const html = htmlInject(getTemplate('invite-attendee-to-event'), {
+      link,
+      event: eventName,
+    });
+
+    return send(to, subject, html);
+  }
 }
