@@ -61,4 +61,16 @@ export class AlertService {
       eventName,
     );
   }
+  
+  sendInviteAttendeeToEvent(
+    recipient: string,
+    link:string,
+    eventName: string,
+  ) {
+    return this.emailService.sendAttendeeInviteToEvent(
+      recipient,
+      link,
+      eventName,
+    );
+  }
 }

@@ -10,7 +10,7 @@ import { DeeplinkService } from 'src/features/deeplink/deeplink.service';
 import { CoreService } from '../core/core.service';
 
 @Controller('api/invite/event')
-export class InviteCaretakerController {
+export class InviteEventController {
   constructor(
     private coreService: CoreService,
     private tokenService: TokenService,
@@ -18,9 +18,30 @@ export class InviteCaretakerController {
     private deeplinkService: DeeplinkService,
   ) {}
 
+  @Post('attendee/for/:eventId')
+  async inviteAttendee(
+    @Param('eventId') eventId: id,
+    @Body() emailDto: EmailDto,
+  ) {
+    const email = emailDto.email;
+
+    const link = this.deeplinkService.createLink("/event/signup/:eventId", {
+        eventId,
+        email,
+        type: "attendee"
+    });
+
+    const event = await this.coreService.event.get(eventId);
+
+    return await this.alertService.sendInviteAttendeeToEvent(
+        email,
+        link,
+        event.summary,
+    );
+  }
+
   @Post('caretaker/for/:eventId')
   async inviteCaretaker(
-    @Sesh() sesh: SeshDocument,
     @Param('eventId') eventId: id,
     @Body() emailDto: EmailDto,
   ) {
