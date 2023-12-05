@@ -17,27 +17,14 @@ import { Prop } from '@nestjs/mongoose';
 export class TempZoneController {
   constructor(private tempzoneService: TempZoneService) {}
 
-  @Post('request/dropoff')
+  @Post('request')
   async requestChildDropOff(
     @Body(ArrayValidationPipe(ChildRequestDto)) requests: ChildRequestDto[],
   ) {
     const responces: ChildRequestDto[] = [];
 
     for (let i = 0; i < requests.length; i++) {
-      responces.push(await this.tempzoneService.dropOffRequest(requests[i]));
-    }
-
-    return responces;
-  }
-
-  @Post('request/pickup')
-  async requestChildPickUp(
-    @Body(ArrayValidationPipe(ChildRequestDto)) requests: ChildRequestDto[],
-  ) {
-    const responces: ChildRequestDto[] = [];
-
-    for (let i = 0; i < requests.length; i++) {
-      responces.push(await this.tempzoneService.pickupRequest(requests[i]));
+      responces.push(await this.tempzoneService.makeRequest(requests[i]));
     }
 
     return responces;

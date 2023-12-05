@@ -13,7 +13,6 @@ import { LocatableService } from '../../locatable/locatable.service';
 import { ChildReqeust, ChildReqeustDocument } from './childRequest.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { ChildService } from 'src/features/core/child/child.service';
 import { CoreService } from 'src/features/core/core.service';
 
 function requestPipe(request, responce) {
@@ -74,7 +73,7 @@ export class TempZoneService {
     return await this.childRequestModel.find({ event: eventId });
   }
 
-  private async makeRequest(childRequest: ChildRequestDto, type: requestType) {
+  async makeRequest(childRequest: ChildRequestDto) {
     let request = await this.getRequestByChildId(childRequest.child);
 
     if (request) {
@@ -83,12 +82,10 @@ export class TempZoneService {
       }
 
       request.status = requestStatus.INPROGRESS;
-      request.type = type;
 
       request = await request.save();
     } else {
       childRequest.status = requestStatus.INPROGRESS;
-      childRequest.type = type;
       request = await this.saveRequest(childRequest);
     }
 
@@ -107,14 +104,6 @@ export class TempZoneService {
     })();
 
     return request;
-  }
-
-  async pickupRequest(dropOffRequest: ChildRequestDto) {
-    return await this.makeRequest(dropOffRequest, requestType.PICKUP);
-  }
-
-  async dropOffRequest(dropOffRequest: ChildRequestDto) {
-    return await this.makeRequest(dropOffRequest, requestType.DROPOFF);
   }
 
   async checkChildStatus(childId: id) {
@@ -157,7 +146,7 @@ export class TempZoneService {
       return request;
     } else {
       // this path is broken
-      request = await this.makeRequest(childRequest, childRequest.type);
+      request = await this.makeRequest(childRequest);
       return await this.declineRequest(request);
     }
   }
