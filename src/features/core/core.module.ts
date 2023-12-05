@@ -5,7 +5,7 @@ import { CryptModule } from '../crypt/crypt.module';
 import { TokenModule } from '../token/token.module';
 import { AlertModule } from '../alert/alert.module';
 import { ImageFileModule } from '../images/imageFile.module';
-import { LocatableModule } from '../location/locatable/locatable.module';
+import { LocatableModule } from '../locatable/locatable.module';
 
 import { UserService } from './user/user.service';
 import { EventService } from './event/event.service';

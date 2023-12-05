@@ -12,7 +12,7 @@ import {
 } from '@ottery/ottery-dto';
 
 import { SignupAble } from '../event/event.schema';
-import { LocateAble } from 'src/features/location/locatable/locatable.interface';
+import { LocateAble } from 'src/features/locatable/locatable.interface';
 import {
   PermissionAble,
   PermLink,

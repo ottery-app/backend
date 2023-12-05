@@ -12,5 +12,5 @@ export class LocatableService {
             with: withh,
             time: new Date().getTime(),
         }
-    }   
+    }
 }

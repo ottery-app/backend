@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 //import { Event, EventDocument } from './event.schema';
 import { id } from '@ottery/ottery-dto';
 //import { CreateEventDto } from '@ottery/ottery-dto';
-import { CustomFormFieldDto } from '@ottery/ottery-dto';
+import { FormFieldDto } from '@ottery/ottery-dto';
 import { FormField, FormFieldDocument } from './form.schema';
 import { CrudService } from '../interfaces/crud.service.inerface';
 
@@ -30,7 +30,7 @@ export class FormFieldService implements CrudService {
         return await Promise.all(ids.map((id)=>this.formFieldModel.findById(id)));
     }
  
-    async create(customFormFieldDto: CustomFormFieldDto) {
+    async create(customFormFieldDto: FormFieldDto) {
 
     }
 }

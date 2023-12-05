@@ -13,6 +13,7 @@ import { SocialModule } from './features/social/social.module';
 import { MessageModule } from './features/message/message.module';
 import { InviteModule } from './features/invite/invite.module';
 import { SignupModule } from './features/signup/signup.module';
+import { RosterModule } from './features/roster/roster.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { SignupModule } from './features/signup/signup.module';
     MessageModule,
     InviteModule,
     SignupModule,
+    RosterModule,
   ],
   controllers: [],
   providers: [SeshGuardProvider, RolesGuardProvider, PermsGuardPrivider],

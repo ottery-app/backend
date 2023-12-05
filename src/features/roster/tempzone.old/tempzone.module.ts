@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
 import { CoreModule } from 'src/features/core/core.module';
-import { LocatableModule } from '../locatable/locatable.module';
+import { LocatableModule } from '../../locatable/locatable.module';
 import { TempZoneService } from './tempzone.service';
 import { TempZoneController } from './tempzone.controller';
 import { ChildReqeust, ChildReqeustSchema } from './childRequest.schema';

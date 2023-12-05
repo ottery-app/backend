@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body } from '@nestjs/common';
 import {
   ChildRequestDto,
   id,
+  isId,
   requestStatus,
   requestType,
 } from '@ottery/ottery-dto';
@@ -10,6 +11,7 @@ import { Patch, Query } from '@nestjs/common/decorators';
 import { ArrayValidationPipe } from 'src/pipes/ArrayValidationPipe';
 import { SeshDocument } from '../../auth/sesh/sesh.schema';
 import { Sesh } from '../../auth/sesh/Sesh.decorator';
+import { Prop } from '@nestjs/mongoose';
 
 @Controller('api/tempzone')
 export class TempZoneController {
