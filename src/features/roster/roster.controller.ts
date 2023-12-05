@@ -20,7 +20,6 @@ export class RosterController {
     present = present === 'true' as unknown as boolean
     const event = await this.coreService.event.get(eventId);
     const attendees = (await this.coreService.child.getMany(event.attendees)).filter((child)=>{
-      
       if (present === true) {
         if (child.lastStampedLocation?.at) {
           return normalizeId(child.lastStampedLocation.at).equals(normalizeId(event._id));
@@ -35,6 +34,7 @@ export class RosterController {
         }
       }
 
+      console.log(7)
       return true;
     });
 
@@ -60,6 +60,30 @@ export class RosterController {
     if (event.tempzone === tempzone.Default) {
       return await Promise.all(children.map(async (child)=>{
         this.locatableService.stamp(child, event._id, noId);
+        return await child.save();
+      }));
+    }
+  }
+
+  @Patch(":eventId/pickup")
+  async pickup(
+    @Sesh() sesh,
+    @Param("eventId") eventId: id,
+    @Body() childIds: IdArrayDto
+  ) {
+    if (sesh.event !== eventId) {
+      throw new HttpException(
+        "Not allowed to dismiss children",
+        HttpStatus.BAD_REQUEST,
+      )
+    }
+
+    const event = await this.coreService.event.get(eventId);
+    const children = await this.coreService.child.getMany(childIds.ids);
+
+    if (event.tempzone === tempzone.Default) {
+      return await Promise.all(children.map(async (child)=>{
+        this.locatableService.stamp(child, noId, noId);
         return await child.save();
       }));
     }
