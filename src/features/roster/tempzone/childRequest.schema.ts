@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, now } from 'mongoose';
 import { id, requestStatus, requestType } from '@ottery/ottery-dto';
 
 export type ChildReqeustDocument = ChildReqeust & Document;
@@ -22,6 +22,11 @@ export class ChildReqeust {
 
     @Prop({required: true})
     type: requestType;
+
+    @Prop({ default: Date.now, expires: 600 })
+    createdAt: Date;
 }
 
 export const ChildReqeustSchema = SchemaFactory.createForClass(ChildReqeust);
+
+//86000000
