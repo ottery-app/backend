@@ -66,25 +66,35 @@ export class TempZoneController {
     //this should be able to filter based on both but rn i see no point so im not
     @Query('children') children?: id[],
     @Query('event') event?: id,
+    @Query('guardian') guardian?: id,
     @Query('type') type?: requestType, // requestType
     @Query('status') status?: requestStatus, //
   ) {
-    let requests = [];
+    let requests:any = {};
 
     if (children) {
       const ids: id[] = children;
       for (let i = 0; i < ids.length; i++) {
-        requests.push(await this.tempzoneService.checkChildStatus(ids[i]));
+        const request = await this.tempzoneService.checkChildStatus(ids[i]);
+        requests[request._id] = await this.tempzoneService.checkChildStatus(ids[i]);
       }
     }
 
     if (event) {
       const id: id = event;
-      requests = [
-        ...requests,
-        ...(await this.tempzoneService.checkEventStatus(id)),
-      ];
+      (await this.tempzoneService.checkEventStatus(id)).forEach((request)=>{
+        requests[request._id] = request;
+      })
     }
+
+    if (guardian) {
+      const id: id = guardian;
+      (await this.tempzoneService.checkUserStatus(id)).forEach((request)=>{
+        requests[request._id] = request;
+      })
+    }
+
+    requests = Object.values(requests);
 
     if (requests && type) {
       requests = requests.filter((req) => req.type === type);
