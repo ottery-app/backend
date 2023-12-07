@@ -20,7 +20,7 @@ export class Token {
   @Prop()
   token: string;
 
-  @Prop({ default: Date.now, expires: 86400 })
+  @Prop({ default: Date.now, expires: 60 })
   createdAt: Date;
 }
 

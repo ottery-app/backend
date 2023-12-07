@@ -104,6 +104,7 @@ export class TempZoneController {
       requests = requests.filter((req) => req.status === status);
     }
 
-    return requests.filter((i) => i);
+    requests = requests.filter((i) => i);
+    return requests;
   }
 }
