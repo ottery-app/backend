@@ -28,7 +28,7 @@
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/swagger": "^6.1.2",
     "@nestjs/typeorm": "^9.0.1",
-    "@ottery/ottery-dto": "^0.0.35",
+    "@ottery/ottery-dto": "^0.0.37",
     "@types/aws-sdk": "^2.7.0",
     "@types/uuid": "^9.0.7",
     "aws-sdk": "^2.1492.0",

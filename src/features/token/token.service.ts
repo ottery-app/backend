@@ -38,6 +38,8 @@ export class TokenService {
     const token = this.cryptService.makeCode(32);
     const hash = await this.cryptService.hash(token);
 
+    console.log("DELETING  TOKEN");
+
     await this.tokenModel.create({
       type,
       key,
@@ -54,26 +56,34 @@ export class TokenService {
     type: TokenType = TokenType.RESET_PASSWORD,
     deltoken: boolean,
   ) {
+    console.log("VALIDATING TOKEN")
     // Check token's validity
     const dbToken = await this.tokenModel.findOne({
       key,
       type,
     });
 
+    console.log("FOUND TOKEN")
+
     if (!dbToken) {
+      console.log("NO TOKE")
       throw new HttpException(
         'Invalid or expired token',
         HttpStatus.BAD_REQUEST,
       );
     }
 
+
     const isEqual = await this.cryptService.compare(token, dbToken.token)
     if (isEqual === false) {
+      console.log("TOKEN IS NOT VALID")
       throw new HttpException('Invalid token', HttpStatus.BAD_REQUEST);
     } else {
       if (deltoken) {
+        console.log("DELETING TOKEN")
         await dbToken.deleteOne();
       }
+      console.log("SUCCESS")
       return isEqual;
     }
   }

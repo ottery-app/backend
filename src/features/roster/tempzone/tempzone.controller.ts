@@ -17,27 +17,14 @@ import { Prop } from '@nestjs/mongoose';
 export class TempZoneController {
   constructor(private tempzoneService: TempZoneService) {}
 
-  @Post('request/dropoff')
+  @Post('request')
   async requestChildDropOff(
     @Body(ArrayValidationPipe(ChildRequestDto)) requests: ChildRequestDto[],
   ) {
     const responces: ChildRequestDto[] = [];
 
     for (let i = 0; i < requests.length; i++) {
-      responces.push(await this.tempzoneService.dropOffRequest(requests[i]));
-    }
-
-    return responces;
-  }
-
-  @Post('request/pickup')
-  async requestChildPickUp(
-    @Body(ArrayValidationPipe(ChildRequestDto)) requests: ChildRequestDto[],
-  ) {
-    const responces: ChildRequestDto[] = [];
-
-    for (let i = 0; i < requests.length; i++) {
-      responces.push(await this.tempzoneService.pickupRequest(requests[i]));
+      responces.push(await this.tempzoneService.makeRequest(requests[i]));
     }
 
     return responces;
@@ -63,12 +50,13 @@ export class TempZoneController {
 
   @Patch('request/decline')
   async declineRequest(
+    @Sesh() sesh: SeshDocument,
     @Body(ArrayValidationPipe(ChildRequestDto)) requests: ChildRequestDto[],
   ) {
     const responces: ChildRequestDto[] = [];
 
     for (let i = 0; i < requests.length; i++) {
-      responces.push(await this.tempzoneService.declineRequest(requests[i]));
+      responces.push(await this.tempzoneService.declineRequest(requests[i], sesh.userId));
     }
 
     return responces;
@@ -79,25 +67,35 @@ export class TempZoneController {
     //this should be able to filter based on both but rn i see no point so im not
     @Query('children') children?: id[],
     @Query('event') event?: id,
+    @Query('guardian') guardian?: id,
     @Query('type') type?: requestType, // requestType
     @Query('status') status?: requestStatus, //
   ) {
-    let requests = [];
+    let requests:any = {};
 
     if (children) {
       const ids: id[] = children;
       for (let i = 0; i < ids.length; i++) {
-        requests.push(await this.tempzoneService.checkChildStatus(ids[i]));
+        const request = await this.tempzoneService.checkChildStatus(ids[i]);
+        requests[request._id] = await this.tempzoneService.checkChildStatus(ids[i]);
       }
     }
 
     if (event) {
       const id: id = event;
-      requests = [
-        ...requests,
-        ...(await this.tempzoneService.checkEventStatus(id)),
-      ];
+      (await this.tempzoneService.checkEventStatus(id)).forEach((request)=>{
+        requests[request._id] = request;
+      })
     }
+
+    if (guardian) {
+      const id: id = guardian;
+      (await this.tempzoneService.checkUserStatus(id)).forEach((request)=>{
+        requests[request._id] = request;
+      })
+    }
+
+    requests = Object.values(requests);
 
     if (requests && type) {
       requests = requests.filter((req) => req.type === type);
@@ -107,6 +105,7 @@ export class TempZoneController {
       requests = requests.filter((req) => req.status === status);
     }
 
-    return requests.filter((i) => i);
+    requests = requests.filter((i) => i);
+    return requests;
   }
 }

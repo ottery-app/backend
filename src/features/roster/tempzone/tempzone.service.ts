@@ -13,24 +13,25 @@ import { LocatableService } from '../../locatable/locatable.service';
 import { ChildReqeust, ChildReqeustDocument } from './childRequest.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { ChildService } from 'src/features/core/child/child.service';
 import { CoreService } from 'src/features/core/core.service';
 
-function requestPipe(request, responce) {
+//used to always return something
+function requestPipe(request, responce):ChildReqeustDocument {
   if (responce) {
     return responce;
   } else {
-    const res = {
+    const res:ChildRequestDto = {
+      _id: request.child,
       child: noId,
       event: noId,
       guardian: noId,
       status: requestStatus.NONE,
       type: requestType.NONE,
       ...request,
-    };
+    }
 
     classifyWithDto(ChildRequestDto, res, { throw: true });
-    return res;
+    return res as ChildReqeustDocument;
   }
 }
 
@@ -46,8 +47,9 @@ export class TempZoneService {
     private childRequestModel: Model<ChildReqeustDocument>,
   ) {}
 
+
   private async saveRequest(childRequest: ChildRequestDto) {
-    let request = await this.getRequestByChildId(childRequest.child);
+    let request = await this.childRequestModel.findOne({ child: childRequest.child });
 
     if (request) {
       request = Object.assign(request, childRequest);
@@ -58,24 +60,8 @@ export class TempZoneService {
     return await request.save();
   }
 
-  private async deleteRequest(childRequest: ChildRequestDto) {
-    const request = await this.getRequestByChildId(childRequest.child);
-
-    if (request) {
-      return await request.delete();
-    }
-  }
-
-  private async getRequestByChildId(childId: id) {
-    return await this.childRequestModel.findOne({ child: childId });
-  }
-
-  private async getRequestsByEventId(eventId: id) {
-    return await this.childRequestModel.find({ event: eventId });
-  }
-
-  private async makeRequest(childRequest: ChildRequestDto, type: requestType) {
-    let request = await this.getRequestByChildId(childRequest.child);
+  async makeRequest(childRequest: ChildRequestDto) {
+    let request = await this.childRequestModel.findOne({ child: childRequest.child });
 
     if (request) {
       for (const key in childRequest) {
@@ -83,12 +69,10 @@ export class TempZoneService {
       }
 
       request.status = requestStatus.INPROGRESS;
-      request.type = type;
 
       request = await request.save();
     } else {
       childRequest.status = requestStatus.INPROGRESS;
-      childRequest.type = type;
       request = await this.saveRequest(childRequest);
     }
 
@@ -98,10 +82,10 @@ export class TempZoneService {
         await delay(tryagain);
         waittime += tryagain;
 
-        request = (await this.getRequestByChildId(request.child)) || request;
+        request = (await this.childRequestModel.findOne({ child: childRequest.child })) || request;
 
         if (waittime >= timeout) {
-          request = await this.declineRequest(request);
+          request = await this.declineRequest(request, noId);
         }
       } while (request && request.status === requestStatus.INPROGRESS);
     })();
@@ -109,37 +93,35 @@ export class TempZoneService {
     return request;
   }
 
-  async pickupRequest(dropOffRequest: ChildRequestDto) {
-    return await this.makeRequest(dropOffRequest, requestType.PICKUP);
-  }
-
-  async dropOffRequest(dropOffRequest: ChildRequestDto) {
-    return await this.makeRequest(dropOffRequest, requestType.DROPOFF);
-  }
-
   async checkChildStatus(childId: id) {
-    const res = await this.getRequestByChildId(childId);
+    const res = await this.childRequestModel.findOne({ child: childId });
     return requestPipe({ child: childId }, res);
   }
 
   async checkEventStatus(eventId: id) {
-    const res = await this.getRequestsByEventId(eventId);
+    const res = await this.childRequestModel.find({ event: eventId });;
     return res.map((res) => requestPipe({ event: eventId }, res));
   }
 
-  async acceptRequest(childRequest: ChildRequestDto, acceptor: id) {
+  async checkUserStatus(guardianId: id) {
+    const res = await this.childRequestModel.find({guardian: guardianId})
+    return res.map((res) => requestPipe({guardian: guardianId}, res));
+  }
+
+  async acceptRequest(childRequest: ChildRequestDto, caretaker: id) {
     //update local
-    let request = await this.getRequestByChildId(childRequest.child);
+    let request = await this.childRequestModel.findOne({ child: childRequest.child });
     request.status = requestStatus.ACCEPTED;
+    request.caretaker = caretaker;
     request = await request.save();
 
     //stamp da homie
     const child = await this.coreService.child.get(childRequest.child);
 
     if (childRequest.type === requestType.PICKUP) {
-      this.locatableService.stamp(child, noId, acceptor);
+      this.locatableService.stamp(child, noId, caretaker);
     } else {
-      this.locatableService.stamp(child, childRequest.event, acceptor);
+      this.locatableService.stamp(child, childRequest.event, caretaker);
     }
 
     await child.save();
@@ -148,17 +130,18 @@ export class TempZoneService {
     return request;
   }
 
-  async declineRequest(childRequest: ChildRequestDto) {
-    let request = await this.getRequestByChildId(childRequest.child);
+  async declineRequest(childRequest: ChildRequestDto, caretaker: id) {
+    let request = await this.childRequestModel.findOne({ child: childRequest.child });
 
     if (request) {
       request.status = requestStatus.REJECTED;
+      request.caretaker = caretaker;
       await request.save();
       return request;
     } else {
       // this path is broken
-      request = await this.makeRequest(childRequest, childRequest.type);
-      return await this.declineRequest(request);
+      request = await this.makeRequest(childRequest);
+      return await this.declineRequest(request, caretaker);
     }
   }
 }
