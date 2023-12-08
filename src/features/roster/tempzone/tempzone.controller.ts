@@ -50,12 +50,13 @@ export class TempZoneController {
 
   @Patch('request/decline')
   async declineRequest(
+    @Sesh() sesh: SeshDocument,
     @Body(ArrayValidationPipe(ChildRequestDto)) requests: ChildRequestDto[],
   ) {
     const responces: ChildRequestDto[] = [];
 
     for (let i = 0; i < requests.length; i++) {
-      responces.push(await this.tempzoneService.declineRequest(requests[i]));
+      responces.push(await this.tempzoneService.declineRequest(requests[i], sesh.userId));
     }
 
     return responces;

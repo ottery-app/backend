@@ -15,6 +15,9 @@ export class ChildReqeust {
     event: id;
 
     @Prop({required: true})
+    caretaker: id;
+
+    @Prop({required: true})
     guardian: id;
 
     @Prop({required: true})

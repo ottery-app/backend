@@ -85,7 +85,7 @@ export class TempZoneService {
         request = (await this.childRequestModel.findOne({ child: childRequest.child })) || request;
 
         if (waittime >= timeout) {
-          request = await this.declineRequest(request);
+          request = await this.declineRequest(request, noId);
         }
       } while (request && request.status === requestStatus.INPROGRESS);
     })();
@@ -108,19 +108,20 @@ export class TempZoneService {
     return res.map((res) => requestPipe({guardian: guardianId}, res));
   }
 
-  async acceptRequest(childRequest: ChildRequestDto, acceptor: id) {
+  async acceptRequest(childRequest: ChildRequestDto, caretaker: id) {
     //update local
     let request = await this.childRequestModel.findOne({ child: childRequest.child });
     request.status = requestStatus.ACCEPTED;
+    request.caretaker = caretaker;
     request = await request.save();
 
     //stamp da homie
     const child = await this.coreService.child.get(childRequest.child);
 
     if (childRequest.type === requestType.PICKUP) {
-      this.locatableService.stamp(child, noId, acceptor);
+      this.locatableService.stamp(child, noId, caretaker);
     } else {
-      this.locatableService.stamp(child, childRequest.event, acceptor);
+      this.locatableService.stamp(child, childRequest.event, caretaker);
     }
 
     await child.save();
@@ -129,17 +130,18 @@ export class TempZoneService {
     return request;
   }
 
-  async declineRequest(childRequest: ChildRequestDto) {
+  async declineRequest(childRequest: ChildRequestDto, caretaker: id) {
     let request = await this.childRequestModel.findOne({ child: childRequest.child });
 
     if (request) {
       request.status = requestStatus.REJECTED;
+      request.caretaker = caretaker;
       await request.save();
       return request;
     } else {
       // this path is broken
       request = await this.makeRequest(childRequest);
-      return await this.declineRequest(request);
+      return await this.declineRequest(request, caretaker);
     }
   }
 }
