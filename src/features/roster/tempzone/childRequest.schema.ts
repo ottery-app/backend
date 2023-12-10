@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, now } from 'mongoose';
 import { id, requestStatus, requestType } from '@ottery/ottery-dto';
+import { timeout } from './tempzone.meta';
 
 export type ChildReqeustDocument = ChildReqeust & Document;
 
@@ -26,7 +27,7 @@ export class ChildReqeust {
     @Prop({required: true})
     type: requestType;
 
-    @Prop({ default: Date.now, expires: 600 })
+    @Prop({ default: Date.now, expires: timeout / 10 })
     createdAt: Date;
 }
 
