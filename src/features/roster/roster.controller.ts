@@ -34,7 +34,6 @@ export class RosterController {
         }
       }
 
-      console.log(7)
       return true;
     });
 
@@ -57,12 +56,12 @@ export class RosterController {
     const event = await this.coreService.event.get(eventId);
     const children = await this.coreService.child.getMany(childIds.ids);
 
-    if (event.tempzone === tempzone.Default) {
+    //if (event.tempzone === tempzone.Default) {
       return await Promise.all(children.map(async (child)=>{
         this.locatableService.stamp(child, event._id, noId);
         return await child.save();
       }));
-    }
+    //}
   }
 
   @Patch(":eventId/pickup")
@@ -81,11 +80,12 @@ export class RosterController {
     const event = await this.coreService.event.get(eventId);
     const children = await this.coreService.child.getMany(childIds.ids);
 
-    if (event.tempzone === tempzone.Default) {
+    //if (event.tempzone === tempzone.Default) {
       return await Promise.all(children.map(async (child)=>{
         this.locatableService.stamp(child, noId, noId);
+        console.log(child)
         return await child.save();
       }));
-    }
+    //}
   }
 }
