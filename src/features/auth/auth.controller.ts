@@ -159,6 +159,15 @@ export class AuthController {
       eventId = query.event;
     }
 
+    const event = await this.coreService.event.get(eventId);
+
+    if (!event.volenteers.includes(sesh.userId)) {
+      throw new HttpException(
+        'Not a registered volenteer',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
     return await this.authService.sesh.switchState(sesh, eventId);
   }
 
