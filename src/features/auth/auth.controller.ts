@@ -72,7 +72,6 @@ export class AuthController {
   ) {
     try {
       await this.coreService.user.activate(sesh.userId, createActivateDto.code);
-
       return await this.authService.sesh.activate(sesh);
     } catch (e) {
       throw e;
