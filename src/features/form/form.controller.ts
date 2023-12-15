@@ -7,12 +7,12 @@ export class FormController {
         private formFieldService: FormFieldService,
     ) {}
 
-    // @Get("fields")
-    // async getAllFormFields() {
-    //     try {
-    //         return await this.formFieldService.getAll();
-    //     } catch (e) {
-    //         throw e;
-    //     }
-    // }
+    @Get("fields")
+    async getAllFormFields() {
+        try {
+            return await this.formFieldService.getAll();
+        } catch (e) {
+            throw e;
+        }
+    }
 }
