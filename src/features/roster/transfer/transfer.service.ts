@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { LocatableService } from '../../locatable/locatable.service';
-import { attendanceType, noId } from '@ottery/ottery-dto';
+import { attendanceType, id, noId } from '@ottery/ottery-dto';
 import { AttendanceService } from '../attendance/attendance.service';
+import { Child } from 'src/features/core/child/child.schema';
 
 @Injectable()
 export class TransferService {
@@ -10,12 +11,12 @@ export class TransferService {
     private attendanceService: AttendanceService,
   ) {}
 
-  async dropoffActions(child, event, caretaker) {
+  async dropoffActions(child: Child, event:id, caretaker:id) {
     await this.locatableService.stamp(child, event, caretaker);
-    await this.attendanceService.markAttendance(child, event, attendanceType.Present);
+    await this.attendanceService.markAttendance(child._id, event, attendanceType.Present);
   }
 
-  async pickupActions(child, caretaker) {
+  async pickupActions(child:Child, caretaker:id) {
     await this.locatableService.stamp(child, noId, caretaker);
   }
 }
