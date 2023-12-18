@@ -14,6 +14,7 @@ import { ChildReqeust, ChildReqeustDocument } from './childRequest.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { CoreService } from 'src/features/core/core.service';
+import { TransferService } from '../transfer/transfer.service';
 
 //used to always return something
 function requestPipe(request, responce):ChildReqeustDocument {
@@ -42,7 +43,7 @@ export class TempZoneService {
 
   constructor(
     private coreService: CoreService,
-    private locatableService: LocatableService,
+    private transferService: TransferService,
     @InjectModel(ChildReqeust.name)
     private childRequestModel: Model<ChildReqeustDocument>,
   ) {}
@@ -119,9 +120,9 @@ export class TempZoneService {
     const child = await this.coreService.child.get(childRequest.child);
 
     if (childRequest.type === requestType.PICKUP) {
-      this.locatableService.stamp(child, noId, caretaker);
+      await this.transferService.pickupActions(child, caretaker);
     } else {
-      this.locatableService.stamp(child, childRequest.event, caretaker);
+      await this.transferService.dropoffActions(child, childRequest.event, caretaker);
     }
 
     await child.save();
