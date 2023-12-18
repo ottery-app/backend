@@ -8,6 +8,6 @@ import { AttendanceModule } from "../attendance/attendance.module";
   imports: [LocatableModule, AttendanceModule],
   controllers: [],
   providers: [TransferService],
-  exports: [TransferService],
+  exports: [TransferService, AttendanceModule],
 })
 export class TransferModule {}
