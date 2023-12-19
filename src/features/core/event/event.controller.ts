@@ -10,14 +10,12 @@ import { DeeplinkService } from 'src/features/deeplink/deeplink.service';
 import { TokenService } from 'src/features/token/token.service';
 import { TokenType } from 'src/features/token/token.schema';
 import { AlertService } from 'src/features/alert/alert.service';
+import { AuthService } from 'src/features/auth/auth.services';
 
 @Controller('api/event')
 export class EventController {
     constructor(
-        private coreService: CoreService,
-        private alertService: AlertService, 
-        private deeplinkService: DeeplinkService,
-        private tokenService: TokenService,
+        private coreService: CoreService
     ) {}
 
     @Post()

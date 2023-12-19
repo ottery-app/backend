@@ -21,6 +21,7 @@ import { EventSchema } from './event/event.schema';
 import { Child, ChildSchema } from './child/child.schema';
 import { DeeplinkModule } from '../deeplink/deeplink.module';
 import { DataModule } from '../data/data.module';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
