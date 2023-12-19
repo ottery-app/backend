@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { RosterController } from './roster.controller';
-import { LocatableModule } from '../locatable/locatable.module';
 import { CoreModule } from '../core/core.module';
 import { TempZoneModule } from './tempzone/tempzone.module';
+import { TransferModule } from './transfer/transfer.module';
 
 @Module({
-  imports: [TempZoneModule, LocatableModule, CoreModule],
+  imports: [TempZoneModule, CoreModule, TransferModule],
   controllers: [RosterController],
   providers: [],
   exports: [],

@@ -7,7 +7,7 @@ import {
 import { Sesh, SeshDocument } from './sesh.schema';
 import { CryptService } from '../../crypt/crypt.service';
 import { User } from 'src/features/core/user/user.schema';
-import { role, id, token } from '@ottery/ottery-dto';
+import { role, id, token, noId } from '@ottery/ottery-dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Sesh as InitSesh } from './sesh.class';
@@ -70,7 +70,13 @@ export class SeshService {
 
   async switchState(sesh: SeshDocument, eventId?: id) {
     sesh.state = sesh.state === role.GUARDIAN ? role.CARETAKER : role.GUARDIAN;
-    sesh.event = eventId;
+
+    if (sesh.event === eventId) {
+      sesh.event = noId;
+    } else {
+      sesh.event = eventId;
+    }
+
     return await sesh.save();
   }
 
@@ -109,5 +115,9 @@ export class SeshService {
 
   async isGuardian(sesh: SeshDocument) {
     return sesh.state === role.GUARDIAN || false;
+  }
+
+  async usersAtEvent(eventId: id) {
+    return (await this.seshModel.find({event: eventId})).map(sesh=>sesh.userId);
   }
 }

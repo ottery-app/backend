@@ -1,14 +1,14 @@
 import { Controller, Body, Patch, Get, Param, Query, HttpException, HttpStatus } from '@nestjs/common';
 import { IdArrayDto, id, noId, tempzone } from '@ottery/ottery-dto';
 import { Sesh } from '../auth/sesh/Sesh.decorator';
-import { LocatableService } from '../locatable/locatable.service';
 import { CoreService } from '../core/core.service';
 import { normalizeId } from 'src/functions/normalizeId';
+import { TransferService } from './transfer/transfer.service';
 
 @Controller('api/roster')
 export class RosterController {
   constructor(
-    private locatableService: LocatableService,
+    private transferService: TransferService,
     private coreService: CoreService,
   ) {}
 
@@ -56,12 +56,10 @@ export class RosterController {
     const event = await this.coreService.event.get(eventId);
     const children = await this.coreService.child.getMany(childIds.ids);
 
-    //if (event.tempzone === tempzone.Default) {
-      return await Promise.all(children.map(async (child)=>{
-        this.locatableService.stamp(child, event._id, noId);
-        return await child.save();
-      }));
-    //}
+    return await Promise.all(children.map(async (child)=>{
+      await this.transferService.dropoffActions(child, event._id, noId);
+      return await child.save();
+    }));
   }
 
   @Patch(":eventId/pickup")
@@ -80,12 +78,9 @@ export class RosterController {
     const event = await this.coreService.event.get(eventId);
     const children = await this.coreService.child.getMany(childIds.ids);
 
-    //if (event.tempzone === tempzone.Default) {
-      return await Promise.all(children.map(async (child)=>{
-        this.locatableService.stamp(child, noId, noId);
-        console.log(child)
-        return await child.save();
-      }));
-    //}
+    return await Promise.all(children.map(async (child)=>{
+      await this.transferService.pickupActions(child, noId);
+      return await child.save();
+    }));
   }
 }

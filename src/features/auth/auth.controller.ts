@@ -8,6 +8,7 @@ import {
   HttpException,
   HttpStatus,
   Query,
+  Param,
 } from '@nestjs/common';
 
 import { ACTIVATION_CODE_LENGTH } from '../crypt/crypt.types';
@@ -20,6 +21,7 @@ import {
   role,
   EmailDto,
   ResetPasswordDto,
+  noId,
 } from '@ottery/ottery-dto';
 import { Roles } from './roles/roles.decorator';
 import { UnsecureSesh } from './sesh/UnsecureSesh.decorator';
@@ -154,13 +156,14 @@ export class AuthController {
     },
   ) {
     let eventId = null;
+
     if (query) {
       eventId = query.event;
     }
 
     const event = await this.coreService.event.get(eventId);
 
-    if (!event.volenteers.includes(sesh.userId)) {
+    if (eventId !== noId && event?.volenteers && !event.volenteers.includes(sesh.userId)) {
       throw new HttpException(
         'Not a registered volenteer',
         HttpStatus.FORBIDDEN,
