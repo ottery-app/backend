@@ -21,7 +21,7 @@ import { EventSchema } from './event/event.schema';
 import { Child, ChildSchema } from './child/child.schema';
 import { DeeplinkModule } from '../deeplink/deeplink.module';
 import { DataModule } from '../data/data.module';
-import { AuthModule } from '../auth/auth.module';
+import { FormModule } from '../form/form.module';
 
 @Module({
   imports: [
@@ -37,6 +37,7 @@ import { AuthModule } from '../auth/auth.module';
     TokenModule,
     AlertModule,
     DataModule,
+    FormModule
   ],
   controllers: [UserController, EventController, ChildController],
   providers: [UserService, EventService, ChildService, CoreService],

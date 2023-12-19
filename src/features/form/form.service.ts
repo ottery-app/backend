@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 //import { Event, EventDocument } from './event.schema';
-import { id } from '@ottery/ottery-dto';
+import { id, noId } from '@ottery/ottery-dto';
 //import { CreateEventDto } from '@ottery/ottery-dto';
 import { FormFieldDto } from '@ottery/ottery-dto';
 import { FormField, FormFieldDocument } from './form.schema';
@@ -31,6 +31,13 @@ export class FormFieldService implements CrudService {
     }
  
     async create(customFormFieldDto: FormFieldDto) {
+        //customFormFieldDto.
 
+
+        return await this.formFieldModel.create(customFormFieldDto);
+    }
+
+    async createMany(customFormFieldDtos: FormFieldDto[]) {
+        return await Promise.all(customFormFieldDtos.map((f)=>this.create(f)));
     }
 }
