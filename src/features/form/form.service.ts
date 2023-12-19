@@ -23,18 +23,21 @@ export class FormFieldService implements CrudService {
     }
 
     async get(id: id) {
-
+        return await this.formFieldModel.findById(id);
     }
 
     async getMany(ids:id[]): Promise<FormField[]> {
         return await Promise.all(ids.map((id)=>this.formFieldModel.findById(id)));
     }
  
-    async create(customFormFieldDto: FormFieldDto) {
-        //customFormFieldDto.
-
-
-        return await this.formFieldModel.create(customFormFieldDto);
+    async create(customFormFieldDto: FormFieldDto & {_id?:id}) {
+        const form = await this.get(customFormFieldDto._id);
+        if (customFormFieldDto._id && form) {
+            return form;
+        } else {
+            delete customFormFieldDto._id;
+            return await this.formFieldModel.create(customFormFieldDto);
+        }
     }
 
     async createMany(customFormFieldDtos: FormFieldDto[]) {

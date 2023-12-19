@@ -44,48 +44,4 @@ export class EventService implements CrudService {
   async delete(id: id) {
     throw new Error('delete not yet implemented');
   }
-
-  // async signUpVolenteers(eventId:id, ids:id[]) {
-  //     const event = await this.findOneById(eventId);
-
-  //     //const users = await this.userService.findManyById(ids);
-  //     // for (let i = 0; i < users.length; i++) {
-  //     //     if (!users[i].events.includes(eventId)) {
-  //     //         users[i].events.push(eventId);
-  //     //         users[i].save();
-  //     //     }
-  //     // }
-
-  //     return await this.signUpX(event, "volenteers", ids, event.volenteerSignUp);
-  // }
-
-  // async signUpAttendees(eventId:id, ids:id[]) {
-  //     const event = await this.findOneById(eventId);
-
-  //     const children = await this.childService.findManyByIds(ids);
-  //     for (let i = 0; i < children.length; i++) {
-  //         if (!children[i].events.includes(eventId)) {
-  //             children[i].events.push(eventId);
-  //             children[i].save();
-  //         }
-  //     }
-
-  //     return await this.signUpX(event, "attendees", ids, event.attendeeSignUp);
-  // }
-
-  // private async signUpX(event: EventDocument, addTo:string, ids: id[], requiredFields: id[]) {
-  //     const missing = {};
-  //     for (let i = 0 ; i < ids.length; i++) {
-  //         missing[ids[i]] = await this.dataService.findMissingDataForOwner(ids[i], requiredFields);
-
-  //         if (!missing[ids[i]].length) {
-  //             if (!event[addTo].includes(ids[i])) {
-  //                 event[addTo].push(ids[i]);
-  //             }
-  //         }
-  //     }
-
-  //     event.save();
-  //     return missing;
-  // }
 }
