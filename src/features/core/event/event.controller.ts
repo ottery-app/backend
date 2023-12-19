@@ -5,17 +5,13 @@ import { compareIds } from 'src/functions/compareIds';
 import { SeshDocument } from 'src/features/auth/sesh/sesh.schema';
 import { Sesh } from 'src/features/auth/sesh/Sesh.decorator';
 import { CoreService } from '../core.service';
-import { Roles } from 'src/features/auth/roles/roles.decorator';
-import { DeeplinkService } from 'src/features/deeplink/deeplink.service';
-import { TokenService } from 'src/features/token/token.service';
-import { TokenType } from 'src/features/token/token.schema';
-import { AlertService } from 'src/features/alert/alert.service';
-import { AuthService } from 'src/features/auth/auth.services';
+import { FormFieldService } from 'src/features/form/form.service';
 
 @Controller('api/event')
 export class EventController {
     constructor(
-        private coreService: CoreService
+        private coreService: CoreService,
+        private formFieldService: FormFieldService,
     ) {}
 
     @Post()
@@ -26,12 +22,14 @@ export class EventController {
         try {
             const userID = sesh.userId;
 
-            // const volIds = await this.formFieldService.createMany(createEventDto.volenteerSignUp);
-            // const atenIds = await this.formFieldService.createMany(createEventDto.attendeeSignUp);
+            const volIds = (await this.formFieldService.createMany(createEventDto.volenteerSignUp)).map(({_id})=>_id);
+            const atenIds = (await this.formFieldService.createMany(createEventDto.attendeeSignUp)).map(({_id})=>_id);
 
             const event = await this.coreService.event.create({
-            ...createEventDto,
-            leadManager: userID,
+              ...createEventDto,
+              leadManager: userID,
+              volenteerSignUp: volIds,
+              attendeeSignUp: atenIds,
             });
 
             await this.coreService.user.addEvent(userID, event._id);

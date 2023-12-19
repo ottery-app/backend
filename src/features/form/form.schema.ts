@@ -17,10 +17,10 @@ export class FormField {
     @Prop({required: true})
     note: string;
 
-    @Prop({required: true})
+    @Prop({required: true, default: false})
     permanent: boolean;
 
-    @Prop({required: true})
+    @Prop({required: true, default: false})
     optional: boolean;
 }
 
