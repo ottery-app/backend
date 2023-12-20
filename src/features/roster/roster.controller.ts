@@ -58,7 +58,8 @@ export class RosterController {
 
     return await Promise.all(children.map(async (child)=>{
       await this.transferService.dropoffActions(child, event._id, noId);
-      return await child.save();
+      const childRes = await child.save();
+      return childRes;
     }));
   }
 

@@ -13,10 +13,13 @@ export class TransferService {
 
   async dropoffActions(child: Child, event:id, caretaker:id) {
     await this.locatableService.stamp(child, event, caretaker);
+    console.log("stamped location")
     await this.attendanceService.markAttendance(child._id, event, attendanceType.Present);
+    console.log("marked attendance")
   }
 
   async pickupActions(child:Child, caretaker:id) {
     await this.locatableService.stamp(child, noId, caretaker);
+    console.log("stamped location");
   }
 }

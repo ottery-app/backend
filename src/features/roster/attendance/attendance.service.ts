@@ -44,11 +44,14 @@ export class AttendanceService implements CrudService {
     return await this.attendanceModel.create(object);
   }
 
-  async update(id: id, status: attendanceType): Promise<Attendance> {
-    const obj = await this.get(id);
-    obj.status = status;
-    await this.attendanceModel.updateOne(obj);
-    return obj;
+  async update(id, status) {
+    const updatedAttendance = await this.attendanceModel.findByIdAndUpdate(
+      id,
+      { status: status },
+      { new: true },
+    );
+  
+    return updatedAttendance;
   }
 
   async getChildAtEvent(child:id, event:id): Promise<Attendance[]> {
