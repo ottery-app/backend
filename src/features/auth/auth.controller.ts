@@ -73,9 +73,12 @@ export class AuthController {
     @Body() createActivateDto: ActivationCodeDto,
   ) {
     try {
+      console.log(sesh);
       await this.coreService.user.activate(sesh.userId, createActivateDto.code);
-      return await this.authService.sesh.activate(sesh);
+      const res = await this.authService.sesh.activate(sesh);
+      return res;
     } catch (e) {
+      console.log(e);
       throw e;
     }
   }
@@ -143,6 +146,7 @@ export class AuthController {
   @UnsecureSesh()
   async load(@Sesh() sesh: SeshDocument) {
     //the sesh is made in the sesh guard if it does not exist.
+    console.log(sesh);
     return sesh;
   }
 

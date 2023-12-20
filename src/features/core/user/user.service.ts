@@ -57,11 +57,16 @@ export class UserService implements CrudService {
    */
   async activate(userId: id, code: activationCode): Promise<User> {
     const user = await this.get(userId);
+
+    if (!user) {
+      throw new HttpException('Not a user', HttpStatus.BAD_REQUEST); 
+    }
+
     if (user.activated) {
       throw new HttpException('Already activated', HttpStatus.BAD_REQUEST);
     }
 
-    if (user.activationCode !== code) {
+    if (user.activationCode !== code.toUpperCase()) {
       throw new HttpException('Incorrect code', HttpStatus.BAD_REQUEST);
     }
 

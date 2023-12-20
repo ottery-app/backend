@@ -40,12 +40,12 @@ export class OtteryDtoValidationPipe implements PipeTransform {
           );
         }
       } catch (e) {
-        printResults(print, metadata, "ERROR")
+        //printResults(print, metadata, "ERROR")
         throw new BadRequestException(e.message);
       }
     }
 
-    printResults(print, metadata, "SUCCESS");
+    //printResults(print, metadata, "SUCCESS");
     return value;
   }
 }
