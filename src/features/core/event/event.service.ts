@@ -16,7 +16,7 @@ export class EventService implements CrudService {
     const event = new this.eventModel({
       ...eventDto,
       attendees: [],
-      volenteers: [],
+      volenteers: [eventDto.leadManager],
       managers: [eventDto.leadManager],
     });
 

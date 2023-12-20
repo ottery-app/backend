@@ -69,6 +69,7 @@ export class SeshService {
   }
 
   async switchState(sesh: SeshDocument, eventId?: id) {
+    console.log("switching");
     sesh.state = sesh.state === role.GUARDIAN ? role.CARETAKER : role.GUARDIAN;
 
     if (sesh.event === eventId) {
@@ -77,7 +78,10 @@ export class SeshService {
       sesh.event = eventId;
     }
 
-    return await sesh.save();
+    console.log("saving sesh");
+    const seshRes = await sesh.save();
+    console.log("saved sesh");
+    return seshRes;
   }
 
   async logout(sesh: SeshDocument) {
