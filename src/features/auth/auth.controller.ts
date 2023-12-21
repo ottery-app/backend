@@ -165,24 +165,15 @@ export class AuthController {
       eventId = query.event;
     }
 
-    console.log(eventId);
-
     const event = await this.coreService.event.get(eventId);
 
-    console.log("got event");
-
-    console.log(sesh.userId);
-    console.log(event.volenteers);
-
-    if (eventId !== noId && event?.volenteers && event.volenteers.includes(sesh.userId)) {
-      console.log("was not a volenteer");
+    if (eventId === noId || !!!event?.volenteers.includes(sesh.userId)) {
       throw new HttpException(
         'Not a registered volenteer',
         HttpStatus.FORBIDDEN,
       );
     }
-
-    console.log("switching state");
+    
     return await this.authService.sesh.switchState(sesh, eventId);
   }
 
