@@ -18,8 +18,8 @@ export class FormFieldService implements CrudService {
 
     }
 
-    async getAll() {
-        return await this.formFieldModel.find();
+    async getAllDefault() {
+        return await this.formFieldModel.find({permanent:true});
     }
 
     async get(id: id) {
