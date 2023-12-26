@@ -23,16 +23,16 @@ export class Event implements PermissionAble {
     description: string
 
     @Prop({required: true})
-    start: time;
+    rrule: recurrence
 
     @Prop({required: true})
-    end: time;
+    start: time
+
+    @Prop({required: true})
+    durration: time
 
     @Prop({required: true})
     location: location;
-
-    @Prop({required: true})
-    recurrence: recurrence[];
 
     //TODO this should also be able to be not children
     @Prop({required: true})

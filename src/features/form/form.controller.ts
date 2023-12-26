@@ -8,9 +8,7 @@ export class FormController {
     ) {}
 
     @Get("fields/default")
-    async getAllDefaultFormFields(
-        @Query("permanent") permanentQuery: string
-    ) {
+    async getAllDefaultFormFields() {
         try {
             return await this.formFieldService.getAllDefault();
         } catch (e) {
