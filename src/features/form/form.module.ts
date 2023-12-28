@@ -1,8 +1,10 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { forwardRef, Module, OnModuleInit } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { FormController } from './form.controller';
 import { FormField, FormFieldSchema } from './form.schema';
 import { FormFieldService } from './form.service';
+import { inputType, noId } from '@ottery/ottery-dto';
+import { FormFlag } from './form.flag.enum';
 
 @Module({
   imports: [
@@ -12,5 +14,29 @@ import { FormFieldService } from './form.service';
   providers: [FormFieldService],
   exports: [FormFieldService],
 })
+export class FormModule implements OnModuleInit {
+  constructor(private readonly formFieldService: FormFieldService) {}
 
-export class FormModule {}
+  onModuleInit() {
+    this.formFieldService.initializeFields([
+      {
+        _id: noId,
+        label: "photo",
+        type: inputType.PICTURE,
+        note: "This is a photo for identifying who this person is",
+        permanent: true,
+        optional: false,
+        baseFor: [],
+      },
+      {
+        _id: noId,
+        label: "phone",
+        type: inputType.PHONE,
+        note: "This is the best phone number to contact this person at.",
+        permanent: true,
+        optional: false,
+        baseFor: [FormFlag.guardian, FormFlag.caretaker],
+      }
+    ]);
+  }
+}

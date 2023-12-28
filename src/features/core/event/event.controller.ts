@@ -24,12 +24,14 @@ export class EventController {
 
             const volIds = (await this.formFieldService.createMany(createEventDto.volenteerSignUp)).map(({_id})=>_id);
             const atenIds = (await this.formFieldService.createMany(createEventDto.attendeeSignUp)).map(({_id})=>_id);
+            const guardianIds = (await this.formFieldService.createMany(createEventDto.guardianSignUp)).map(({_id})=>_id);
 
             const event = await this.coreService.event.create({
               ...createEventDto,
               leadManager: userID,
               volenteerSignUp: volIds,
               attendeeSignUp: atenIds,
+              guardianSignUp: guardianIds,
             });
 
             await this.coreService.user.addEvent(userID, event._id);
