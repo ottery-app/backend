@@ -45,10 +45,18 @@ export class SignupController {
   ) {
     const child = await this.coreService.child.get(childId);
     const event = await this.coreService.event.get(eventId);
-    const missing = await this.dataService.getMissingFields(child, event.attendeeSignUp);
+    let missing = await this.dataService.getMissingFields(child, event.attendeeSignUp);
 
     if (missing.length) {
       throw new HttpException("Missing child data", HttpStatus.BAD_REQUEST);
+    }
+
+    //TODO consider checking all guardians???
+    const user = await this.coreService.user.get(sesh.userId);
+    missing = await this.dataService.getMissingFields(user, event.guardianSignUp);
+
+    if (missing.length) {
+      throw new HttpException("Missing guardian data", HttpStatus.BAD_REQUEST);
     }
 
     if (!event.attendees.includes(child._id)) {
