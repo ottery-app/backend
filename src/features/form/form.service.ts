@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { id } from '@ottery/ottery-dto';
@@ -6,6 +6,7 @@ import { FormFieldDto } from '@ottery/ottery-dto';
 import { FormField, FormFieldDocument } from './form.schema';
 import { CrudService } from '../interfaces/crud.service.inerface';
 import { FormFlag } from './form.flag.enum';
+import {FormFieldMap} from "./form.type";
 
 @Injectable()
 export class FormFieldService implements CrudService {
@@ -13,11 +14,7 @@ export class FormFieldService implements CrudService {
         @InjectModel(FormField.name) private formFieldModel: Model<FormFieldDocument>,
     ){}
 
-    async getBaseFields() {
-        type FormFieldMap = {
-            [key in FormFlag]: FormField[];
-        };
-        
+    async getBaseFields(): Promise<FormFieldMap> {
         const map:FormFieldMap = {} as FormFieldMap;
         const formFields = await this.formFieldModel.find({
             baseFor: { $exists: true, $ne: [] }
@@ -31,6 +28,7 @@ export class FormFieldService implements CrudService {
             })
         })
 
+        console.log(map)
         return map;
     }
 

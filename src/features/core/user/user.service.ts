@@ -7,6 +7,7 @@ import { activationCode, email, id, password, role } from '@ottery/ottery-dto';
 import { CreateUserDto } from './CreateUserDto';
 import { CrudService } from 'src/features/interfaces/crud.service.inerface';
 import { ImageFileService } from 'src/features/images/imageFile.service';
+import { normalizeId } from 'src/functions/normalizeId';
 
 @Injectable()
 export class UserService implements CrudService {
@@ -107,6 +108,7 @@ export class UserService implements CrudService {
   }
 
   async addChild(userId: id, childId: id) {
+
     const user = await this.userModel.findById(userId).exec();
     if (user.children.includes(childId)) {
       throw new HttpException(

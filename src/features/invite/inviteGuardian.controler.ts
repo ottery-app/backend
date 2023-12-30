@@ -8,6 +8,10 @@ import { TokenType } from 'src/features/token/token.schema';
 import { AlertService } from 'src/features/alert/alert.service';
 import { DeeplinkService } from 'src/features/deeplink/deeplink.service';
 import { CoreService } from '../core/core.service';
+import { FormFieldService } from '../form/form.service';
+import { FormFlag } from '../form/form.flag.enum';
+import { FormField } from '../form/form.schema';
+import { DataService } from '../data/data.service';
 
 @Controller('api/invite/guardian')
 export class InviteGuardianController {
@@ -16,6 +20,8 @@ export class InviteGuardianController {
     private tokenService: TokenService,
     private alertService: AlertService,
     private deeplinkService: DeeplinkService,
+    private formService: FormFieldService,
+    private dataService: DataService,
   ) {}
 
   @Post('for/:childId')
@@ -56,10 +62,25 @@ export class InviteGuardianController {
     @Body() acceptGuardianshipDto: AcceptGuardianshipDto,
   ) {
     if (await this.tokenService.validateToken(acceptGuardianshipDto.key, acceptGuardianshipDto.token, TokenType.INVITE_GUARDIAN_FOR_CHILD, true)) {
-      this.coreService.child.addGuardians(acceptGuardianshipDto.childId, [userId]);
-      this.coreService.user.addChild(userId, acceptGuardianshipDto.childId);
+      const requiredData:FormField[] = (await this.formService.getBaseFields())[FormFlag.guardian] || [];
+      console.log(requiredData);
 
-      return "success"
+      const user = await this.coreService.user.get(userId);
+
+      const missing = await this.dataService.getMissingFields(user, requiredData.map(formField=>formField._id));
+      console.log(missing)
+
+      if (missing.length) {
+        throw new HttpException(
+          "Guardian is missing base info to be a guardian",
+          HttpStatus.BAD_REQUEST,
+        )
+      } else {
+        this.coreService.child.addGuardians(acceptGuardianshipDto.childId, [userId]);
+        this.coreService.user.addChild(userId, acceptGuardianshipDto.childId);
+
+        return "success"
+      }
     } else {
       throw new HttpException(
         'Not a valid invite',

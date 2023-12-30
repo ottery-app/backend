@@ -66,7 +66,7 @@ export class TokenService {
     console.log("FOUND TOKEN")
 
     if (!dbToken) {
-      console.log("NO TOKE")
+      console.log("NO TOKEN")
       throw new HttpException(
         'Invalid or expired token',
         HttpStatus.BAD_REQUEST,
