@@ -51,9 +51,14 @@ export class UserController implements DataController {
     @Param('userId') userId: id,
     @Body() data: DataFieldDto[]
   ) {
-    const user = await this.userService.get(userId);
-    user.data = await this.dataService.update(user, data);
-    await this.userService.update(userId, user);
+    try {
+      const user = await this.userService.get(userId);
+      user.data = await this.dataService.update(user, data);
+      await this.userService.update(userId, user);
+      return "success";
+    } catch (e) {
+      return "false";
+    }
   }
 
   @Post(":userId/pfp")
