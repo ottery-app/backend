@@ -60,6 +60,9 @@ export class Event implements PermissionAble {
     volenteerSignUp: id[]; //these are links to the fields 
 
     @Prop({required: true})
+    guardianSignUp: id[];
+
+    @Prop({required: true})
     attendeeSignUp: id[]; //these are links to the fields 
 
     @Prop({required: true, default:tempzone.Default})

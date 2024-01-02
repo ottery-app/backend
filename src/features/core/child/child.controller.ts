@@ -73,11 +73,12 @@ export class ChildController implements DataController {
     }
   }
   
-  @Post(':childId/addGuardians')
-  async addGuardians(@Param('childId') childId: id, @Body() body: IdArrayDto) {
-    const ids = (await this.userService.getMany(body.ids)).map(
-      (user) => user._id,
-    );
-    this.childService.addGuardians(childId, ids);
-  }
+  //NOT SURE THIS IS USED?????
+  // @Post(':childId/addGuardians')
+  // async addGuardians(@Param('childId') childId: id, @Body() body: IdArrayDto) {
+  //   const ids = (await this.userService.getMany(body.ids)).map(
+  //     (user) => user._id,
+  //   );
+  //   this.childService.addGuardians(childId, ids);
+  // }
 }

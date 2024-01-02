@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { EmailDto, ResetPasswordDto } from '@ottery/ottery-dto';
+import { EmailDto, ResetPasswordDto, noId } from '@ottery/ottery-dto';
 
 import { AuthService } from './auth.services';
 import { AlertService } from '../alert/alert.service';
@@ -29,7 +29,7 @@ export class PasswordResetService {
       );
     }
 
-    const token = await this.tokenService.setToken(email);
+    const token = await this.tokenService.setToken(email, TokenType.RESET_PASSWORD, noId);
 
     // Send password reset link to the user
     const link = this.deeplinkService.createLink("/auth/reset-password", {token, email});

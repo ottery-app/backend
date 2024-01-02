@@ -1,11 +1,12 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { CreateEventDto, EmailDto, id, role, UserInfoDto } from '@ottery/ottery-dto';
+import { CreateEventDto, id, UserInfoDto } from '@ottery/ottery-dto';
 import { Body, Post, Query } from '@nestjs/common/decorators';
 import { compareIds } from 'src/functions/compareIds';
 import { SeshDocument } from 'src/features/auth/sesh/sesh.schema';
 import { Sesh } from 'src/features/auth/sesh/Sesh.decorator';
 import { CoreService } from '../core.service';
 import { FormFieldService } from 'src/features/form/form.service';
+import { FormFlag } from 'src/features/form/form.flag.enum';
 
 @Controller('api/event')
 export class EventController {
@@ -24,12 +25,20 @@ export class EventController {
 
             const volIds = (await this.formFieldService.createMany(createEventDto.volenteerSignUp)).map(({_id})=>_id);
             const atenIds = (await this.formFieldService.createMany(createEventDto.attendeeSignUp)).map(({_id})=>_id);
+            const guardianIds = (await this.formFieldService.createMany(createEventDto.guardianSignUp)).map(({_id})=>_id);
+
+            const formFieldService = await this.formFieldService.getBaseFields();
+
+            atenIds.push(...formFieldService[FormFlag.attendee].map(({_id})=>_id));
+            volIds.push(...formFieldService[FormFlag.caretaker].map(({_id})=>_id));
+            guardianIds.push(...formFieldService[FormFlag.guardian].map(({_id})=>_id))
 
             const event = await this.coreService.event.create({
               ...createEventDto,
               leadManager: userID,
               volenteerSignUp: volIds,
               attendeeSignUp: atenIds,
+              guardianSignUp: guardianIds,
             });
 
             await this.coreService.user.addEvent(userID, event._id);

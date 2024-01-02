@@ -42,6 +42,7 @@ export class InviteEventController {
 
   @Post('caretaker/for/:eventId')
   async inviteCaretaker(
+    @Sesh() sesh,
     @Param('eventId') eventId: id,
     @Body() emailDto: EmailDto,
   ) {
@@ -49,6 +50,7 @@ export class InviteEventController {
     const token = await this.tokenService.setToken(
         email,
         TokenType.INVITE_CARETAKER_TO_EVENT,
+        sesh.userId,
     );
 
     const link = this.deeplinkService.createLink("/event/signup/:eventId", {
