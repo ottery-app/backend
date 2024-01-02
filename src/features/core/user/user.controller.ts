@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ChildService } from '../child/child.service';
-import { DataFieldDto, IdArrayDto, ImageDto, UserInfoDto } from '@ottery/ottery-dto';
+import { DataFieldDto, IdArrayDto, ImageDto, UserInfoDto, inputType } from '@ottery/ottery-dto';
 import { id } from '@ottery/ottery-dto';
 import { EventService } from '../event/event.service';
 import { Sesh } from '../../auth/sesh/Sesh.decorator';
@@ -54,6 +54,12 @@ export class UserController implements DataController {
     try {
       const user = await this.userService.get(userId);
       user.data = await this.dataService.update(user, data);
+      for (let i = 0; i < user.data.length; i++) {
+        if (user.data[i].type === inputType.PICTURE) {
+          const image:ImageDto = user.data[i].value;
+          user.pfp = image;
+        }
+      }
       await this.userService.update(userId, user);
       return "success";
     } catch (e) {

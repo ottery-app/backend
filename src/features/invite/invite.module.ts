@@ -9,6 +9,7 @@ import { InviteGuardianController } from './inviteGuardian.controler';
 import { InviteEventController } from './inviteEvent.controler';
 import { FormModule } from '../form/form.module';
 import { DataModule } from '../data/data.module';
+import { SocialModule } from '../social/social.module';
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { DataModule } from '../data/data.module';
     AlertModule,
     CoreModule,
     FormModule,
-    DataModule
+    DataModule,
+    SocialModule,
   ],
   controllers: [InviteGuardianController, InviteEventController],
   providers: [],

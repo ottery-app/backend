@@ -1,5 +1,6 @@
-import { DataFieldDto } from "@ottery/ottery-dto";
+import { DataFieldDto, ImageDto } from "@ottery/ottery-dto";
 
-export interface DataAble { 
+export interface DataAble {
+    pfp: ImageDto;
     data: DataFieldDto[],
 }

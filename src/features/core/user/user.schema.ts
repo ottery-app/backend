@@ -80,9 +80,6 @@ export class User implements DataAble, SignupAble {
   @Prop()
   data: DataFieldDto[];
 
-  // @Prop()
-  // socialLinks: id[];
-
   @Prop()
   chats: id[];
 }

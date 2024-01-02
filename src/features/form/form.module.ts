@@ -21,18 +21,18 @@ export class FormModule implements OnModuleInit {
     this.formFieldService.initializeFields([
       {
         _id: noId,
-        label: "photo",
+        label: "Security photo",
         type: inputType.PICTURE,
         note: "This is a photo for identifying who this person is",
         permanent: true,
         optional: false,
-        baseFor: [],
+        baseFor: [FormFlag.guardian, FormFlag.caretaker, FormFlag.attendee],
       },
       {
         _id: noId,
-        label: "phone",
+        label: "Phone",
         type: inputType.PHONE,
-        note: "This is the best phone number to contact this person at.",
+        note: "This is the best phone number to contact this person.",
         permanent: true,
         optional: false,
         baseFor: [FormFlag.guardian, FormFlag.caretaker],

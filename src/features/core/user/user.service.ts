@@ -49,7 +49,8 @@ export class UserService implements CrudService {
   }
 
   async update(userId: id, user: User): Promise<User> {
-    return await new this.userModel(user).save();
+    const res = await new this.userModel(user).save();
+    return res;
   }
 
   /**

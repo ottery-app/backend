@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { id } from '@ottery/ottery-dto';
 import { Document, now } from 'mongoose';
 
 export enum TokenType {
@@ -11,17 +12,20 @@ export type TokenDocument = Token & Document;
 
 @Schema()
 export class Token {
-  @Prop({ type: String, enum: TokenType, default: TokenType.RESET_PASSWORD })
+  @Prop({ required:true, type: String, enum: TokenType}) //why is there a type?
   type: TokenType;
 
-  @Prop()
+  @Prop({required: true})
   key: string;
 
-  @Prop()
+  @Prop({required: true})
   token: string;
 
-  @Prop({ default: Date.now, expires: 6000 })
+  @Prop({ default: Date.now, expires: 60000 })
   createdAt: Date;
+
+  @Prop({required: true})
+  createdBy: id;
 }
 
 export const TokenSchema = SchemaFactory.createForClass(Token);
