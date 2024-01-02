@@ -28,9 +28,6 @@ export class Child implements DataAble, SignupAble, LocateAble, PermissionAble {
   @Prop({ required: true })
   firstName: name;
 
-  @Prop({ required: false })
-  middleName: name;
-
   @Prop({ required: true })
   lastName: name;
 
