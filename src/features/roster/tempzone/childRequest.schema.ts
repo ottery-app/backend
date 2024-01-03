@@ -27,7 +27,7 @@ export class ChildReqeust {
     @Prop({required: true})
     type: requestType;
 
-    @Prop({ default: Date.now, expires: timeout / 10 })
+    @Prop({ default: Date.now, expires: (timeout / 1000) * 2 })
     createdAt: Date;
 }
 

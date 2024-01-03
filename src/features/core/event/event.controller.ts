@@ -59,7 +59,10 @@ export class EventController {
   }
 
   @Get()
-  async getEvents(@Param('id') id: id, @Query('ids') eventIds: id[]) {
+  async getEvents(
+    @Param('id') id: id,
+    @Query('ids') eventIds: id[]
+  ) {
     try {
       return await this.coreService.event.getMany(eventIds);
     } catch (e) {
