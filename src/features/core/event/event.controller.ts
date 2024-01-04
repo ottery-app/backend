@@ -23,16 +23,20 @@ export class EventController {
         try {
             const userID = sesh.userId;
 
-            const volIds = (await this.formFieldService.createMany(createEventDto.volenteerSignUp)).map(({_id})=>_id);
-            const atenIds = (await this.formFieldService.createMany(createEventDto.attendeeSignUp)).map(({_id})=>_id);
-            const guardianIds = (await this.formFieldService.createMany(createEventDto.guardianSignUp)).map(({_id})=>_id);
+            const volForms = await this.formFieldService.createMany(createEventDto.volenteerSignUp);
+            const atenForms = await this.formFieldService.createMany(createEventDto.attendeeSignUp);
+            const guardianForms = await this.formFieldService.createMany(createEventDto.guardianSignUp);
 
-            const formFieldService = await this.formFieldService.getBaseFields();
-
-            atenIds.push(...formFieldService[FormFlag.attendee].map(({_id})=>_id));
-            volIds.push(...formFieldService[FormFlag.caretaker].map(({_id})=>_id));
-            guardianIds.push(...formFieldService[FormFlag.guardian].map(({_id})=>_id))
-
+            const volIds = volForms.map(({_id})=>_id);
+            const atenIds = atenForms.map(({_id})=>_id);
+            const guardianIds = guardianForms.map(({_id})=>_id);
+            
+            //these are now shown on the front end and the users decides if they will keep them
+            //const formFieldService = await this.formFieldService.getBaseFields();
+            // atenIds.push(...formFieldService[FormFlag.attendee].map(({_id})=>_id));
+            // volIds.push(...formFieldService[FormFlag.caretaker].map(({_id})=>_id));
+            // guardianIds.push(...formFieldService[FormFlag.guardian].map(({_id})=>_id))
+            
             const event = await this.coreService.event.create({
               ...createEventDto,
               leadManager: userID,
@@ -40,6 +44,8 @@ export class EventController {
               attendeeSignUp: atenIds,
               guardianSignUp: guardianIds,
             });
+
+            await this.formFieldService.addEventToCustomForms(event._id, [...guardianIds, ...atenIds, ...volIds]);
 
             await this.coreService.user.addEvent(userID, event._id);
 
