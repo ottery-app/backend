@@ -26,13 +26,14 @@ export class EventController {
             const volIds = (await this.formFieldService.createMany(createEventDto.volenteerSignUp)).map(({_id})=>_id);
             const atenIds = (await this.formFieldService.createMany(createEventDto.attendeeSignUp)).map(({_id})=>_id);
             const guardianIds = (await this.formFieldService.createMany(createEventDto.guardianSignUp)).map(({_id})=>_id);
-
-            const formFieldService = await this.formFieldService.getBaseFields();
-
-            atenIds.push(...formFieldService[FormFlag.attendee].map(({_id})=>_id));
-            volIds.push(...formFieldService[FormFlag.caretaker].map(({_id})=>_id));
-            guardianIds.push(...formFieldService[FormFlag.guardian].map(({_id})=>_id))
-
+            
+            
+            //these are now shown on the front end and the users decides if they will keep them
+            //const formFieldService = await this.formFieldService.getBaseFields();
+            // atenIds.push(...formFieldService[FormFlag.attendee].map(({_id})=>_id));
+            // volIds.push(...formFieldService[FormFlag.caretaker].map(({_id})=>_id));
+            // guardianIds.push(...formFieldService[FormFlag.guardian].map(({_id})=>_id))
+            
             const event = await this.coreService.event.create({
               ...createEventDto,
               leadManager: userID,
