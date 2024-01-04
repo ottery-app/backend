@@ -1,12 +1,13 @@
 import { Controller, Get, Post, Body, Query, Param, Patch } from '@nestjs/common';
 import { ChildService } from './child.service';
 import { UserService } from '../user/user.service';
-import { DataFieldDto, IdArrayDto, id } from '@ottery/ottery-dto';
+import { DataFieldDto, IdArrayDto, ImageDto, id, inputType } from '@ottery/ottery-dto';
 import { CreateChildDto } from '@ottery/ottery-dto';
 import { SeshDocument } from '../../auth/sesh/sesh.schema';
 import { Sesh } from '../../auth/sesh/Sesh.decorator';
 import { DataController } from 'src/features/data/data.controller';
 import { DataService } from 'src/features/data/data.service';
+import { isTSExpressionWithTypeArguments } from '@babel/types';
 
 @Controller('api/child')
 export class ChildController implements DataController {
@@ -37,9 +38,21 @@ export class ChildController implements DataController {
     @Param('childId') childId: id,
     @Body() data: DataFieldDto[]
   ) {
-    const child = await this.childService.get(childId);
-    child.data = await this.dataService.update(child, data);
-    await this.childService.update(childId, child);
+
+    try {
+      const child = await this.childService.get(childId);
+      child.data = await this.dataService.update(child, data);
+      for (let i = 0; i < child.data.length; i++) {
+        if (child.data[i].type === inputType.PICTURE) {
+          const image:ImageDto = child.data[i].value;
+          child.pfp = image;
+        }
+      }
+      await this.childService.update(childId, child);
+      return "success";
+    } catch (e) {
+      return "false";
+    }
   }
 
   @Post()
