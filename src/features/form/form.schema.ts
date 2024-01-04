@@ -24,6 +24,9 @@ export class FormField {
     @Prop({required: false, default: noId})
     forEvent: id;
 
+    @Prop({required: true, default:false})
+    required: boolean;
+
     @Prop({required: true, default: false})
     permanent: boolean;
 }
