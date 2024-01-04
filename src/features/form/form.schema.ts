@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { id } from '@ottery/ottery-dto';
+import { id, noId } from '@ottery/ottery-dto';
 import { FormFlag } from './form.flag.enum';
 
 export type FormFieldDocument = FormField & Document;
@@ -18,14 +18,14 @@ export class FormField {
     @Prop({required: true})
     note: string;
 
-    @Prop({required: true, default: false})
-    permanent: boolean;
-
-    @Prop({required: true, default: false})
-    optional: boolean;
-
     @Prop({required: false, default: []})
     baseFor: FormFlag[];
+
+    @Prop({required: false, default: noId})
+    forEvent: id;
+
+    @Prop({required: true, default: false})
+    permanent: boolean;
 }
 
 export const FormFieldSchema = SchemaFactory.createForClass(FormField);

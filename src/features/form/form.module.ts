@@ -25,8 +25,9 @@ export class FormModule implements OnModuleInit {
         type: inputType.PICTURE,
         note: "This is a photo for identifying who this person is",
         permanent: true,
-        optional: false,
+        // optional: false,
         baseFor: [FormFlag.guardian, FormFlag.caretaker, FormFlag.attendee],
+        forEvent: noId,
       },
       {
         _id: noId,
@@ -34,8 +35,9 @@ export class FormModule implements OnModuleInit {
         type: inputType.PHONE,
         note: "This is the best phone number to contact this person.",
         permanent: true,
-        optional: false,
+        // optional: false,
         baseFor: [FormFlag.guardian, FormFlag.caretaker],
+        forEvent: noId,
       }
     ]);
   }

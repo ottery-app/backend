@@ -77,4 +77,14 @@ export class FormFieldService implements CrudService {
             }
         }));
     }
+
+    async addEventToCustomForms(eventId: id, formIds: id[]) {
+        await Promise.all(formIds.map(async (id)=>{
+            const form = await this.formFieldModel.findById(id);
+            if (form.permanent === false) {
+                form.forEvent = eventId;
+                await form.save();
+            }
+        }));
+    }
 }
