@@ -43,10 +43,12 @@ export class SignupController {
     @Param('eventId') eventId: id,
     @Query('childId') childId: id,
   ) {
+
+    console.log('signup attendee');
     const child = await this.coreService.child.get(childId);
     const event = await this.coreService.event.get(eventId);
     let missing = await this.dataService.getMissingFields(child, event.attendeeSignUp);
-
+    console.log(missing);
     if (missing.length) {
       throw new HttpException("Missing child data", HttpStatus.BAD_REQUEST);
     }

@@ -21,19 +21,26 @@ export class DataService {
     }
 
     async update(dataPage: DataAble, data: DataFieldDto[]) {
-        dataPage.data = dataPage.data.filter((storedData:DataFieldDto)=>
-            data.find((data)=>data.formField === storedData.formField) !== undefined
-        )
+        const filteredData = dataPage.data.filter((storedData: DataFieldDto) => {
+            for (let i = 0; i < data.length; i++) {
+                if (storedData.formField === data[i].formField) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
 
         for (let i = 0; i < data.length; i++) {
             if (data[i].type === inputType.PICTURE) {
                 const image: ImageDto = data[i].value;
                 const res = await this.imageFileService.uploadPublicFile(image.src);
                 image.src = res.url;
-                //dataPage.pfp;
             }
         }
 
-        return [...dataPage.data, ...data];
+        const res = [...filteredData, ...data];
+
+        return res;
     }
 }
