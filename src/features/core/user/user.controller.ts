@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ChildService } from '../child/child.service';
-import { DataFieldDto, IdArrayDto, ImageDto, UserInfoDto, inputType } from '@ottery/ottery-dto';
+import { DataFieldDto, IdArrayDto, ImageDto, StringDto, UserInfoDto, inputType } from '@ottery/ottery-dto';
 import { id } from '@ottery/ottery-dto';
 import { EventService } from '../event/event.service';
 import { Sesh } from '../../auth/sesh/Sesh.decorator';
@@ -55,6 +55,7 @@ export class UserController implements DataController {
       const user = await this.userService.get(userId);
       user.data = await this.dataService.update(user, data);
       for (let i = 0; i < user.data.length; i++) {
+        //TODO is this storign it into aws?
         if (user.data[i].type === inputType.PICTURE) {
           const image:ImageDto = user.data[i].value;
           user.pfp = image;
@@ -65,6 +66,28 @@ export class UserController implements DataController {
     } catch (e) {
       return "false";
     }
+  }
+
+  @Patch(":userId/firstName")
+  async updateFirstName(
+    @Param('userId') userId: id,
+    @Body() nameDto: StringDto,
+  ) {
+    const user = await this.userService.get(userId);
+    user.firstName = nameDto.string;
+    await this.userService.update(userId, user);
+    return nameDto.string;
+  }
+
+  @Patch(":userId/lastName")
+  async updateLastName(
+    @Param('userId') userId: id,
+    @Body() nameDto: StringDto,
+  ) {
+    const user = await this.userService.get(userId);
+    user.lastName = nameDto.string;
+    await this.userService.update(userId, user);
+    return nameDto.string;
   }
 
   @Post(":userId/pfp")
