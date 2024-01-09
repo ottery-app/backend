@@ -18,9 +18,13 @@ export class MessageService {
       throw new Error('Group chats are not yet supported');
     }
 
+    let uniqueUsers = chatRaw.users.filter((value, index, self) => {
+      return self.indexOf(value) === index;
+  });
+
     const chat = new this.chatModel({
       name: chatRaw.name,
-      users: chatRaw.users.map(normalizeId),
+      users: uniqueUsers.map(normalizeId),
       messages: [],
     });
 
