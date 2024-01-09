@@ -34,7 +34,6 @@ export class Event implements PermissionAble {
     @Prop({required: true})
     location: location;
 
-    //TODO this should also be able to be not children
     @Prop({required: true})
     attendees: id[]; //these are the children that are signed up
 
@@ -45,7 +44,7 @@ export class Event implements PermissionAble {
     managers: id[];
 
     @Prop({required: true})
-    volenteers: id[]; //these are the people that are signed up
+    volenteers: id[];
 
     @Prop({required: true})
     cost: currency.USD;
