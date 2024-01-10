@@ -25,6 +25,7 @@ export class UserService implements CrudService {
    * @returns a new user DTO
    */
   async create(createUserDto: CreateUserDto): Promise<User> {
+    console.log(createUserDto);
     if (await this.getByEmail(createUserDto.email)) {
       throw new HttpException(
         'User already exists with this email',

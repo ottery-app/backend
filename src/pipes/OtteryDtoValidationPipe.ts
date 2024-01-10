@@ -1,5 +1,5 @@
 import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException } from '@nestjs/common';
-import { classifyWithDto, isDto } from '@ottery/ottery-dto';
+import { classifyWithDto, isDto, trimDto } from '@ottery/ottery-dto';
 
 
 function printResults(value, meta, msg) {
@@ -46,6 +46,10 @@ export class OtteryDtoValidationPipe implements PipeTransform {
     }
 
     //printResults(print, metadata, "SUCCESS");
-    return value;
+    if (isDto(metadata.metatype)) {
+      return trimDto(value, metadata.metatype);
+    } else {
+      return value;
+    }
   }
 }

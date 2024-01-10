@@ -73,12 +73,10 @@ export class AuthController {
     @Body() createActivateDto: ActivationCodeDto,
   ) {
     try {
-      console.log(sesh);
       await this.coreService.user.activate(sesh.userId, createActivateDto.code);
       const res = await this.authService.sesh.activate(sesh);
       return res;
     } catch (e) {
-      console.log(e);
       throw e;
     }
   }

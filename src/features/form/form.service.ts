@@ -28,7 +28,6 @@ export class FormFieldService implements CrudService {
             })
         })
 
-        console.log(map)
         return map;
     }
 
@@ -44,8 +43,9 @@ export class FormFieldService implements CrudService {
         return await this.formFieldModel.findById(id);
     }
 
-    async getMany(ids:id[]): Promise<FormField[]> {
-        return await Promise.all(ids.map((id)=>this.formFieldModel.findById(id)));
+    async getMany(ids: id[]): Promise<FormField[]> {
+        const uniqueIds = Array.from(new Set(ids)); // Remove duplicates from the array of IDs
+        return await Promise.all(uniqueIds.map((id) => this.formFieldModel.findById(id)));
     }
  
     async create(customFormFieldDto: FormFieldDto & {_id?:id}) {
