@@ -8,7 +8,6 @@ function createArrayValidationPipe<T>(itemType: Type<T>): Type<PipeTransform> {
   class MixinArrayValidationPipe extends ValidationPipe implements PipeTransform {
 
     transform(values: T[], metadata: ArgumentMetadata): Promise<any[]> {
-      console.log(values, metadata);
       if (!Array.isArray(values)) {
         return values;
       }
