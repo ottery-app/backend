@@ -76,7 +76,7 @@ export class AuthController {
     @Body() createActivateDto: ActivationCodeDto,
   ) {
     try {
-      await this.permsService.requireValidAction(sesh.userId, sesh.userId, perm.EDIT);
+      //await this.permsService.requireValidAction(sesh.userId, sesh.userId, perm.EDIT);
       await this.coreService.user.activate(sesh.userId, createActivateDto.code);
       const res = await this.authService.sesh.activate(sesh);
       return res;

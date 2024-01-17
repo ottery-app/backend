@@ -32,5 +32,6 @@ import { PermsModule } from './features/auth/perms/perms.module';
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
     consumer.apply(ApiLoggerMiddleware).forRoutes('*');
+    //consumer.apply(PermMiddleware).forRoutes("*");
   }
 }

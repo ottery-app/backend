@@ -25,7 +25,7 @@ export class ChildController implements DataController {
     @Sesh() sesh: SeshDocument,
   ) {
     const child = await this.childService.get(childId);
-    await this.permsService.requireValidAction(sesh.userId, child._id, perm.READ);
+    //await this.permsService.requireValidAction(sesh.userId, child._id, perm.READ);
     return child?.data;
   }
 
@@ -36,7 +36,7 @@ export class ChildController implements DataController {
     @Sesh() sesh: SeshDocument,
   ) {
     const child  = await this.childService.get(childId);
-    await this.permsService.requireValidAction(sesh.userId, childId, perm.READ);
+    //await this.permsService.requireValidAction(sesh.userId, childId, perm.READ);
     return await this.dataService.getMissingFields(child, desired);
   }
 
@@ -57,7 +57,7 @@ export class ChildController implements DataController {
         }
       }
 
-      await this.permsService.requireValidAction(sesh.userId, child._id, perm.EDIT);
+      //await this.permsService.requireValidAction(sesh.userId, child._id, perm.EDIT);
       await this.childService.update(childId, child);
       return "success";
     } catch (e) {
@@ -95,7 +95,16 @@ export class ChildController implements DataController {
     @Sesh() sesh: SeshDocument,
   ) {
     try {
-      return (await this.childService.getMany(childIds)).filter(async (child)=>await this.permsService.validateAction(sesh.userId, child._id, perm.READ));
+      const children = await this.childService.getMany(childIds);
+
+      // let waitFor = [];
+      // for (let i = 0; i < children.length; i++) {
+      //   waitFor.push(this.permsService.requireValidAction(sesh.userId, children[i]._id, perm.READ));
+      // }
+
+      //await Promise.all(waitFor);
+
+      return children;
     } catch (e) {
       throw e;
     }

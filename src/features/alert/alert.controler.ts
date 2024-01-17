@@ -18,9 +18,6 @@ export class AlertController {
         @Param('userId') userId: id,
     ) {
         const notif = await this.alertService.getNotifs(userId);
-        
-        this.permService.requireValidAction(sesh.userId, notif._id, perm.READ);
-
         return notif.notifications;
     }
 

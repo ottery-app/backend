@@ -1,5 +1,5 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { CreateEventDto, id, UserInfoDto } from '@ottery/ottery-dto';
+import { CreateEventDto, id, UserInfoDto, perm } from '@ottery/ottery-dto';
 import { Body, Post, Query } from '@nestjs/common/decorators';
 import { compareIds } from 'src/functions/compareIds';
 import { SeshDocument } from 'src/features/auth/sesh/sesh.schema';
@@ -7,12 +7,14 @@ import { Sesh } from 'src/features/auth/sesh/Sesh.decorator';
 import { CoreService } from '../core.service';
 import { FormFieldService } from 'src/features/form/form.service';
 import { FormFlag } from 'src/features/form/form.flag.enum';
+import {PermsService} from 'src/features/auth/perms/perms.service';
 
 @Controller('api/event')
 export class EventController {
     constructor(
         private coreService: CoreService,
         private formFieldService: FormFieldService,
+        private permsService: PermsService,
     ) {}
 
     @Post()
@@ -49,6 +51,8 @@ export class EventController {
 
             await this.coreService.user.addEvent(userID, event._id);
 
+            await this.permsService.addPerms(userID, event._id, perm.SUPER);
+
             return event;
         } catch (e) {
             throw e;
@@ -56,9 +60,14 @@ export class EventController {
   }
 
   @Get(':id')
-  async get(@Param('id') id: id) {
+  async get(
+    @Param('id') id: id,
+    @Sesh() sesh: SeshDocument
+  ) {
     try {
-      return await this.coreService.event.get(id);
+      const event = await this.coreService.event.get(id);
+      //await this.permsService.requireValidAction(sesh.userId, event._id, perm.READ);
+      return event;
     } catch (e) {
       throw e;
     }
@@ -67,10 +76,19 @@ export class EventController {
   @Get()
   async getEvents(
     @Param('id') id: id,
-    @Query('ids') eventIds: id[]
+    @Query('ids') eventIds: id[],
+    @Sesh() sesh: SeshDocument,
   ) {
     try {
-      return await this.coreService.event.getMany(eventIds);
+      const events = await this.coreService.event.getMany(eventIds);
+
+      // const waitFor = [];
+      // for (let i = 0; i < events.length; i++) {
+      //   waitFor.push(this.permsService.requireValidAction(sesh.userId, events[i]._id, perm.READ));
+      // }
+
+      return events;
+
     } catch (e) {
       throw e;
     }
