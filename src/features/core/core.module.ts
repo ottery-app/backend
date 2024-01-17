@@ -22,6 +22,7 @@ import { Child, ChildSchema } from './child/child.schema';
 import { DeeplinkModule } from '../deeplink/deeplink.module';
 import { DataModule } from '../data/data.module';
 import { FormModule } from '../form/form.module';
+import { PermsService } from '../auth/perms/perms.service';
 
 @Module({
   imports: [
@@ -37,7 +38,8 @@ import { FormModule } from '../form/form.module';
     TokenModule,
     AlertModule,
     DataModule,
-    FormModule
+    FormModule,
+    PermsService,
   ],
   controllers: [UserController, EventController, ChildController],
   providers: [UserService, EventService, ChildService, CoreService],

@@ -1,59 +1,48 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { id, perm } from '@ottery/ottery-dto';
+import { Perms, PermsDocument } from './perms.schema';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
 export class PermsService {
-    constructor(){}
+    constructor(
+        @InjectModel(Perms.name) private permissionModel: Model<PermsDocument>,
+    ){}
 
-    // async create(owner: Permissions, ownee: MultiSchemeDto,  ...perms: perm[]) {
-    //     if (await this.permissionModel.findOne({ 
-    //         owner: owner,
-    //         ownee: ownee,
-    //     }).exec()) {
-    //         throw new HttpException("These two items are already linked", HttpStatus.CONFLICT);
-    //     } else {
-    //         return await new this.permissionModel({
-    //             owner: owner,
-    //             ownee: ownee,
-    //             perms: perms,
-    //         }).save();
-    //     }   
-    // }
+    async addPerms(owner: id, ownee:id, ...perms:perm[]) {
+        let permDoc = await this.permissionModel.findOne({
+            owner,
+            ownee,
+        });
 
-    // async getPermDocument(owner:MultiSchemeDto, ownee: OwneeSchemeDto) {
-    //     for (let perm of ownee.perms) {
-    //         if (perm.owner.id === owner.id) {
-    //             return await this.permissionModel.findById(perm.perms);
-    //         }
-    //     }
-    // }
+        if (!permDoc) {
+            permDoc = await new this.permissionModel({owner, ownee, perms:[]})
+        }
 
-    // async checkPermissions(owner: MultiSchemeDto, ownee: OwneeSchemeDto, ...require: perm[]) {
-    //     const permsDoc = await this.getPermDocument(owner, ownee);
-        
-    //     if (!permsDoc) {
-    //         return false;
-    //     }
+        for (let i = 0; i < perms.length; i++) {
+            if (!permDoc.perms.includes(perms[i])) {
+                permDoc.perms = [...permDoc.perms, perms[i]]
+            }
+        }
 
-    //     return require.every((requiredPerm)=>{permsDoc.perms.includes(requiredPerm)});
-    // }
+        return await permDoc.save();
+    }
 
-    // async requirePerms(owner: MultiSchemeDto, ownee: OwneeSchemeDto, ...require: perm[]) {
-    //     if (await this.checkPermissions(owner, ownee, ...require) === false) {
-    //         throw new HttpException("Lack permissions", HttpStatus.FORBIDDEN);
-    //     }
-    // }
+    async validateAction(owner:id, ownee:id, ...required:perm[]) {
+        const permDoc = await this.permissionModel.findOne({
+            owner,
+            ownee,
+        });
 
-    // async addPermissions(owner: MultiSchemeDto, ownee: OwneeSchemeDto, ...perms: perm[]) {
-    //     const permsDoc = await this.getPermDocument(owner, ownee);
+        return permDoc.perms.includes(perm.SUPER) || required
+            .map((perm)=>permDoc.perms.includes(perm))
+            .every((result=>result === true));
+    }
 
-    //     if (permsDoc) {
-    //         return await this.addPermissionsDoc(permsDoc, ...perms);
-    //     }
-    // }
-
-    // async addPermissionsDoc(doc: PermsDocument, ...perms: perm[]) {
-    //     perms = perms.filter((perm)=>!doc.perms.includes(perm));
-    //     doc.perms.push(...perms);
-    //     return await doc.save();
-    // }
+    async requireValidAction(owner:id, ownee:id, ...required:perm[]) {
+        if (!this.validateAction(owner, ownee, ...required)) {
+            throw new HttpException("User lacks permissions", HttpStatus.FORBIDDEN);
+        }
+    }
 }

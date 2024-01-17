@@ -12,9 +12,10 @@ import { AuthService } from './auth.services';
 import { PasswordResetService } from './passwordReset.service';
 import { CoreModule } from '../core/core.module';
 import { DeeplinkModule } from '../deeplink/deeplink.module';
+import { PermsModule } from './perms/perms.module';
 
 @Module({
-  imports: [CoreModule, SeshModule, CryptModule, AlertModule, TokenModule, DeeplinkModule],
+  imports: [CoreModule, SeshModule, CryptModule, AlertModule, TokenModule, DeeplinkModule, PermsModule],
   controllers: [AuthController],
   providers: [AuthService, PasswordResetService],
   exports: [AuthService],

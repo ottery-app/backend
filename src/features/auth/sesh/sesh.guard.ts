@@ -28,6 +28,9 @@ export class SeshGuard implements CanActivate {
     if (!id || id === undefined || id === null || id === "") {
       const sesh = await this.seshService.create();
       request.sesh = sesh;
+      if (!ignore) {
+        return false;
+      }
     } else if (ignore) {
       const sesh = await this.seshService.getSeshInfo(id);
       request.sesh = sesh;

@@ -2,11 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { Notification, NotificationDocument} from './notification.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { NotificationDto, id } from '@ottery/ottery-dto';
+import { NotificationDto, id, perm } from '@ottery/ottery-dto';
+import { PermsService } from 'src/features/auth/perms/perms.service';
 
 @Injectable()
 export class NotificationService {
     constructor(
+        private permService: PermsService,
         @InjectModel(Notification.name) private notificationModel: Model<NotificationDocument>,
     ){}
 
@@ -15,6 +17,8 @@ export class NotificationService {
             user:id,
             notifications:[],
         });
+
+        this.permService.addPerms(id, notif._id, perm.SUPER);
 
         return await notif.save();
     }
@@ -37,7 +41,7 @@ export class NotificationService {
     }
 
     async getNotificationsByUser(userId:id) {
-        return (await this.getDocumentByUser(userId)).notifications;
+        return (await this.getDocumentByUser(userId));
     }
 
     async markNotificationsAsRead(userId: id) {

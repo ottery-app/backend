@@ -22,6 +22,7 @@ import {
   EmailDto,
   ResetPasswordDto,
   noId,
+  perm,
 } from '@ottery/ottery-dto';
 import { Roles } from './roles/roles.decorator';
 import { UnsecureSesh } from './sesh/UnsecureSesh.decorator';
@@ -32,6 +33,7 @@ import { AuthService } from './auth.services';
 import { CreateUserDto } from '../core/user/CreateUserDto';
 import { PasswordResetService } from './passwordReset.service';
 import { CoreService } from '../core/core.service';
+import { PermsService } from './perms/perms.service';
 
 @Controller('api/auth')
 export class AuthController {
@@ -40,6 +42,7 @@ export class AuthController {
     private alertService: AlertService,
     private authService: AuthService,
     private passwordResetTokenService: PasswordResetService,
+    private permsService: PermsService,
   ) {}
 
   @Put('resend')
@@ -73,6 +76,7 @@ export class AuthController {
     @Body() createActivateDto: ActivationCodeDto,
   ) {
     try {
+      await this.permsService.requireValidAction(sesh.userId, sesh.userId, perm.EDIT);
       await this.coreService.user.activate(sesh.userId, createActivateDto.code);
       const res = await this.authService.sesh.activate(sesh);
       return res;
@@ -96,6 +100,8 @@ export class AuthController {
       const user = await this.coreService.user.create(createUserDto);
 
       this.alertService.accountActivation(user.email, user.activationCode);
+
+      await this.permsService.addPerms(user._id, user._id, perm.SUPER);
 
       return await this.authService.sesh.login(sesh, user);
     } catch (e) {
@@ -141,6 +147,7 @@ export class AuthController {
   }
 
   @Get('load')
+  @Roles(role.LOGGEDIN)
   @UnsecureSesh()
   async load(@Sesh() sesh: SeshDocument) {
     //the sesh is made in the sesh guard if it does not exist.

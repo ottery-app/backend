@@ -1,13 +1,14 @@
 import { Controller, Get, Post, Body, Query, Param, Patch } from '@nestjs/common';
 import { ChildService } from './child.service';
 import { UserService } from '../user/user.service';
-import { DataFieldDto, IdArrayDto, ImageDto, id, inputType } from '@ottery/ottery-dto';
+import { DataFieldDto, IdArrayDto, ImageDto, id, inputType, perm, role } from '@ottery/ottery-dto';
 import { CreateChildDto } from '@ottery/ottery-dto';
 import { SeshDocument } from '../../auth/sesh/sesh.schema';
 import { Sesh } from '../../auth/sesh/Sesh.decorator';
 import { DataController } from 'src/features/data/data.controller';
 import { DataService } from 'src/features/data/data.service';
 import { isTSExpressionWithTypeArguments } from '@babel/types';
+import { PermsService } from 'src/features/auth/perms/perms.service';
 
 @Controller('api/child')
 export class ChildController implements DataController {
@@ -15,28 +16,35 @@ export class ChildController implements DataController {
     private userService: UserService,
     private childService: ChildService,
     private dataService: DataService,
+    private permsService: PermsService,
   ) {}
 
   @Get(":childId/data")
   async getData(
     @Param('childId') childId: id,
+    @Sesh() sesh: SeshDocument,
   ) {
-    return (await this.childService.get(childId)).data;
+    const child = await this.childService.get(childId);
+    await this.permsService.requireValidAction(sesh.userId, child._id, perm.READ);
+    return child?.data;
   }
 
   @Get(":childId/data/missing")
   async getMissingData(
     @Param('childId') childId: id,
     @Query("desired") desired:id[],
+    @Sesh() sesh: SeshDocument,
   ) {
     const child  = await this.childService.get(childId);
+    await this.permsService.requireValidAction(sesh.userId, childId, perm.READ);
     return await this.dataService.getMissingFields(child, desired);
   }
 
   @Patch(":childId/data")
   async updateData(
     @Param('childId') childId: id,
-    @Body() data: DataFieldDto[]
+    @Body() data: DataFieldDto[],
+    @Sesh() sesh: SeshDocument,
   ) {
 
     try {
@@ -48,6 +56,8 @@ export class ChildController implements DataController {
           child.pfp = image;
         }
       }
+
+      await this.permsService.requireValidAction(sesh.userId, child._id, perm.EDIT);
       await this.childService.update(childId, child);
       return "success";
     } catch (e) {
@@ -70,6 +80,8 @@ export class ChildController implements DataController {
       //add child to user
       this.userService.addChild(sesh.userId, child._id);
 
+      await this.permsService.addPerms(sesh.userId, child._id, perm.SUPER);
+
       //update
       return child;
     } catch (e) {
@@ -78,20 +90,14 @@ export class ChildController implements DataController {
   }
 
   @Get()
-  async get(@Query('children') childIds: id[]) {
+  async get(
+    @Query('children') childIds: id[],
+    @Sesh() sesh: SeshDocument,
+  ) {
     try {
-      return await this.childService.getMany(childIds);
+      return (await this.childService.getMany(childIds)).filter(async (child)=>await this.permsService.validateAction(sesh.userId, child._id, perm.READ));
     } catch (e) {
       throw e;
     }
   }
-  
-  //NOT SURE THIS IS USED?????
-  // @Post(':childId/addGuardians')
-  // async addGuardians(@Param('childId') childId: id, @Body() body: IdArrayDto) {
-  //   const ids = (await this.userService.getMany(body.ids)).map(
-  //     (user) => user._id,
-  //   );
-  //   this.childService.addGuardians(childId, ids);
-  // }
 }
