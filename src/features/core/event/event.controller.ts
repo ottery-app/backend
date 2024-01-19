@@ -1,6 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { CreateEventDto, id, UserInfoDto, perm } from '@ottery/ottery-dto';
-import { Body, Post, Query } from '@nestjs/common/decorators';
+import { Body, Patch, Post, Query } from '@nestjs/common/decorators';
 import { compareIds } from 'src/functions/compareIds';
 import { SeshDocument } from 'src/features/auth/sesh/sesh.schema';
 import { Sesh } from 'src/features/auth/sesh/Sesh.decorator';
@@ -140,6 +140,48 @@ export class EventController {
         event.leadManager || event.managers[0],
       );
       return new UserInfoDto(owner);
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  @Patch(':eventId')
+  async update(
+    @Param('eventId') eventId: id,
+    @Body() createEventDto: CreateEventDto,
+  ) {
+    try {
+      const event = await this.coreService.event.get(eventId);
+
+      const volForms = await this.formFieldService.createMany(
+        createEventDto.volenteerSignUp,
+      );
+      const atenForms = await this.formFieldService.createMany(
+        createEventDto.attendeeSignUp,
+      );
+      const guardianForms = await this.formFieldService.createMany(
+        createEventDto.guardianSignUp,
+      );
+
+      const volIds = volForms.map(({ _id }) => _id);
+      const atenIds = atenForms.map(({ _id }) => _id);
+      const guardianIds = guardianForms.map(({ _id }) => _id);
+
+      const updatedEvent = await this.coreService.event.update(eventId, {
+        ...event,
+        ...createEventDto,
+        volenteerSignUp: volIds,
+        attendeeSignUp: atenIds,
+        guardianSignUp: guardianIds,
+      });
+
+      await this.formFieldService.addEventToCustomForms(updatedEvent._id, [
+        ...guardianIds,
+        ...atenIds,
+        ...volIds,
+      ]);
+
+      return updatedEvent;
     } catch (e) {
       throw e;
     }
