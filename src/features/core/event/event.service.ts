@@ -28,9 +28,14 @@ export class EventService implements CrudService {
 
   async update(eventId: id, event: Event) {
     // overwrite is false so only modified fields are updated
-    return await this.eventModel
-      .findByIdAndUpdate(eventId, event)
-      .setOptions({ overwrite: false, new: true });
+    // return await this.eventModel
+    //   .findByIdAndUpdate(eventId, event)
+    //   .setOptions({ overwrite: false, new: true });
+
+    const eventDoc = await this.eventModel.findById(eventId);
+    Object.keys(event).forEach((key) => (eventDoc[key] = event[key]));
+    eventDoc.save();
+    return eventDoc;
   }
 
   async get(id: id) {
